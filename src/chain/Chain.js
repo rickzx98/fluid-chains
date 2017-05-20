@@ -2,6 +2,7 @@ import { ChainStorage, putChain } from './ChainStorage';
 
 import ChainContext from './ChainContext';
 import lodash from 'lodash';
+import sizeOf from 'object-sizeof';
 
 const STATUS_IN_PROGRESS = 'IN_PROGRESS';
 const STATUS_UNTOUCHED = 'UNTOUCHED';
@@ -67,6 +68,10 @@ export default class Chain {
                 errorHandler: error
             }
         };
+    }
+
+    size() {
+        return sizeOf(this);
     }
 
 }

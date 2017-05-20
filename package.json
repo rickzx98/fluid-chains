@@ -1,7 +1,7 @@
 {
   "name": "fluid-chains",
-  "version": "1.0.0",
-  "description": "A better way to execute processes",
+  "version": "0.1.0",
+  "description": "Just a better way to execute actions in sequence",
   "main": "dist/index.js",
   "scripts": {
     "babel-node": "node_modules/.bin/babel-node",
@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "object-sizeof": "^1.2.0"
   }
 }
