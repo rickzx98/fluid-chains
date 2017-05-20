@@ -1,4 +1,4 @@
-import { Chain } from '../../src';
+import { Chain } from 'fluid-chains';
 
 export default class SayHelloWorld extends Chain {
     constructor() {

@@ -1,4 +1,4 @@
-import { ExecuteChain } from '../../src/';
+import { ExecuteChain } from 'fluid-chains';
 import SayHelloWorld from './SayHelloWorld';
 
 ExecuteChain('SayHelloWorld', {}, () => {

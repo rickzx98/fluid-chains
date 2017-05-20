@@ -10,7 +10,6 @@
     "prestart": "babel src --out-dir dist",
     "start": "node dist/index.js",
     "compile": "babel src --out-dir dist",
-    "compile-examples":"babel examples --out-dir dist-examples",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "test": "npm run compile && mocha --compilers js:babel-core/register"
   },
