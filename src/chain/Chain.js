@@ -10,7 +10,7 @@ const STATUS_DONE = 'DONE';
 const STATUS_FAILED = 'FAILED';
 const STATUS_TERMINATED = 'TERMINATED';
 
-export default class Chain {
+export class CH {
 
     constructor(name, action, next, error) {
         validate(name, action);
@@ -74,6 +74,24 @@ export default class Chain {
         return sizeOf(this);
     }
 
+}
+
+export const Execute = (name, param, done) => {
+    if (!ChainStorage[name]) {
+        throw new Error('Chain ' + name + ' does not exist.');
+    }
+    let context = new ChainContext('starter');
+    if (param) {
+        const keys = lodash.keys(param);
+        keys.forEach(key => {
+            const val = lodash.get(param, key);
+            if (val instanceof Function) {
+                throw new Error('Param must not contain functions');
+            }
+            context.set(key, val);
+        });
+    }
+    ChainStorage[name]().execute(done, context);
 }
 
 function validate(name, action) {

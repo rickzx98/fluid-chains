@@ -1,12 +1,50 @@
 import 'babel-polyfill';
 
-import { Chain } from '../../../src/';
+import { Chain, ExecuteChain } from '../../../src/';
+
 import { ChainStorage } from '../../../src/chain/ChainStorage';
 import chai from 'chai';
 
 const expect = chai.expect;
 
 describe('Chain Unit', () => {
+    describe('execute', () => {
+        it('should execute a specific chain', (done) => {
+            new Chain('hello', (context, param, next) => {
+                context.set('saidHello', true);
+                next();
+            });
+            ExecuteChain('hello', {}, (context) => {
+                expect(context.$owner()).to.be.equal('hello');
+                expect(context.saidHello).to.be.defined;
+                done();
+            });
+        });
+        it('should get the param value as ChainContext', (done) => {
+            new Chain('hello', (context, param, next) => {
+                context.set('saidHello', true);
+                expect(param.hey).to.be.defined;
+                expect(param.hey()).to.be.equal('daydreamer');
+                next();
+            });
+            ExecuteChain('hello', { hey: 'daydreamer' }, (context) => {
+                expect(context.$owner()).to.be.equal('hello');
+                expect(context.saidHello).to.be.defined;
+                done();
+            });
+        });
+        it('should throw an error if param contains functions', () => {
+            new Chain('hello', (context, param, next) => {
+                context.set('saidHello', true);
+                next();
+            });
+            expect(() => {
+                ExecuteChain('hello', { hi: () => { } }, (context) => {
+                });
+            }).to.throws();
+
+        });
+    })
     describe('constructor', () => {
         it('should compute its size', () => {
             const chain = new Chain('sample', () => {

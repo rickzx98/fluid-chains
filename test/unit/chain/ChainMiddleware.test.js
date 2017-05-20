@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 
-import { CH as ChainMiddleware, RunMiddleware } from '../../../src/chain/ChainMiddleware';
+import { CM as ChainMiddleware, RunMiddleware } from '../../../src/chain/ChainMiddleware';
 
 import chai from 'chai';
 

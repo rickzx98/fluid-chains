@@ -3,15 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ChaimMiddleware = exports.Chain = undefined;
-
-var _ChainMiddleware = require('./chain/ChainMiddleware');
+exports.ExecuteChain = exports.ChaimMiddleware = exports.Chain = undefined;
 
 var _Chain = require('./chain/Chain');
 
-var _Chain2 = _interopRequireDefault(_Chain);
+var _ChainMiddleware = require('./chain/ChainMiddleware');
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Chain = exports.Chain = _Chain2.default;
-var ChaimMiddleware = exports.ChaimMiddleware = _ChainMiddleware.CH;
+var Chain = exports.Chain = _Chain.CH;
+var ChaimMiddleware = exports.ChaimMiddleware = _ChainMiddleware.CM;
+var ExecuteChain = exports.ExecuteChain = _Chain.Execute;

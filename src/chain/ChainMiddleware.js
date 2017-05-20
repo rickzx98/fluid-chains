@@ -3,7 +3,7 @@ import { getMiddlewares, putChain } from './ChainStorage';
 import ChainContext from './ChainContext';
 import lodash from 'lodash';
 
-export class CH {
+export class CM {
     constructor(name, action) {
         validate(name, action);
         this.type = 'MIDDLEWARE';

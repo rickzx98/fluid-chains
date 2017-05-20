@@ -1,5 +1,7 @@
-import { CH } from './chain/ChainMiddleware';
-import ch from './chain/Chain';
+import { CH, Execute } from './chain/Chain';
 
-export const Chain = ch;
-export const ChaimMiddleware = CH;
+import { CM } from './chain/ChainMiddleware';
+
+export const Chain = CH;
+export const ChaimMiddleware = CM;
+export const ExecuteChain = Execute;

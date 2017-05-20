@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Execute = exports.CH = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -30,9 +31,9 @@ var STATUS_DONE = 'DONE';
 var STATUS_FAILED = 'FAILED';
 var STATUS_TERMINATED = 'TERMINATED';
 
-var Chain = function () {
-    function Chain(name, action, next, error) {
-        _classCallCheck(this, Chain);
+var CH = exports.CH = function () {
+    function CH(name, action, next, error) {
+        _classCallCheck(this, CH);
 
         validate(name, action);
         var status = STATUS_UNTOUCHED;
@@ -93,18 +94,33 @@ var Chain = function () {
         };
     }
 
-    _createClass(Chain, [{
+    _createClass(CH, [{
         key: 'size',
         value: function size() {
             return (0, _objectSizeof2.default)(this);
         }
     }]);
 
-    return Chain;
+    return CH;
 }();
 
-exports.default = Chain;
-
+var Execute = exports.Execute = function Execute(name, param, done) {
+    if (!_ChainStorage.ChainStorage[name]) {
+        throw new Error('Chain ' + name + ' does not exist.');
+    }
+    var context = new _ChainContext2.default('starter');
+    if (param) {
+        var keys = _lodash2.default.keys(param);
+        keys.forEach(function (key) {
+            var val = _lodash2.default.get(param, key);
+            if (val instanceof Function) {
+                throw new Error('Param must not contain functions');
+            }
+            context.set(key, val);
+        });
+    }
+    _ChainStorage.ChainStorage[name]().execute(done, context);
+};
 
 function validate(name, action) {
     if (!name) {

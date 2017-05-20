@@ -8,6 +8,9 @@ export default class ChainContext {
         this.set('$owner', name);
     }
     set(name, value) {
+        if(value instanceof Function){
+            throw new Error('Function cannot be set as value');
+        }
         lodash.set(this, name, () => lodash.clone(value));
     }
 }

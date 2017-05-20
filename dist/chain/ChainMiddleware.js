@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.RunMiddleware = exports.CH = undefined;
+exports.RunMiddleware = exports.CM = undefined;
 
 var _ChainStorage = require('./ChainStorage');
 
@@ -19,8 +19,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var CH = exports.CH = function CH(name, action) {
-    _classCallCheck(this, CH);
+var CM = exports.CM = function CM(name, action) {
+    _classCallCheck(this, CM);
 
     validate(name, action);
     this.type = 'MIDDLEWARE';

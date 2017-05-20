@@ -27,6 +27,9 @@ var ChainContext = function () {
     _createClass(ChainContext, [{
         key: 'set',
         value: function set(name, value) {
+            if (value instanceof Function) {
+                throw new Error('Function cannot be set as value');
+            }
             _lodash2.default.set(this, name, function () {
                 return _lodash2.default.clone(value);
             });
