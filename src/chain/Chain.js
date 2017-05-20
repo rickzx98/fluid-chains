@@ -103,7 +103,7 @@ export const Execute = (name, param, done) => {
     ChainStorage[name]().execute(done, context);
 };
 
-class ChainSpec {
+export class ChainSpec {
     constructor(field, required, customValidator) {
         if (customValidator && !(customValidator instanceof Function)) {
             throw new Error('customValidator must be a Function instance.');
