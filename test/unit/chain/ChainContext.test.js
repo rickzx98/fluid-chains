@@ -6,11 +6,11 @@ import assert from 'assert';
 
 describe('ChainContext Unit', () => {
     describe('constructor', () => {
-        it('should have owner', () => {
+        it('should have $owner', () => {
             const context = new ChainContext('sample');
-            assert(context.owner() === 'sample');
+            assert(context.$owner() === 'sample');
         });
-        it('should throw error if owner is not specified', () => {
+        it('should throw error if $owner is not specified', () => {
             expect(ChainContext).to.throw();
         });
     });
@@ -25,6 +25,12 @@ describe('ChainContext Unit', () => {
             const context = new ChainContext('sample');
             context.set('hello', 'hi');
             assert(context.hello() === 'hi');
+        });
+        it('should not be mutated', ()=> {
+            const context = new ChainContext('sample');
+            context.set('hello', {remark: 'hi'});
+            context.hello().remark = 'hello';
+            assert(context.hello().remark === 'hi');
         });
     });
 });

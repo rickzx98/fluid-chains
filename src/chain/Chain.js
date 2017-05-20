@@ -1,51 +1,72 @@
 import ChainContext from './ChainContext';
 import { putChain, ChainStorage } from './ChainStorage';
+import lodash from 'lodash';
+const STATUS_IN_PROGRESS = 'IN_PROGRESS';
+const STATUS_UNTOUCHED = 'UNTOUCHED';
+const STATUS_DONE = 'DONE';
+const STATUS_FAILED = 'FAILED';
+const STATUS_TERMINATED = 'TERMINATED';
 
 export default class Chain {
+
     constructor(name, action, next, error) {
         validate(action);
-        this.name = name;
-        this.action = action;
-        this.next = next;
-        this.context = new ChainContext(name);
+        let status = STATUS_UNTOUCHED;
+        const context = new ChainContext(name);
         if (error) {
-            this.context.set('$error', error);
+            context.set('$error', error);
         }
         putChain(name, this);
-    }
-
-    execute(done, param) {
-        if ((param && param.$error) && !this.context.$error) {
-            this.context.set('$error', param.$error());
-        }
-        if (this.context.$isTerminated && this.context.$isTerminated()) {
-            done(this.context);
-        } else {
-            setTimeout(() => {
-                try {
-                    this.action(this.context, param, () => {
-                        if (this.next) {
-                            ChainStorage[this.next]().execute(done, this.context);
+        this.terminate = ()=> {
+            context.set('$isTerminated', true);
+        };
+        this.execute = (done, param)=> {
+            status = STATUS_IN_PROGRESS;
+            if ((param && param.$error) && !context.$error) {
+                context.set('$error', param.$error());
+            }
+            if (context.$isTerminated && context.$isTerminated()) {
+                status = STATUS_TERMINATED;
+                done(context);
+            } else {
+                lodash.defer(() => {
+                    try {
+                        action(context, param, () => {
+                            if (next) {
+                                ChainStorage[next]().execute(done, context);
+                            } else {
+                                done(context);
+                            }
+                            status = STATUS_DONE;
+                        });
+                    } catch (err) {
+                        status = STATUS_FAILED;
+                        if (context.$error) {
+                            context.set('$errorMessage', err);
+                            context.set('$name', name);
+                            ChainStorage[context.$error()]().execute(done, context);
                         } else {
-                            done(this.context);
+                            done({
+                                $error: ()=>err
+                            });
                         }
-                    });
-                } catch (err) {
-                    if (this.context.$error) {
-                        this.context.set('$errorMessage', err);
-                        this.context.set('$name', this.name);
-                        ChainStorage[this.context.$error()]().execute(done, this.context);
-                    } else {
-                        throw err;
                     }
-                }
-            });
-        }
+                });
+            }
+        };
+        this.status = ()=> {
+            return status;
+        };
+        this.info = ()=> {
+            return {
+                name: name,
+                status: status,
+                next: next,
+                errorHandler: error
+            }
+        };
     }
 
-    terminate() {
-        this.context.set('$isTerminated', true);
-    }
 }
 
 function validate(action) {
