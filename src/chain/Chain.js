@@ -1,6 +1,8 @@
+import { ChainStorage, putChain } from './ChainStorage';
+
 import ChainContext from './ChainContext';
-import { putChain, ChainStorage } from './ChainStorage';
 import lodash from 'lodash';
+
 const STATUS_IN_PROGRESS = 'IN_PROGRESS';
 const STATUS_UNTOUCHED = 'UNTOUCHED';
 const STATUS_DONE = 'DONE';
@@ -10,17 +12,17 @@ const STATUS_TERMINATED = 'TERMINATED';
 export default class Chain {
 
     constructor(name, action, next, error) {
-        validate(action);
+        validate(name, action);
         let status = STATUS_UNTOUCHED;
         const context = new ChainContext(name);
         if (error) {
             context.set('$error', error);
         }
         putChain(name, this);
-        this.terminate = ()=> {
+        this.terminate = () => {
             context.set('$isTerminated', true);
         };
-        this.execute = (done, param)=> {
+        this.execute = (done, param) => {
             status = STATUS_IN_PROGRESS;
             if ((param && param.$error) && !context.$error) {
                 context.set('$error', param.$error());
@@ -47,17 +49,17 @@ export default class Chain {
                             ChainStorage[context.$error()]().execute(done, context);
                         } else {
                             done({
-                                $error: ()=>err
+                                $error: () => err
                             });
                         }
                     }
                 });
             }
         };
-        this.status = ()=> {
+        this.status = () => {
             return status;
         };
-        this.info = ()=> {
+        this.info = () => {
             return {
                 name: name,
                 status: status,
@@ -69,7 +71,10 @@ export default class Chain {
 
 }
 
-function validate(action) {
+function validate(name, action) {
+    if (!name) {
+        throw new Error('Name is required.');
+    }
     if (!action) {
         throw new Error('Action (Function) is required.');
     }
