@@ -24,6 +24,7 @@ export class CH {
             context.set('$isTerminated', true);
         };
         this.execute = (done, param) => {
+            context.validate();
             status = STATUS_IN_PROGRESS;
             if ((param && param.$error) && !context.$error) {
                 context.set('$error', param.$error());
@@ -92,7 +93,7 @@ export const Execute = (name, param, done) => {
         });
     }
     ChainStorage[name]().execute(done, context);
-}
+};
 
 function validate(name, action) {
     if (!name) {

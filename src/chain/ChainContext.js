@@ -13,4 +13,11 @@ export default class ChainContext {
         }
         lodash.set(this, name, () => lodash.clone(value));
     }
+    spec(data){
+
+    }
+    validate(){
+
+    }
+
 }
