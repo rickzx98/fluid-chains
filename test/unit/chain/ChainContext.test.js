@@ -8,6 +8,9 @@ const expect = chai.expect;
 
 
 describe('ChainContext Unit', () => {
+    describe('validator', () => {
+
+    });
     describe('constructor', () => {
         it('should have $owner', () => {
             const context = new ChainContext('sample');

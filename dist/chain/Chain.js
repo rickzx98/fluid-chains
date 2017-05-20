@@ -33,11 +33,14 @@ var STATUS_TERMINATED = 'TERMINATED';
 
 var CH = exports.CH = function () {
     function CH(name, action, next, error) {
+        var _this = this;
+
         _classCallCheck(this, CH);
 
         validate(name, action);
         var status = STATUS_UNTOUCHED;
         var context = new _ChainContext2.default(name);
+        this.spec = [];
         if (error) {
             context.set('$error', error);
         }
@@ -47,6 +50,9 @@ var CH = exports.CH = function () {
         };
         this.execute = function (done, param) {
             status = STATUS_IN_PROGRESS;
+            if (param) {
+                param.validate();
+            }
             if (param && param.$error && !context.$error) {
                 context.set('$error', param.$error());
             }
@@ -92,6 +98,11 @@ var CH = exports.CH = function () {
                 errorHandler: error
             };
         };
+        this.addSpec = function (field, required, customValidator) {
+            var spec = new ChainSpec(field, required, customValidator);
+            _this.spec.push(spec);
+            context.addValidator(spec);
+        };
     }
 
     _createClass(CH, [{
@@ -120,6 +131,24 @@ var Execute = exports.Execute = function Execute(name, param, done) {
         });
     }
     _ChainStorage.ChainStorage[name]().execute(done, context);
+};
+
+var ChainSpec = function ChainSpec(field, required, customValidator) {
+    _classCallCheck(this, ChainSpec);
+
+    if (customValidator && !(customValidator instanceof Function)) {
+        throw new Error('customValidator must be a Function instance.');
+    }
+    this.field = field;
+    this.required = required;
+    this.validate = function (context) {
+        if (required && (!context[field] || context[field]() === '')) {
+            throw new Error('Field ' + field + ' is required.');
+        }
+        if (customValidator && context[field]) {
+            customValidator(context[field]());
+        }
+    };
 };
 
 function validate(name, action) {

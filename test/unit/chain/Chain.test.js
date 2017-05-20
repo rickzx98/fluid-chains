@@ -8,6 +8,18 @@ import chai from 'chai';
 const expect = chai.expect;
 
 describe('Chain Unit', () => {
+    describe('spec', () => {
+        it('should add spec', () => {
+            const chain = new Chain('hello', (context, param, next) => {
+                context.set('saidHello', true);
+                next();
+            });
+            chain.addSpec('sample', true, () => { });
+            expect(chain.spec).to.be.defined;
+            expect(chain.spec.length).to.be.defined;
+            expect(chain.spec[0].field).to.be.equal('sample');
+        });
+    });
     describe('execute', () => {
         it('should execute a specific chain', (done) => {
             new Chain('hello', (context, param, next) => {

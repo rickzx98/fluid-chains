@@ -16,6 +16,7 @@ export class CH {
         validate(name, action);
         let status = STATUS_UNTOUCHED;
         const context = new ChainContext(name);
+        this.spec = [];
         if (error) {
             context.set('$error', error);
         }
@@ -24,8 +25,10 @@ export class CH {
             context.set('$isTerminated', true);
         };
         this.execute = (done, param) => {
-            context.validate();
             status = STATUS_IN_PROGRESS;
+            if (param) {
+                param.validate();
+            }
             if ((param && param.$error) && !context.$error) {
                 context.set('$error', param.$error());
             }
@@ -69,6 +72,11 @@ export class CH {
                 errorHandler: error
             }
         };
+        this.addSpec = (field, required, customValidator) => {
+            const spec = new ChainSpec(field, required, customValidator);
+            this.spec.push(spec);
+            context.addValidator(spec);
+        }
     }
 
     size() {
@@ -94,6 +102,24 @@ export const Execute = (name, param, done) => {
     }
     ChainStorage[name]().execute(done, context);
 };
+
+class ChainSpec {
+    constructor(field, required, customValidator) {
+        if (customValidator && !(customValidator instanceof Function)) {
+            throw new Error('customValidator must be a Function instance.');
+        }
+        this.field = field;
+        this.required = required;
+        this.validate = (context) => {
+            if (required && (!context[field] || context[field]() === '')) {
+                throw new Error('Field ' + field + ' is required.');
+            }
+            if (customValidator && context[field]) {
+                customValidator(context[field]());
+            }
+        }
+    }
+}
 
 function validate(name, action) {
     if (!name) {

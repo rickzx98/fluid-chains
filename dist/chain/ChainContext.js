@@ -16,12 +16,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var ChainContext = function () {
     function ChainContext(name) {
+        var _this = this;
+
         _classCallCheck(this, ChainContext);
 
+        var validators = [];
         if (!name) {
             throw new Error('Owner name is required.');
         }
         this.set('$owner', name);
+        this.addValidator = function (fieldSpec) {
+            validators.push(fieldSpec);
+        };
+        this.validate = function () {
+            validators.forEach(function (validator) {
+                return validator.validate(_this);
+            });
+        };
     }
 
     _createClass(ChainContext, [{
