@@ -73,7 +73,7 @@ var CH = exports.CH = function () {
                     } catch (err) {
                         status = STATUS_FAILED;
                         if (context.$error) {
-                            context.set('$errorMessage', err);
+                            context.set('$errorMessage', err.message);
                             context.set('$name', name);
                             _ChainStorage.ChainStorage[context.$error()]().execute(done, context);
                         } else {
