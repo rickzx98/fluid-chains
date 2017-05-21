@@ -117,7 +117,7 @@ new Chain('firstErrorHandler', (context, param, next) => {
     */
 });
 ```
-Note: You can put an error handler to each chain otherwise it will be thrown to the nearest error handler of its previous chain.
+Note: You can place an error handler for each chain otherwise it will be thrown to the nearest error handler of its previous chain.
 
 ```
 new Chain('firstChain', (context, param, next) => {
