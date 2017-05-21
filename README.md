@@ -1,6 +1,6 @@
 # Fluid-chains
 
-Just a simple way to process actions in sequence
+Just a simple way to process actions in sequence.
 
 ## Getting Started
 
@@ -11,11 +11,22 @@ These instructions will get you a copy of the project up and running on your loc
 ```
 npm install --save fluid-chains
 ```
-
-And repeat
+then import it to your (ES6) javascript file
 
 ```
-until finished
+import {Chain, ExecuteChain} from 'fluid-chains';
+
+new Chain('FindPeople', (context, param, next) => {
+    const people = ['john','jane','sam'];
+    context.set('people', people.filter((person) => person === param.filterBy()));
+    next();
+});
+
+ExecuteChain('FindPeople', {filterBy: 'jane'}, (result) => {
+   const people = result.people();;
+   console.log('people', people);
+});
+
 ```
 
 End with an example of getting some data out of the system or using it for a little demo
