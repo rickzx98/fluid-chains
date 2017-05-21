@@ -11,23 +11,76 @@ These instructions will get you a copy of the project up and running on your loc
 ```
 npm install --save fluid-chains
 ```
-then import it to your (ES6) javascript file
 
 ```
-import {Chain, ExecuteChain} from 'fluid-chains';
+import {Chain} from 'fluid-chains';
+```
 
+### Creating your first chain
+
+```
 new Chain('FindPeople', (context, param, next) => {
     const people = ['john','jane','sam'];
     context.set('people', people.filter((person) => person === param.filterBy()));
     next();
 });
+```
+
+### Starting the chain
+
+```
+import {ExecuteChain} from 'fluid-chains';
 
 ExecuteChain('FindPeople', {filterBy: 'jane'}, (result) => {
    const people = result.people();;
    console.log('people', people);
 });
+```
+
+### Creating chain sequence
 
 ```
+import {Chain, ExecuteChain} from 'fluid-chains';
+
+new Chain('firstChain', (context, param, next) => {
+    /* 
+        context.set(key, value) will set param value of the 
+        next chain. 
+    */ 
+
+    if (param.name){
+        context.set('remarksTo', param.name());
+    } else {
+        context.set('remarksTo','everyone');
+    }
+
+    next(); /* call to proceed to the next chain. Good for asynchronous callbacks */
+
+}, 'secondChain' /* name of the next chain */); 
+
+new Chain('secondChain', (context, param, next) => { 
+
+    /* 
+        the context value of the previous chain can
+        be accessed with param.{field}() and it's always
+        a Function.
+    */
+
+    context.set('remarks','Hello, '+param.remarksTo()+'!');
+
+    next(); /* not calling next() will break the chain and will not trigger the callback below.*/
+});
+
+ExecuteChain('firstChain', (result) => {
+    /* 
+        This will run because you call next()
+        from the last chain.
+    */
+    console.log(result.remarks());
+});
+```
+Note: You cannot put Function as a value in context.set(key, value). You can put value and object.
+
 ## Running the tests
 
 To run the test just clone the project and install everything with 
