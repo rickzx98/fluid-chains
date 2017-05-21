@@ -29,43 +29,25 @@ ExecuteChain('FindPeople', {filterBy: 'jane'}, (result) => {
 
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
-
 ## Running the tests
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
+To run the test just clone the project and install everything with 
+```
+   npm install
 
 ```
-Give an example
+then run 
+```
+   npm test
 ```
 
-### And coding style tests
+### Examples
 
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
+* [Examples](https://github.com/rickzx98/fluid-chains/tree/master/examples) 
 
 ## Built With
 
 * [Babel](https://babeljs.io/) - A javascript compiler.
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
 
 ## Authors
 
@@ -76,9 +58,3 @@ See also the list of [contributors](https://github.com/rickzx98/fluid-chains/con
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
