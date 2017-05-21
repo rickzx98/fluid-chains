@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.Execute = exports.CH = undefined;
+exports.ChainSpec = exports.Execute = exports.CH = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -133,7 +133,7 @@ var Execute = exports.Execute = function Execute(name, param, done) {
     _ChainStorage.ChainStorage[name]().execute(done, context);
 };
 
-var ChainSpec = function ChainSpec(field, required, customValidator) {
+var ChainSpec = exports.ChainSpec = function ChainSpec(field, required, customValidator) {
     _classCallCheck(this, ChainSpec);
 
     if (customValidator && !(customValidator instanceof Function)) {
@@ -146,7 +146,11 @@ var ChainSpec = function ChainSpec(field, required, customValidator) {
             throw new Error('Field ' + field + ' is required.');
         }
         if (customValidator && context[field]) {
-            customValidator(context[field]());
+            customValidator(context[field](), function (valid, message) {
+                if (!valid) {
+                    throw new Error(message || 'Validation failed for field ' + field);
+                }
+            });
         }
     };
 };

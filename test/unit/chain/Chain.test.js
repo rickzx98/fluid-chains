@@ -53,7 +53,7 @@ describe('Chain Unit', () => {
             expect(() => {
                 ExecuteChain('hello', { hi: () => { } }, (context) => {
                 });
-            }).to.throws();
+            }).to.throw(Error);
 
         });
     })
@@ -64,7 +64,7 @@ describe('Chain Unit', () => {
             console.log('chain', chain.size() + ' bytes');
         });
         it('should throw an error when Action is undefined', () => {
-            expect(Chain).to.throw();
+            expect(Chain).to.throw(Error);
         });
         it('should return UNTOUCHED as the initial status', () => {
             const chain = new Chain('sample', () => {

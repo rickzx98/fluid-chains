@@ -1,6 +1,7 @@
 import 'babel-polyfill';
 
 import ChainContext from '../../../src/chain/ChainContext';
+import { ChainSpec } from '../../../src/chain/Chain';
 import assert from 'assert';
 import chai from 'chai';
 
@@ -9,7 +10,25 @@ const expect = chai.expect;
 
 describe('ChainContext Unit', () => {
     describe('validator', () => {
-
+        it('should throw error if required field is empty', () => {
+            const spec = new ChainSpec('sampleField', true);
+            expect(() => {
+                const context = new ChainContext('sample');
+                context.addValidator(spec);
+                context.validate();
+            }).to.throw('Field sampleField is required.');
+        });
+        it('should throw error if custom validation field', () => {
+            const spec = new ChainSpec('sampleField', true, (value, valid) => {
+                valid(value === 'hi', 'Value is not hi.');
+            });
+            expect(() => {
+                const context = new ChainContext('sample');
+                context.set('sampleField', 'hello');
+                context.addValidator(spec);
+                context.validate();
+            }).to.throw('Value is not hi.');
+        });
     });
     describe('constructor', () => {
         it('should have $owner', () => {
@@ -17,7 +36,7 @@ describe('ChainContext Unit', () => {
             assert(context.$owner() === 'sample');
         });
         it('should throw error if $owner is not specified', () => {
-            expect(ChainContext).to.throw();
+            expect(ChainContext).to.throw(Error);
         });
     });
 
@@ -42,7 +61,7 @@ describe('ChainContext Unit', () => {
             const context = new ChainContext('sample');
             expect(() => {
                 context.set('tryFunction', () => { });
-            }).to.throws();
+            }).to.throw(Error);
         });
     });
 });

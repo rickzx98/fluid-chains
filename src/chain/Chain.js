@@ -115,7 +115,11 @@ export class ChainSpec {
                 throw new Error('Field ' + field + ' is required.');
             }
             if (customValidator && context[field]) {
-                customValidator(context[field]());
+                customValidator(context[field](), (valid, message) => {
+                    if (!valid) {
+                        throw new Error(message || 'Validation failed for field ' + field);
+                    }
+                });
             }
         }
     }
