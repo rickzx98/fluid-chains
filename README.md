@@ -28,19 +28,16 @@ ExecuteChain('FindPeople', {filterBy: 'jane'}, (result) => {
 });
 
 ```
-
 ## Running the tests
 
 To run the test just clone the project and install everything with 
 ```
-   npm install
-
+npm install
 ```
 then run 
 ```
-   npm test
+npm test
 ```
-
 ### Examples
 
 * [Examples](https://github.com/rickzx98/fluid-chains/tree/master/examples) 
@@ -51,7 +48,7 @@ then run
 
 ## Authors
 
-* **Jerico de Guzman** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Jerico de Guzman** 
 
 See also the list of [contributors](https://github.com/rickzx98/fluid-chains/contributors) who participated in this project.
 
