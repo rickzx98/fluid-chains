@@ -19,8 +19,7 @@ var SayHelloWorldErrorHandler = function (_Chain) {
         _classCallCheck(this, SayHelloWorldErrorHandler);
 
         return _possibleConstructorReturn(this, (SayHelloWorldErrorHandler.__proto__ || Object.getPrototypeOf(SayHelloWorldErrorHandler)).call(this, 'SayHelloWorldErrorHandler', function (context, param, next) {
-            console.log('param.$errorMessage()', param.$errorMessage());
-            console.log('An error has occured in chain ' + param.$name() + '. Error message: ' + param.$errorMessage().message);
+            console.log('An error has occured in chain ' + param.$name() + '. Error message: ' + param.$errorMessage());
             next();
         }));
     }
