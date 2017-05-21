@@ -1,6 +1,8 @@
 import { ExecuteChain } from 'fluid-chains';
 import SayHelloWorld from './SayHelloWorld';
 
+new SayHelloWorld();
+
 ExecuteChain('SayHelloWorld', {}, () => {
     console.log('executed without a name.');
 });
