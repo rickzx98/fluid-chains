@@ -48,7 +48,7 @@ npm test
 
 ## Authors
 
-* **Jerico de Guzman** 
+* **Jerico de Guzman** - [LinkedIn](https://www.linkedin.com/in/jerico-de-guzman-35126657)
 
 See also the list of [contributors](https://github.com/rickzx98/fluid-chains/contributors) who participated in this project.
 
