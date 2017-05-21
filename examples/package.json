@@ -20,6 +20,6 @@
     "babel-preset-es2015": "^6.24.1"
   },
   "dependencies": {
-    "fluid-chains": "^0.1.6"
+    "fluid-chains": "^0.1.0"
   }
 }
