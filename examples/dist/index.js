@@ -1,5 +1,9 @@
 'use strict';
 
+var _middlewares = require('./middlewares/');
+
+var _middlewares2 = _interopRequireDefault(_middlewares);
+
 var _multipleChains = require('./multiple-chains/');
 
 var _multipleChains2 = _interopRequireDefault(_multipleChains);

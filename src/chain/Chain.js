@@ -1,6 +1,7 @@
 import { ChainStorage, putChain } from './ChainStorage';
 
 import ChainContext from './ChainContext';
+import { RunMiddleware } from './ChainMiddleware';
 import lodash from 'lodash';
 import sizeOf from 'object-sizeof';
 
@@ -26,40 +27,50 @@ export class CH {
         };
         this.execute = (done, param) => {
             status = STATUS_IN_PROGRESS;
-            if (param) {
-                param.validate();
-            }
-            if ((param && param.$error) && !context.$error) {
-                context.set('$error', param.$error());
-            }
-            if (context.$isTerminated && context.$isTerminated()) {
-                status = STATUS_TERMINATED;
-                done(context);
-            } else {
-                lodash.defer(() => {
-                    try {
-                        action(context, param, () => {
-                            if (next) {
-                                ChainStorage[next]().execute(done, context);
-                            } else {
-                                done(context);
-                            }
-                            status = STATUS_DONE;
-                        });
-                    } catch (err) {
-                        status = STATUS_FAILED;
-                        if (context.$error) {
-                            context.set('$errorMessage', err.message);
-                            context.set('$name', name);
-                            ChainStorage[context.$error()]().execute(done, context);
-                        } else {
-                            done({
-                                $error: () => err
-                            });
-                        }
+            RunMiddleware(param, (errMiddleware) => {
+                if (errMiddleware) {
+                    done({
+                        $error: () => errMiddleware,
+                        $errorMessage: () => errMiddleware && errMiddleware.message
+                    });
+                } else {
+                    if (param) {
+                        param.validate();
                     }
-                });
-            }
+                    if ((param && param.$error) && !context.$error) {
+                        context.set('$error', param.$error());
+                    }
+                    if (context.$isTerminated && context.$isTerminated()) {
+                        status = STATUS_TERMINATED;
+                        done(context);
+                    } else {
+                        lodash.defer(() => {
+                            try {
+                                action(context, param, () => {
+                                    if (next) {
+                                        ChainStorage[next]().execute(done, context);
+                                    } else {
+                                        done(context);
+                                    }
+                                    status = STATUS_DONE;
+                                });
+                            } catch (err) {
+                                status = STATUS_FAILED;
+                                if (context.$error) {
+                                    context.set('$errorMessage', err.message);
+                                    context.set('$name', name);
+                                    ChainStorage[context.$error()]().execute(done, context);
+                                } else {
+                                    done({
+                                        $error: () => err
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+
+            });
         };
         this.status = () => {
             return status;

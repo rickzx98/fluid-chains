@@ -13,6 +13,8 @@ var _ChainContext = require('./ChainContext');
 
 var _ChainContext2 = _interopRequireDefault(_ChainContext);
 
+var _ChainMiddleware = require('./ChainMiddleware');
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -50,42 +52,55 @@ var CH = exports.CH = function () {
         };
         this.execute = function (done, param) {
             status = STATUS_IN_PROGRESS;
-            if (param) {
-                param.validate();
-            }
-            if (param && param.$error && !context.$error) {
-                context.set('$error', param.$error());
-            }
-            if (context.$isTerminated && context.$isTerminated()) {
-                status = STATUS_TERMINATED;
-                done(context);
-            } else {
-                _lodash2.default.defer(function () {
-                    try {
-                        action(context, param, function () {
-                            if (next) {
-                                _ChainStorage.ChainStorage[next]().execute(done, context);
-                            } else {
-                                done(context);
-                            }
-                            status = STATUS_DONE;
-                        });
-                    } catch (err) {
-                        status = STATUS_FAILED;
-                        if (context.$error) {
-                            context.set('$errorMessage', err.message);
-                            context.set('$name', name);
-                            _ChainStorage.ChainStorage[context.$error()]().execute(done, context);
-                        } else {
-                            done({
-                                $error: function $error() {
-                                    return err;
-                                }
-                            });
+            (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
+                if (errMiddleware) {
+                    done({
+                        $error: function $error() {
+                            return errMiddleware;
+                        },
+                        $errorMessage: function $errorMessage() {
+                            return errMiddleware && errMiddleware.message;
                         }
+                    });
+                } else {
+                    if (param) {
+                        param.validate();
                     }
-                });
-            }
+                    if (param && param.$error && !context.$error) {
+                        context.set('$error', param.$error());
+                    }
+                    if (context.$isTerminated && context.$isTerminated()) {
+                        status = STATUS_TERMINATED;
+                        done(context);
+                    } else {
+                        _lodash2.default.defer(function () {
+                            try {
+                                action(context, param, function () {
+                                    if (next) {
+                                        _ChainStorage.ChainStorage[next]().execute(done, context);
+                                    } else {
+                                        done(context);
+                                    }
+                                    status = STATUS_DONE;
+                                });
+                            } catch (err) {
+                                status = STATUS_FAILED;
+                                if (context.$error) {
+                                    context.set('$errorMessage', err.message);
+                                    context.set('$name', name);
+                                    _ChainStorage.ChainStorage[context.$error()]().execute(done, context);
+                                } else {
+                                    done({
+                                        $error: function $error() {
+                                            return err;
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            });
         };
         this.status = function () {
             return status;
