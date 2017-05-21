@@ -7,10 +7,10 @@ export class CM {
     constructor(name, action) {
         validate(name, action);
         this.type = 'MIDDLEWARE';
-        this.execute = (done, param) => {
+        this.execute = (done, param, next) => {
             lodash.defer(() => {
                 try {
-                    action(param, done);
+                    action(param, next, done);
                 } catch (err) {
                     done(err);
                 }
@@ -20,28 +20,28 @@ export class CM {
     }
 }
 
-export const RunMiddleware = (param, done) => {
+export const RunMiddleware = (param, done, next) => {
     const middlewares = getMiddlewares();
     if (middlewares && middlewares.length) {
-        runMiddleware(middlewares, param, done);
+        runMiddleware(middlewares, param, done, next);
     } else {
         done();
     }
 }
-function runMiddleware(middlewares, param, done, index) {
+function runMiddleware(middlewares, param, done, next, index) {
     if (!index) {
         index = 0;
     }
     try {
         if (index < middlewares.length) {
-            middlewares[index]().execute((err) => {
+            lodash.clone(middlewares[index]()).execute((err) => {
                 if (err) {
                     done(err);
                 } else {
                     index++;
-                    runMiddleware(middlewares, param, done, index);
+                    runMiddleware(middlewares, param, done, next, index);
                 }
-            }, param);
+            }, param, next);
         } else {
             done();
         }

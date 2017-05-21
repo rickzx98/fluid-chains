@@ -25,7 +25,7 @@ export class CH {
         this.terminate = () => {
             context.set('$isTerminated', true);
         };
-        this.execute = (done, pr) => {
+        this.execute = (done, pr, nxt) => {
             context = new ChainContext(name);
             const param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
@@ -76,8 +76,7 @@ export class CH {
                         });
                     }
                 }
-
-            });
+            }, next || nxt);
         };
         this.status = () => {
             return status;
@@ -120,7 +119,7 @@ export const Execute = (name, param, done) => {
     }
     if (ChainStorage[name]) {
         const chain = lodash.clone(lodash.get(ChainStorage, name)());
-        chain.execute(done, context);
+        chain.execute(done, context, name);
     };
 };
 

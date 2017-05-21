@@ -20,12 +20,14 @@ describe('ChaimMiddleware Unit', () => {
     describe('RunMiddleware', () => {
         it('should run middlewares', (done) => {
             let index = 0;
-            new ChainMiddleware('hello', (param, next) => {
+            new ChainMiddleware('hello', (param, nextChain, next) => {
                 index++;
+                expect(nextChain).to.be.equal('nextChainName');
                 next();
             });
-            new ChainMiddleware('hi', (param, next) => {
+            new ChainMiddleware('hi', (param, nextChain, next) => {
                 index++;
+                expect(nextChain).to.be.equal('nextChainName');
                 next();
             });
             RunMiddleware({
@@ -33,19 +35,20 @@ describe('ChaimMiddleware Unit', () => {
             }, () => {
                 expect(index).to.be.equal(2);
                 done();
-            });
+            }, 'nextChainName');
         });
         it('should break when one middleware fails', (done) => {
             let index = 0;
-            new ChainMiddleware('hello', (param, next) => {
+            new ChainMiddleware('hello', (param, nextChain, next) => {
                 index++;
+                expect(nextChain).to.be.equal('nextSample');
                 next();
             });
-            new ChainMiddleware('hi', (param, next) => {
+            new ChainMiddleware('hi', (param, nextChain, next) => {
                 index++;
                 throw new Error('Hi');
             });
-            new ChainMiddleware('bye', (param, next) => {
+            new ChainMiddleware('bye', (param, nextChain, next) => {
                 index++;
                 next();
             });
@@ -55,17 +58,17 @@ describe('ChaimMiddleware Unit', () => {
                 expect(err).to.be.defined;
                 expect(index).to.be.equal(2);
                 done();
-            });
+            }, 'nextSample');
         });
         it('should share the same parameter', (done) => {
             let index = 0;
-            new ChainMiddleware('hello', (param, next) => {
+            new ChainMiddleware('hello', (param, nextChain, next) => {
                 if (param.sample() === 'hello') {
                     index++;
                 }
                 next();
             });
-            new ChainMiddleware('hi', (param, next) => {
+            new ChainMiddleware('hi', (param, nextChain, next) => {
                 if (param.sample() === 'hello') {
                     index++;
                 }

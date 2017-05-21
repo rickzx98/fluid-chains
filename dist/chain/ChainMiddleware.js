@@ -24,10 +24,10 @@ var CM = exports.CM = function CM(name, action) {
 
     validate(name, action);
     this.type = 'MIDDLEWARE';
-    this.execute = function (done, param) {
+    this.execute = function (done, param, next) {
         _lodash2.default.defer(function () {
             try {
-                action(param, done);
+                action(param, next, done);
             } catch (err) {
                 done(err);
             }
@@ -36,28 +36,28 @@ var CM = exports.CM = function CM(name, action) {
     (0, _ChainStorage.putChain)(name, this);
 };
 
-var RunMiddleware = exports.RunMiddleware = function RunMiddleware(param, done) {
+var RunMiddleware = exports.RunMiddleware = function RunMiddleware(param, done, next) {
     var middlewares = (0, _ChainStorage.getMiddlewares)();
     if (middlewares && middlewares.length) {
-        runMiddleware(middlewares, param, done);
+        runMiddleware(middlewares, param, done, next);
     } else {
         done();
     }
 };
-function runMiddleware(middlewares, param, done, index) {
+function runMiddleware(middlewares, param, done, next, index) {
     if (!index) {
         index = 0;
     }
     try {
         if (index < middlewares.length) {
-            middlewares[index]().execute(function (err) {
+            _lodash2.default.clone(middlewares[index]()).execute(function (err) {
                 if (err) {
                     done(err);
                 } else {
                     index++;
-                    runMiddleware(middlewares, param, done, index);
+                    runMiddleware(middlewares, param, done, next, index);
                 }
-            }, param);
+            }, param, next);
         } else {
             done();
         }

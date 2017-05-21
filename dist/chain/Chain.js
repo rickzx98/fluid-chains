@@ -50,7 +50,7 @@ var CH = exports.CH = function () {
         this.terminate = function () {
             context.set('$isTerminated', true);
         };
-        this.execute = function (done, pr) {
+        this.execute = function (done, pr, nxt) {
             context = new _ChainContext2.default(name);
             var param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
@@ -107,7 +107,7 @@ var CH = exports.CH = function () {
                         });
                     }
                 }
-            });
+            }, next || nxt);
         };
         this.status = function () {
             return status;
@@ -154,7 +154,7 @@ var Execute = exports.Execute = function Execute(name, param, done) {
     }
     if (_ChainStorage.ChainStorage[name]) {
         var chain = _lodash2.default.clone(_lodash2.default.get(_ChainStorage.ChainStorage, name)());
-        chain.execute(done, context);
+        chain.execute(done, context, name);
     };
 };
 

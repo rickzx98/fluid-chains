@@ -81,6 +81,132 @@ ExecuteChain('firstChain', (result) => {
 ```
 Note: You cannot put Function as a value in context.set(key, value). You can put value and object.
 
+### Error handling
+
+You can also use a chain as an error handler. Basically you're just creating another chain.
+```
+
+new Chain('firstChain', (context, param, next) => {
+
+    /* 
+        context.set(key, value) will set param value of the 
+        next chain. 
+    */ 
+
+    if (param.name){
+        context.set('remarksTo', param.name());
+    } else {
+      throw new Error('Name is required.');
+    }
+    next();
+
+}, 'secondChain', 'firstErrorHandler' /*error handler is on the fourth argument*/); 
+
+new Chain('firstErrorHandler', (context, param, next) => { 
+    /*
+        param.$error and param.$errorMessage functions
+        are created.
+    */
+    console.log('error', param.$error());  // Error('Name is required.');
+    console.log('errorMessage), param.$errorMessage()); // 'Name is required.'
+    next(); 
+    /* 
+        You can call next() to finish the chain or 
+        just ignore it and break the chain. 
+        You can even start a new chain of actions. 
+    */
+});
+```
+Note: You can put an error handler to each chain otherwise it will be thrown to the nearest error handler of its previous chain.
+
+```
+new Chain('firstChain', (context, param, next) => {
+    if (param.name){
+        context.set('remarksTo', param.name());
+    } else {
+        context.set('remarksTo','everyone');
+    }
+    next();
+
+}, 'secondChain', 'firstErrorHandler'); 
+
+new Chain('secondChain', (context, param, next) => {
+    context.set('remarks','Hello, '+param.remarksTo()+'!');
+    next();
+
+}, 'thirdChain', 'anotherErrorHandler'); 
+
+new Chain('thirdChain', (context, param, next) => {
+   if (param.name){
+        context.set('remarksTo', param.name());
+    } else {
+      throw new Error('Name is required.');
+    }
+    next();
+}); 
+
+new Chain('firstErrorHandler', (context, param, next) => { 
+    console.log('error', param.$error());  // Error('Name is required.');
+    console.log('errorMessage), param.$errorMessage()); // 'Name is required.'
+    next();
+});
+
+new Chain('anotherErrorHandler', (context, param, next) => { 
+    //thirdChain error will also be handled here.
+    next();
+});
+```
+### Adding specifications and validation
+
+For each chain we can specify required fields and custom validations
+
+```
+const FindPeopleChain = new Chain('FindPeople', (context, param, next)=> { 
+    param.name() // should not be null or empty
+    param.type() // should not be null or empty and must be "quick"
+    next();
+});
+
+/*
+    @param field: string,
+    @param required: boolean
+    @param customerValidation (Optional) : Function(callback) => callback(valid, message) 
+*/
+FindPeopleChain.addSpec('name', true);
+FindPeopleChain.addSpec('type',true, (done)=> {
+    done(type ==='quick', 'Type should be "quick"');
+});
+
+```
+
+### Running with Middlewares
+
+Creating middlewares are never been as easy as the following
+```
+import { ChainMiddleware } from 'fluid-chains';
+
+/*
+    @param param: object = parameters for the next chain
+    @param nextChain: string = name of the next chain
+    @param next: Function = proceeds to the next chain
+*/
+new ChainMiddleware('ChainInfoLogger', (param, nextChain, next) => { 
+    console.log('from chain', param.$owner());
+    console.log('to chain', nextChain);
+    next();
+});
+
+new ChainMiddleware('ChainAuthentication', (param, nextChain, next) => { 
+    if(nextChain === 'CreatePeopleChain' && param.sessionKey){
+        //validates 
+    } else {
+        throw new Error('Chain authentication failed.');
+    }
+    next();
+});
+
+```
+
 ## Running the tests
 
 To run the test just clone the project and install everything with 

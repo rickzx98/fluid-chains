@@ -18,8 +18,9 @@ var LoggerMiddleware = function (_ChainMiddleware) {
     function LoggerMiddleware() {
         _classCallCheck(this, LoggerMiddleware);
 
-        return _possibleConstructorReturn(this, (LoggerMiddleware.__proto__ || Object.getPrototypeOf(LoggerMiddleware)).call(this, 'LoggerMiddleware', function (param, next) {
-            console.log('on chain', param.$owner());
+        return _possibleConstructorReturn(this, (LoggerMiddleware.__proto__ || Object.getPrototypeOf(LoggerMiddleware)).call(this, 'LoggerMiddleware', function (param, nextChain, next) {
+            console.log('from chain', param.$owner());
+            console.log('next chain', nextChain);
             next();
         }));
     }
