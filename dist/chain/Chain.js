@@ -51,6 +51,7 @@ var CH = exports.CH = function () {
             context.set('$isTerminated', true);
         };
         this.execute = function (done, pr) {
+            context = new _ChainContext2.default(name);
             var param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
             (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
@@ -82,7 +83,7 @@ var CH = exports.CH = function () {
                                             status = STATUS_TERMINATED;
                                             done(context);
                                         } else {
-                                            _ChainStorage.ChainStorage[next]().execute(done, context);
+                                            _lodash2.default.clone(_ChainStorage.ChainStorage[next]()).execute(done, context);
                                         }
                                     } else {
                                         done(context);
@@ -94,7 +95,7 @@ var CH = exports.CH = function () {
                                 if (context.$error) {
                                     context.set('$errorMessage', err.message);
                                     context.set('$name', name);
-                                    _ChainStorage.ChainStorage[context.$error()]().execute(done, context);
+                                    _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, context);
                                 } else {
                                     done({
                                         $error: function $error() {
@@ -151,7 +152,10 @@ var Execute = exports.Execute = function Execute(name, param, done) {
             context.set(key, val);
         });
     }
-    _ChainStorage.ChainStorage[name]().execute(done, context);
+    if (_ChainStorage.ChainStorage[name]) {
+        var chain = _lodash2.default.clone(_lodash2.default.get(_ChainStorage.ChainStorage, name)());
+        chain.execute(done, context);
+    };
 };
 
 var ChainSpec = exports.ChainSpec = function ChainSpec(field, required, customValidator) {

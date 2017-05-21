@@ -16,7 +16,7 @@ export class CH {
     constructor(name, action, next, error) {
         validate(name, action);
         let status = STATUS_UNTOUCHED;
-        const context = new ChainContext(name);
+        let context = new ChainContext(name);
         this.spec = [];
         if (error) {
             context.set('$error', error);
@@ -26,6 +26,7 @@ export class CH {
             context.set('$isTerminated', true);
         };
         this.execute = (done, pr) => {
+            context = new ChainContext(name);
             const param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
             RunMiddleware(param, (errMiddleware) => {
@@ -53,7 +54,7 @@ export class CH {
                                             status = STATUS_TERMINATED;
                                             done(context);
                                         } else {
-                                            ChainStorage[next]().execute(done, context);
+                                            lodash.clone(ChainStorage[next]()).execute(done, context);
                                         }
                                     } else {
                                         done(context);
@@ -65,7 +66,7 @@ export class CH {
                                 if (context.$error) {
                                     context.set('$errorMessage', err.message);
                                     context.set('$name', name);
-                                    ChainStorage[context.$error()]().execute(done, context);
+                                    lodash.clone(ChainStorage[context.$error()]()).execute(done, context);
                                 } else {
                                     done({
                                         $error: () => err
@@ -117,7 +118,10 @@ export const Execute = (name, param, done) => {
             context.set(key, val);
         });
     }
-    ChainStorage[name]().execute(done, context);
+    if (ChainStorage[name]) {
+        const chain = lodash.clone(lodash.get(ChainStorage, name)());
+        chain.execute(done, context);
+    };
 };
 
 export class ChainSpec {

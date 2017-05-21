@@ -4,6 +4,7 @@ import { Chain, ExecuteChain } from '../../../src/';
 
 import { ChainStorage } from '../../../src/chain/ChainStorage';
 import chai from 'chai';
+import sizeOf from 'object-sizeof';
 
 const expect = chai.expect;
 
@@ -106,7 +107,6 @@ describe('Chain Unit', () => {
             expect(ChainStorage.sample).to.be.defined;
         });
     });
-
     describe('action', () => {
         describe('with a single chain', () => {
             it('should execute action', (done) => {
@@ -270,6 +270,23 @@ describe('Chain Unit', () => {
                     next()
                 });
 
+            });
+        });
+    });
+    describe('memory', () => {
+        it('should clone chain from ChainStorage when executing so context will be renewed every process', (done) => {
+            let index = 0;
+            new Chain('chain1', (context, param, next) => {
+                context.set('count', count++);
+                context.set('firstname', 'john');
+                context.set('lastname', 'doe');
+                next();
+            });
+            const initialSize = ChainStorage['chain1']().size();
+            ExecuteChain('chain1', {}, (result) => {
+                const endSize = ChainStorage['chain1']().size();
+                expect(endSize).to.be.equal(initialSize);
+                done();
             });
         });
     });
