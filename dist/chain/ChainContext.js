@@ -14,24 +14,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var ChainValidators = {};
+
 var ChainContext = function () {
     function ChainContext(name) {
         var _this = this;
 
         _classCallCheck(this, ChainContext);
 
-        var validators = [];
+        this.validators = [];
         if (!name) {
             throw new Error('Owner name is required.');
         }
         this.set('$owner', name);
         this.addValidator = function (fieldSpec) {
-            validators.push(fieldSpec);
-        };
-        this.validate = function () {
-            validators.forEach(function (validator) {
-                return validator.validate(_this);
-            });
+            _this.validators.push(fieldSpec);
         };
     }
 
@@ -44,6 +41,41 @@ var ChainContext = function () {
             _lodash2.default.set(this, name, function () {
                 return _lodash2.default.clone(value);
             });
+        }
+    }, {
+        key: 'clone',
+        value: function clone() {
+            var _this2 = this;
+
+            var copy = {};
+            var validators = _lodash2.default.clone(this.validators) || [];
+            _lodash2.default.forIn(this, function (field, key) {
+                if (key !== 'addValidator' && key !== 'validate' && key !== 'set') {
+                    if (field instanceof Function) {
+                        var value = field();
+                        _lodash2.default.set(copy, key, function () {
+                            return _lodash2.default.clone(value);
+                        });
+                    }
+                    if (key !== '$owner') {
+                        _lodash2.default.unset(_this2, key);
+                    }
+                }
+            });
+            copy.set = function (name, value) {
+                if (value instanceof Function) {
+                    throw new Error('Function cannot be set as value');
+                }
+                _lodash2.default.set(copy, name, function () {
+                    return _lodash2.default.clone(value);
+                });
+            };
+            copy.validate = function () {
+                validators.forEach(function (validator) {
+                    return validator.validate(copy);
+                });
+            };
+            return copy;
         }
     }]);
 

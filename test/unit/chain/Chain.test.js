@@ -110,7 +110,7 @@ describe('Chain Unit', () => {
     describe('action', () => {
         describe('with a single chain', () => {
             it('should execute action', (done) => {
-                const start = new Chain('start', (context, param, next) => {
+                const start = new Chain('start_single', (context, param, next) => {
                     context.set('wasHere', true);
                     next();
                 });
@@ -121,25 +121,27 @@ describe('Chain Unit', () => {
                 });
             });
             it('should change the status to "IN_PROGRESS" in an ongoing process', (done) => {
-                const start = new Chain('start', (context, param, next) => {
-                    if (param && param.count && param.count() === 2) {
-                        start.terminate();
-                    } else {
-                        context.set('count', param && param.count ? param.count() + 1 : 0);
-                    }
+                const start = new Chain('start_IN_PROGRESS', (context, param, next) => {
+                    context.set('count', 1);
+                    start.terminate();
                     next();
-                }, 'start');
+                }, 'start_IN_PROGRESS_TER');
+
+                const end = new Chain('start_IN_PROGRESS_TER', (context, param, next) => {
+                    context.set('count', param.count() + 1);
+                    next();
+                });
 
                 start.execute((result) => {
+                    expect(result.count()).to.be.equal(1);
                     expect(start.status()).to.be.equal('TERMINATED');
-                    expect(result.count()).to.be.equal(2);
                     done();
                 });
 
                 expect(start.status()).to.be.equal('IN_PROGRESS');
             });
             it('should change the status to "FAILED" if an error has been thrown', (done) => {
-                const start = new Chain('start', () => {
+                const start = new Chain('start_FAILED', () => {
                     throw new Error('sample');
                 });
 
@@ -152,18 +154,20 @@ describe('Chain Unit', () => {
 
             });
             it('should terminate its own action', (done) => {
-                const start = new Chain('start', (context, param, next) => {
-                    if (param && param.count && param.count() === 5) {
-                        start.terminate();
-                    } else {
-                        context.set('count', param && param.count ? param.count() + 1 : 0);
-                    }
+                const start = new Chain('start_TERMINATE', (context, param, next) => {
+                    start.terminate();
+                    context.set('count', 1);
                     next();
-                }, 'start');
+                }, 'start_TERMINATE_END');
+
+                const end = new Chain('start_TERMINATE_END', (context, param, next) => {
+                    context.set('count', param.count() + 1);
+                    next();
+                });
 
                 start.execute((result) => {
+                    expect(result.count()).to.be.equal(1);
                     expect(start.status()).to.be.equal('TERMINATED');
-                    expect(result.count()).to.be.equal(5);
                     done();
                 });
             });
@@ -171,7 +175,7 @@ describe('Chain Unit', () => {
 
         describe('with multiple chains', () => {
             it('should return the last chain context as the "result" of execution callback', (done) => {
-                const start = new Chain('start', (context, param, next) => {
+                const start = new Chain('start_multiple', (context, param, next) => {
                     context.set('wasHere', true);
                     next();
                 }, 'second').execute((result) => {

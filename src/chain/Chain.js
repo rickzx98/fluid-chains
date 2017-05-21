@@ -25,7 +25,8 @@ export class CH {
         this.terminate = () => {
             context.set('$isTerminated', true);
         };
-        this.execute = (done, param) => {
+        this.execute = (done, pr) => {
+            const param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
             RunMiddleware(param, (errMiddleware) => {
                 if (errMiddleware) {
@@ -48,7 +49,12 @@ export class CH {
                             try {
                                 action(context, param, () => {
                                     if (next) {
-                                        ChainStorage[next]().execute(done, context);
+                                        if (context.$isTerminated && context.$isTerminated()) {
+                                            status = STATUS_TERMINATED;
+                                            done(context);
+                                        } else {
+                                            ChainStorage[next]().execute(done, context);
+                                        }
                                     } else {
                                         done(context);
                                     }

@@ -50,7 +50,8 @@ var CH = exports.CH = function () {
         this.terminate = function () {
             context.set('$isTerminated', true);
         };
-        this.execute = function (done, param) {
+        this.execute = function (done, pr) {
+            var param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
             (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
                 if (errMiddleware) {
@@ -77,7 +78,12 @@ var CH = exports.CH = function () {
                             try {
                                 action(context, param, function () {
                                     if (next) {
-                                        _ChainStorage.ChainStorage[next]().execute(done, context);
+                                        if (context.$isTerminated && context.$isTerminated()) {
+                                            status = STATUS_TERMINATED;
+                                            done(context);
+                                        } else {
+                                            _ChainStorage.ChainStorage[next]().execute(done, context);
+                                        }
                                     } else {
                                         done(context);
                                     }

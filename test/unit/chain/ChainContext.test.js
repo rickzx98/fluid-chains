@@ -4,6 +4,7 @@ import ChainContext from '../../../src/chain/ChainContext';
 import { ChainSpec } from '../../../src/chain/Chain';
 import assert from 'assert';
 import chai from 'chai';
+import sizeOf from 'object-sizeof';
 
 const expect = chai.expect;
 
@@ -15,7 +16,8 @@ describe('ChainContext Unit', () => {
             expect(() => {
                 const context = new ChainContext('sample');
                 context.addValidator(spec);
-                context.validate();
+                const clone = context.clone();
+                clone.validate();
             }).to.throw('Field sampleField is required.');
         });
         it('should throw error if custom validation field', () => {
@@ -26,7 +28,7 @@ describe('ChainContext Unit', () => {
                 const context = new ChainContext('sample');
                 context.set('sampleField', 'hello');
                 context.addValidator(spec);
-                context.validate();
+                context.clone().validate();
             }).to.throw('Value is not hi.');
         });
     });
@@ -62,6 +64,38 @@ describe('ChainContext Unit', () => {
             expect(() => {
                 context.set('tryFunction', () => { });
             }).to.throw(Error);
+        });
+    });
+
+    describe('copy', () => {
+        it('should make its own copy', () => {
+            const context = new ChainContext('copyContext');
+            context.addValidator(new ChainSpec('phone', true));
+            context.set('id', '123405');
+            context.set('person', {
+                firstname: 'Jane',
+                lastname: 'Doe'
+            });
+            const initialSize = sizeOf(context);
+            const clone = context.clone();
+            expect(context.$owner).to.be.defined;
+            expect(context.addValidator).to.be.defined;
+            expect(context.id).to.not.be.defined;
+            expect(context.person).to.not.be.defined;
+
+            expect(sizeOf(context) < initialSize).to.be.true;
+
+            expect(clone.$owner()).to.be.equal('copyContext');
+            expect(clone.id()).to.be.equal('123405');
+            expect(clone.person).to.be.defined;
+            const person = clone.person();
+            expect(person.firstname).to.be.equal('Jane');
+            expect(person.lastname).to.be.equal('Doe');
+            clone.set('newValue', 'hello');
+            expect(clone.newValue()).to.be.equal('hello');
+            expect(() => {
+                clone.validate();
+            }).to.throw('Field phone is required.');
         });
     });
 });
