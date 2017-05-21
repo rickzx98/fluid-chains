@@ -1,6 +1,6 @@
 {
   "name": "fluid-chains",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Just a better way to execute actions in sequence",
   "main": "dist/index.js",
   "scripts": {

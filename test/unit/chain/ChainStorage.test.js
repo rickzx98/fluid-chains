@@ -2,7 +2,7 @@ import 'babel-polyfill';
 
 import { ChainStorage, getMiddlewares, putChain } from '../../../src/chain/ChainStorage';
 
-import { ChaimMiddleware } from '../../../src/';
+import { ChainMiddleware } from '../../../src/';
 import assert from 'assert';
 
 describe('ChainStorage Unit', () => {
@@ -13,9 +13,9 @@ describe('ChainStorage Unit', () => {
         });
     });
     it('should get all middlewares', () => {
-        new ChaimMiddleware('middleWareOne', (param, next) => { });
-        new ChaimMiddleware('middleWareTwo', (param, next) => { });
-        new ChaimMiddleware('middleWareThree', (param, next) => { });
+        new ChainMiddleware('middleWareOne', (param, next) => { });
+        new ChainMiddleware('middleWareTwo', (param, next) => { });
+        new ChainMiddleware('middleWareThree', (param, next) => { });
         const middlewares = getMiddlewares();
         assert(middlewares.length > 0);
     });
