@@ -156,6 +156,17 @@ new Chain('anotherErrorHandler', (context, param, next) => {
     next();
 });
 ```
+
+Note: For asynchronous callback errors you may do "next(Error)".
+
+```
+new Chain('firstChain', (context, param, next) => {
+    setTimeout(()=>{
+        next(new Error('sample'));
+    });
+}, 'secondChain', 'firstErrorHandler'); 
+```
+
 ### Adding specifications and validation
 
 For each chain we can specify required fields and custom validations
