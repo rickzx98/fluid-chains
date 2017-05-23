@@ -24,7 +24,7 @@ export class CH {
         };
         this.execute = (done, pr, nxt) => {
             context = CreateContext(name, next, error);
-            const param = pr && pr.clone ? pr.clone() : pr;
+            const param = ConvertToContext(pr).clone();
             status = STATUS_IN_PROGRESS;
             RunMiddleware(param, (errMiddleware) => {
                 if (errMiddleware) {
@@ -41,11 +41,12 @@ export class CH {
                     }
                     if (context.$isTerminated && context.$isTerminated()) {
                         status = STATUS_TERMINATED;
-                        done(context.clone());
+                        const clonedContext = context.clone();
+                        done(clonedContext);
                     } else {
                         lodash.defer(() => {
                             try {
-                                action(context, param, (err) => {
+                                action(context, param, err => {
                                     if (err && err instanceof Error) {
                                         failed(done, context, name, err);
                                     } else {
@@ -53,12 +54,14 @@ export class CH {
                                         if (context.$next && context.$next()) {
                                             if (context.$isTerminated && context.$isTerminated()) {
                                                 status = STATUS_TERMINATED;
-                                                done(context);
+                                                const clonedContext = context.clone();
+                                                done(clonedContext);
                                             } else {
                                                 lodash.clone(ChainStorage[context.$next()]()).execute(done, context);
                                             }
                                         } else {
-                                            done(context.clone());
+                                            const clonedContext = context.clone();
+                                            done(clonedContext);
                                         }
                                     }
                                 });
@@ -90,11 +93,9 @@ export class CH {
         const failed = (done, context, name, err) => {
             status = STATUS_FAILED;
             if (context.$error) {
-                context.set('$err', err);
-                context.set('$errorMessage', err.message);
-                context.set('$name', name);
-                lodash.clone(ChainStorage[context.$error()]()).execute(done, context);
+                lodash.clone(ChainStorage[context.$error()]()).execute(done, CreateErrorContext(context.$error(), name, err));
             } else {
+                console.warn('UnhandledErrorCallback', err);
                 done({
                     $err: () => err,
                     $errorMessage: () => err ? err.message : ''
@@ -115,18 +116,8 @@ export const Execute = (name, param, done) => {
     if (!ChainStorage[name]) {
         throw new Error('Chain ' + name + ' does not exist.');
     }
-    let context = new ChainContext();
-    context.addValidator(new ChainSpec('$owner', false, undefined, true));
+    let context = ConvertToContext(param);
     context.set('$owner', name + '_starter');
-    if (param) {
-        lodash.forIn(param, (val, key) => {
-            context.addValidator(new ChainSpec(key, false, undefined, true));
-            if (val instanceof Function) {
-                throw new Error('Param must not contain functions');
-            }
-            context.set(key, val);
-        });
-    }
     if (ChainStorage[name]) {
         const chain = lodash.clone(lodash.get(ChainStorage, name)());
         chain.execute(done, context, name);
@@ -178,4 +169,37 @@ const CreateContext = (name, next, error) => {
         context.set('$next', next);
     }
     return context;
+}
+
+
+
+const CreateErrorContext = (name, errorFrom, err) => {
+    const context = new ChainContext();
+    context.addValidator(new ChainSpec('$err', true, undefined, true));
+    context.addValidator(new ChainSpec('$errorMessage', true, undefined, true));
+    context.addValidator(new ChainSpec('$errorFrom', true, undefined, true));
+    context.addValidator(new ChainSpec('$owner', true, undefined, true));
+    context.set('$owner', name);
+    context.set('$err', err);
+    context.set('$errorMessage', err.message);
+    context.set('$errorFrom', errorFrom);
+    return context;
+}
+
+const ConvertToContext = (param) => {
+    if (!(param instanceof ChainContext)) {
+        let context = new ChainContext();
+        context.addValidator(new ChainSpec('$owner', false, undefined, true));
+        if (param) {
+            lodash.forIn(param, (val, key) => {
+                context.addValidator(new ChainSpec(key, false, undefined, true));
+                if (val instanceof Function) {
+                    throw new Error('Param must not contain functions');
+                }
+                context.set(key, val);
+            });
+        }
+        return context;
+    }
+    return param;
 }

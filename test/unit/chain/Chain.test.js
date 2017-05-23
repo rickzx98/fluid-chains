@@ -84,7 +84,7 @@ describe('Chain Unit', () => {
         });
         it('should create a new context with its name as the owner()', (done) => {
             const chain = new Chain('sample', (context, param, next) => {
-                expect(context.owner()).to.equal('sample');
+                expect(context.$owner()).to.equal('sample');
                 next();
             });
             chain.execute(() => {
@@ -93,7 +93,7 @@ describe('Chain Unit', () => {
         });
         it('should change the status to "DONE" once the process has finished', (done) => {
             const chain = new Chain('sample', (context, param, next) => {
-                expect(context.owner()).to.equal('sample');
+                expect(context.$owner()).to.equal('sample');
                 next();
             });
             chain.execute(() => {
@@ -220,21 +220,18 @@ describe('Chain Unit', () => {
             });
 
             it('should trigger the errorHandler chain specified on the fourth argument of the constructor', (done) => {
-                const start = new Chain('start', (context, param, next) => {
+                const start = new Chain('start_', (context, param, next) => {
                     throw new Error('sample error');
-                }, 'second', 'errorHandler')
+                }, 'second', 'errorHandler_start_')
                     .execute((result) => {
-                        expect(result.$err).to.be.not.undefined;
-                        expect(result.$errorMessage).to.be.not.undefined;
-                        expect(result.$errorMessage()).to.be.equal('sample error');
                         expect(result.errorWasTriggered).to.be.not.undefined;
                         done();
                     });
 
-                new Chain('errorHandler', (context, param, next) => {
+                new Chain('errorHandler_start_', (context, param, next) => {
                     context.set('errorWasTriggered', true);
-                    const name = param.$name();
-                    expect(name).to.be.equal('start');
+                    const name = param.$errorFrom();
+                    expect(name).to.be.equal('start_');
                     next()
                 });
 
@@ -242,34 +239,32 @@ describe('Chain Unit', () => {
 
 
             it('should trigger the errorHandler chain with next(Error) for asycnhronous callback', (done) => {
-                const start = new Chain('start', (context, param, next) => {
+                const start = new Chain('start_0', (context, param, next) => {
                     setTimeout(() => {
                         next(new Error('sample error'));
                     });
-                }, 'second', 'errorHandler')
+                }, 'second', 'errorHandler_start_0')
                     .execute((result) => {
-                        expect(result.$err).to.be.not.undefined;
                         expect(result.errorWasTriggered).to.be.not.undefined;
                         done();
                     });
 
-                new Chain('errorHandler', (context, param, next) => {
+                new Chain('errorHandler_start_0', (context, param, next) => {
                     context.set('errorWasTriggered', true);
-                    const name = param.$name();
-                    expect(name).to.be.equal('start');
+                    const name = param.$errorFrom();
+                    expect(name).to.be.equal('start_0');
                     next()
                 });
 
             });
 
             it('should trigger the nearest errorHandler of the chain hierarchy', (done) => {
-                const start = new Chain('start', (context, param, next) => {
-                    throw new Error('sample error');
-                }, 'second', 'errorHandler')
+                const start = new Chain('start_1', (context, param, next) => {
+                    next();
+                }, 'second', 'errorHandler_start_1')
                     .execute((result) => {
-                        expect(result.$err).to.be.not.undefined;
                         expect(result.errorHandlerForStep2WasTriggered).to.be.not.undefined;
-                        expect(result.errorWasTriggered).to.not.be.defined;
+                        expect(result.errorWasTriggered).to.be.undefined;
                         done();
                     });
 
@@ -282,14 +277,14 @@ describe('Chain Unit', () => {
                 }, 'second');
 
 
-                new Chain('errorHandler', (context, param, next) => {
+                new Chain('errorHandler_start_1', (context, param, next) => {
                     context.set('errorWasTriggered', true);
                     next()
                 });
 
                 new Chain('errorHandlerForStep2', (context, param, next) => {
                     context.set('errorHandlerForStep2WasTriggered', true);
-                    const name = param.$name();
+                    const name = param.$errorFrom();
                     expect(name).to.be.equal('third');
                     next()
                 });
@@ -301,7 +296,6 @@ describe('Chain Unit', () => {
         it('should clone chain from ChainStorage when executing so context will be renewed every process', (done) => {
             let index = 0;
             new Chain('chain1', (context, param, next) => {
-                context.set('count', count++);
                 context.set('firstname', 'john');
                 context.set('lastname', 'doe');
                 next();
