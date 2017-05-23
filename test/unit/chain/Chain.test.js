@@ -34,13 +34,15 @@ describe('Chain Unit', () => {
             });
         });
         it('should get the param value as ChainContext', (done) => {
-            new Chain('hello', (context, param, next) => {
+            new Chain('hello2', (context, param, next) => {
                 context.set('saidHello', true);
+                console.log('param', param);
                 expect(param.hey).to.be.not.undefined;
                 expect(param.hey()).to.be.equal('daydreamer');
                 next();
             });
-            ExecuteChain('hello', { hey: 'daydreamer' }, (context) => {
+            ExecuteChain('hello2', { hey: 'daydreamer' }, (context) => {
+                console.log(context.$err());
                 expect(context.$owner()).to.be.equal('hello');
                 expect(context.saidHello).to.be.not.undefined;
                 done();

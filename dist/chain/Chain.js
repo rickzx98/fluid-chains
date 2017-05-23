@@ -42,17 +42,17 @@ var CH = exports.CH = function () {
         validate(name, action);
         var status = STATUS_UNTOUCHED;
         var context = new _ChainContext2.default();
-        context.addValidator(new ChainSpec('$next', true, undefined, true));
-        context.addValidator(new ChainSpec('$error', false, undefined, true));
-        context.addValidator(new ChainSpec('$owner', true, undefined, true));
-        context.set('$owner', name);
         this.spec = [];
-        (0, _ChainStorage.putChain)(name, this);
         this.terminate = function () {
             context.set('$isTerminated', true);
         };
 
         this.execute = function (done, pr, nxt) {
+            context = new _ChainContext2.default();
+            context.addValidator(new ChainSpec('$next', true, undefined, true));
+            context.addValidator(new ChainSpec('$error', false, undefined, true));
+            context.addValidator(new ChainSpec('$owner', true, undefined, true));
+            context.set('$owner', name);
             if (error) {
                 context.set('$error', error, true);
             }
@@ -91,7 +91,7 @@ var CH = exports.CH = function () {
                                                 status = STATUS_TERMINATED;
                                                 done(context);
                                             } else {
-                                                _lodash2.default.clone(_ChainStorage.ChainStorage[next]()).execute(done, context);
+                                                _lodash2.default.clone(_ChainStorage.ChainStorage[context.$next()]()).execute(done, context);
                                             }
                                         } else {
                                             done(context);
@@ -141,6 +141,8 @@ var CH = exports.CH = function () {
                 });
             }
         };
+
+        (0, _ChainStorage.putChain)(name, this);
     }
 
     _createClass(CH, [{
@@ -157,11 +159,9 @@ var Execute = exports.Execute = function Execute(name, param, done) {
     if (!_ChainStorage.ChainStorage[name]) {
         throw new Error('Chain ' + name + ' does not exist.');
     }
-    var context = new _ChainContext2.default('starter');
+    var context = new _ChainContext2.default();
     if (param) {
-        var keys = _lodash2.default.keys(param);
-        keys.forEach(function (key) {
-            var val = _lodash2.default.get(param, key);
+        _lodash2.default.forIn(param, function (val, key) {
             if (val instanceof Function) {
                 throw new Error('Param must not contain functions');
             }

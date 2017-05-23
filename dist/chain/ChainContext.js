@@ -20,22 +20,18 @@ var ChainContext = function () {
 
         _classCallCheck(this, ChainContext);
 
-        this.validators = [];
+        this.validators = {};
         this.addValidator = function (fieldSpec) {
-            _this.validators.push(fieldSpec);
+            _this.validators[fieldSpec.field] = fieldSpec;
         };
     }
 
     _createClass(ChainContext, [{
         key: 'set',
         value: function set(name, value) {
-            var fieldSpec = _lodash2.default.filter(this.validators, function (spec) {
-                return spec.field === name;
-            });
-            if (fieldSpec && fieldSpec.length) {
-                if (fieldSpec[0].immutable && _lodash2.default.get(this, name)) {
-                    throw new Error('Field ' + name + ' is already defined and is marked immutable.');
-                }
+            var fieldSpec = this.validators[name];
+            if (fieldSpec && fieldSpec.immutable && _lodash2.default.get(this, name)) {
+                throw new Error('Field ' + name + ' is already defined and is marked immutable.');
             }
             if (value instanceof Function) {
                 throw new Error('Function cannot be set as value');
@@ -48,7 +44,7 @@ var ChainContext = function () {
         key: 'clone',
         value: function clone() {
             var copy = {};
-            var validators = _lodash2.default.clone(this.validators) || [];
+            var validators = _lodash2.default.clone(this.validators) || {};
             _lodash2.default.forIn(this, function (field, key) {
                 if (key !== 'addValidator' && key !== 'validate' && key !== 'set') {
                     if (field instanceof Function) {
@@ -68,7 +64,7 @@ var ChainContext = function () {
                 });
             };
             copy.validate = function () {
-                validators.forEach(function (validator) {
+                _lodash2.default.forIn(validators, function (validator) {
                     return validator.validate(copy);
                 });
             };

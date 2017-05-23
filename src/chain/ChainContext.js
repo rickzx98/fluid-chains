@@ -2,17 +2,15 @@ import lodash from 'lodash';
 
 export default class ChainContext {
     constructor() {
-        this.validators = [];
+        this.validators = {};
         this.addValidator = (fieldSpec) => {
-            this.validators.push(fieldSpec);
+            this.validators[fieldSpec.field] = fieldSpec;
         }
     }
     set(name, value) {
-        const fieldSpec = lodash.filter(this.validators, spec => spec.field === name);
-        if (fieldSpec && fieldSpec.length) {
-            if (fieldSpec[0].immutable && lodash.get(this, name)) {
-                throw new Error('Field ' + name + ' is already defined and is marked immutable.');
-            }
+        const fieldSpec = this.validators[name];
+        if (fieldSpec && fieldSpec.immutable && lodash.get(this, name)) {
+            throw new Error('Field ' + name + ' is already defined and is marked immutable.');
         }
         if (value instanceof Function) {
             throw new Error('Function cannot be set as value');
@@ -21,7 +19,7 @@ export default class ChainContext {
     }
     clone() {
         const copy = {};
-        const validators = lodash.clone(this.validators) || [];
+        const validators = lodash.clone(this.validators) || {};
         lodash.forIn(this, (field, key) => {
             if (key !== 'addValidator' &&
                 key !== 'validate' &&
@@ -39,7 +37,7 @@ export default class ChainContext {
             lodash.set(copy, name, () => lodash.clone(value));
         };
         copy.validate = () => {
-            validators.forEach(validator => validator.validate(copy));
+            lodash.forIn(validators, validator => validator.validate(copy));
         }
         return copy;
     }

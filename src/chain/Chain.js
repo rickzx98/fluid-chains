@@ -17,17 +17,17 @@ export class CH {
         validate(name, action);
         let status = STATUS_UNTOUCHED;
         let context = new ChainContext();
-        context.addValidator(new ChainSpec('$next', true, undefined, true));
-        context.addValidator(new ChainSpec('$error', false, undefined, true));
-        context.addValidator(new ChainSpec('$owner', true, undefined, true));
-        context.set('$owner', name);
         this.spec = [];
-        putChain(name, this);
         this.terminate = () => {
             context.set('$isTerminated', true);
         };
 
         this.execute = (done, pr, nxt) => {
+            context = new ChainContext();
+            context.addValidator(new ChainSpec('$next', true, undefined, true));
+            context.addValidator(new ChainSpec('$error', false, undefined, true));
+            context.addValidator(new ChainSpec('$owner', true, undefined, true));
+            context.set('$owner', name);
             if (error) {
                 context.set('$error', error, true);
             }
@@ -62,7 +62,7 @@ export class CH {
                                                 status = STATUS_TERMINATED;
                                                 done(context);
                                             } else {
-                                                lodash.clone(ChainStorage[next]()).execute(done, context);
+                                                lodash.clone(ChainStorage[context.$next()]()).execute(done, context);
                                             }
                                         } else {
                                             done(context);
@@ -109,6 +109,7 @@ export class CH {
             }
         };
 
+        putChain(name, this);
     }
 
     size() {
@@ -121,11 +122,9 @@ export const Execute = (name, param, done) => {
     if (!ChainStorage[name]) {
         throw new Error('Chain ' + name + ' does not exist.');
     }
-    let context = new ChainContext('starter');
+    let context = new ChainContext();
     if (param) {
-        const keys = lodash.keys(param);
-        keys.forEach(key => {
-            const val = lodash.get(param, key);
+        lodash.forIn(param, (val, key) => {
             if (val instanceof Function) {
                 throw new Error('Param must not contain functions');
             }
