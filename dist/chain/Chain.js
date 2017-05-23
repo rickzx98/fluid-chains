@@ -46,17 +46,8 @@ var CH = exports.CH = function () {
         this.terminate = function () {
             context.set('$isTerminated', true);
         };
-
         this.execute = function (done, pr, nxt) {
-            context = new _ChainContext2.default();
-            context.addValidator(new ChainSpec('$next', true, undefined, true));
-            context.addValidator(new ChainSpec('$error', false, undefined, true));
-            context.addValidator(new ChainSpec('$owner', true, undefined, true));
-            context.set('$owner', name);
-            if (error) {
-                context.set('$error', error, true);
-            }
-            context.set('$next', nxt || next, true);
+            context = CreateContext(name, next, error);
             var param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
             (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
@@ -78,7 +69,7 @@ var CH = exports.CH = function () {
                     }
                     if (context.$isTerminated && context.$isTerminated()) {
                         status = STATUS_TERMINATED;
-                        done(context);
+                        done(context.clone());
                     } else {
                         _lodash2.default.defer(function () {
                             try {
@@ -86,6 +77,7 @@ var CH = exports.CH = function () {
                                     if (err && err instanceof Error) {
                                         failed(done, context, name, err);
                                     } else {
+                                        status = STATUS_DONE;
                                         if (context.$next && context.$next()) {
                                             if (context.$isTerminated && context.$isTerminated()) {
                                                 status = STATUS_TERMINATED;
@@ -94,9 +86,8 @@ var CH = exports.CH = function () {
                                                 _lodash2.default.clone(_ChainStorage.ChainStorage[context.$next()]()).execute(done, context);
                                             }
                                         } else {
-                                            done(context);
+                                            done(context.clone());
                                         }
-                                        status = STATUS_DONE;
                                     }
                                 });
                             } catch (err) {
@@ -105,8 +96,9 @@ var CH = exports.CH = function () {
                         });
                     }
                 }
-            }, context.$next ? context.$next() : undefined);
+            }, nxt || next);
         };
+
         this.status = function () {
             return status;
         };
@@ -160,8 +152,11 @@ var Execute = exports.Execute = function Execute(name, param, done) {
         throw new Error('Chain ' + name + ' does not exist.');
     }
     var context = new _ChainContext2.default();
+    context.addValidator(new ChainSpec('$owner', false, undefined, true));
+    context.set('$owner', name + '_starter');
     if (param) {
         _lodash2.default.forIn(param, function (val, key) {
+            context.addValidator(new ChainSpec(key, false, undefined, true));
             if (val instanceof Function) {
                 throw new Error('Param must not contain functions');
             }
@@ -197,11 +192,26 @@ var ChainSpec = exports.ChainSpec = function ChainSpec(field, required, customVa
     this.immutable = immutable;
 };
 
-function validate(name, action) {
+var validate = function validate(name, action) {
     if (!name) {
         throw new Error('Name is required.');
     }
     if (!action) {
         throw new Error('Action (Function) is required.');
     }
-}
+};
+
+var CreateContext = function CreateContext(name, next, error) {
+    var context = new _ChainContext2.default();
+    context.addValidator(new ChainSpec('$next', false, undefined, true));
+    context.addValidator(new ChainSpec('$error', false, undefined, true));
+    context.addValidator(new ChainSpec('$owner', true, undefined, true));
+    context.set('$owner', name);
+    if (error) {
+        context.set('$error', error);
+    }
+    if (next) {
+        context.set('$next', next);
+    }
+    return context;
+};

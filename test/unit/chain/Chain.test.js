@@ -11,7 +11,7 @@ const expect = chai.expect;
 describe('Chain Unit', () => {
     describe('spec', () => {
         it('should add spec', () => {
-            const chain = new Chain('hello', (context, param, next) => {
+            const chain = new Chain('helloN', (context, param, next) => {
                 context.set('saidHello', true);
                 next();
             });
@@ -23,12 +23,12 @@ describe('Chain Unit', () => {
     });
     describe('execute', () => {
         it('should execute a specific chain', (done) => {
-            new Chain('hello', (context, param, next) => {
+            new Chain('hello0', (context, param, next) => {
                 context.set('saidHello', true);
                 next();
             });
-            ExecuteChain('hello', {}, (context) => {
-                expect(context.$owner()).to.be.equal('hello');
+            ExecuteChain('hello0', {}, (context) => {
+                expect(context.$owner()).to.be.equal('hello0');
                 expect(context.saidHello).to.be.not.undefined;
                 done();
             });
@@ -36,25 +36,23 @@ describe('Chain Unit', () => {
         it('should get the param value as ChainContext', (done) => {
             new Chain('hello2', (context, param, next) => {
                 context.set('saidHello', true);
-                console.log('param', param);
                 expect(param.hey).to.be.not.undefined;
                 expect(param.hey()).to.be.equal('daydreamer');
                 next();
             });
             ExecuteChain('hello2', { hey: 'daydreamer' }, (context) => {
-                console.log(context.$err());
-                expect(context.$owner()).to.be.equal('hello');
+                expect(context.$owner()).to.be.equal('hello2');
                 expect(context.saidHello).to.be.not.undefined;
                 done();
             });
         });
         it('should throw an error if param contains functions', () => {
-            new Chain('hello', (context, param, next) => {
+            new Chain('hello3', (context, param, next) => {
                 context.set('saidHello', true);
                 next();
             });
             expect(() => {
-                ExecuteChain('hello', { hi: () => { } }, (context) => {
+                ExecuteChain('hello3', { hi: () => { } }, (context) => {
                 });
             }).to.throw(Error);
 

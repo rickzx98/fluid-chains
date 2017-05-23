@@ -11,6 +11,7 @@ const STATUS_DONE = 'DONE';
 const STATUS_FAILED = 'FAILED';
 const STATUS_TERMINATED = 'TERMINATED';
 
+
 export class CH {
 
     constructor(name, action, next, error) {
@@ -21,17 +22,8 @@ export class CH {
         this.terminate = () => {
             context.set('$isTerminated', true);
         };
-
         this.execute = (done, pr, nxt) => {
-            context = new ChainContext();
-            context.addValidator(new ChainSpec('$next', true, undefined, true));
-            context.addValidator(new ChainSpec('$error', false, undefined, true));
-            context.addValidator(new ChainSpec('$owner', true, undefined, true));
-            context.set('$owner', name);
-            if (error) {
-                context.set('$error', error, true);
-            }
-            context.set('$next', nxt || next, true);
+            context = CreateContext(name, next, error);
             const param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
             RunMiddleware(param, (errMiddleware) => {
@@ -49,7 +41,7 @@ export class CH {
                     }
                     if (context.$isTerminated && context.$isTerminated()) {
                         status = STATUS_TERMINATED;
-                        done(context);
+                        done(context.clone());
                     } else {
                         lodash.defer(() => {
                             try {
@@ -57,6 +49,7 @@ export class CH {
                                     if (err && err instanceof Error) {
                                         failed(done, context, name, err);
                                     } else {
+                                        status = STATUS_DONE;
                                         if (context.$next && context.$next()) {
                                             if (context.$isTerminated && context.$isTerminated()) {
                                                 status = STATUS_TERMINATED;
@@ -65,9 +58,8 @@ export class CH {
                                                 lodash.clone(ChainStorage[context.$next()]()).execute(done, context);
                                             }
                                         } else {
-                                            done(context);
+                                            done(context.clone());
                                         }
-                                        status = STATUS_DONE;
                                     }
                                 });
                             } catch (err) {
@@ -76,8 +68,9 @@ export class CH {
                         });
                     }
                 }
-            }, context.$next ? context.$next() : undefined);
+            }, nxt || next);
         };
+
         this.status = () => {
             return status;
         };
@@ -123,8 +116,11 @@ export const Execute = (name, param, done) => {
         throw new Error('Chain ' + name + ' does not exist.');
     }
     let context = new ChainContext();
+    context.addValidator(new ChainSpec('$owner', false, undefined, true));
+    context.set('$owner', name + '_starter');
     if (param) {
         lodash.forIn(param, (val, key) => {
+            context.addValidator(new ChainSpec(key, false, undefined, true));
             if (val instanceof Function) {
                 throw new Error('Param must not contain functions');
             }
@@ -160,11 +156,26 @@ export class ChainSpec {
     }
 }
 
-function validate(name, action) {
+const validate = (name, action) => {
     if (!name) {
         throw new Error('Name is required.');
     }
     if (!action) {
         throw new Error('Action (Function) is required.');
     }
+}
+
+const CreateContext = (name, next, error) => {
+    const context = new ChainContext();
+    context.addValidator(new ChainSpec('$next', false, undefined, true));
+    context.addValidator(new ChainSpec('$error', false, undefined, true));
+    context.addValidator(new ChainSpec('$owner', true, undefined, true));
+    context.set('$owner', name);
+    if (error) {
+        context.set('$error', error);
+    }
+    if (next) {
+        context.set('$next', next);
+    }
+    return context;
 }
