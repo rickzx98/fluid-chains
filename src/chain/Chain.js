@@ -16,23 +16,28 @@ export class CH {
     constructor(name, action, next, error) {
         validate(name, action);
         let status = STATUS_UNTOUCHED;
-        let context = new ChainContext(name);
+        let context = new ChainContext();
+        context.addValidator(new ChainSpec('$next', true, undefined, true));
+        context.addValidator(new ChainSpec('$error', false, undefined, true));
+        context.addValidator(new ChainSpec('$owner', true, undefined, true));
+        context.set('$owner', name);
         this.spec = [];
-        if (error) {
-            context.set('$error', error);
-        }
         putChain(name, this);
         this.terminate = () => {
             context.set('$isTerminated', true);
         };
+
         this.execute = (done, pr, nxt) => {
-            context = new ChainContext(name);
+            if (error) {
+                context.set('$error', error, true);
+            }
+            context.set('$next', nxt || next, true);
             const param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
             RunMiddleware(param, (errMiddleware) => {
                 if (errMiddleware) {
                     done({
-                        $error: () => errMiddleware,
+                        $err: () => errMiddleware,
                         $errorMessage: () => errMiddleware && errMiddleware.message
                     });
                 } else {
@@ -48,35 +53,30 @@ export class CH {
                     } else {
                         lodash.defer(() => {
                             try {
-                                action(context, param, () => {
-                                    if (next) {
-                                        if (context.$isTerminated && context.$isTerminated()) {
-                                            status = STATUS_TERMINATED;
-                                            done(context);
-                                        } else {
-                                            lodash.clone(ChainStorage[next]()).execute(done, context);
-                                        }
+                                action(context, param, (err) => {
+                                    if (err && err instanceof Error) {
+                                        failed(done, context, name, err);
                                     } else {
-                                        done(context);
+                                        if (context.$next && context.$next()) {
+                                            if (context.$isTerminated && context.$isTerminated()) {
+                                                status = STATUS_TERMINATED;
+                                                done(context);
+                                            } else {
+                                                lodash.clone(ChainStorage[next]()).execute(done, context);
+                                            }
+                                        } else {
+                                            done(context);
+                                        }
+                                        status = STATUS_DONE;
                                     }
-                                    status = STATUS_DONE;
                                 });
                             } catch (err) {
-                                status = STATUS_FAILED;
-                                if (context.$error) {
-                                    context.set('$errorMessage', err.message);
-                                    context.set('$name', name);
-                                    lodash.clone(ChainStorage[context.$error()]()).execute(done, context);
-                                } else {
-                                    done({
-                                        $error: () => err
-                                    });
-                                }
+                                failed(done, context, name, err);
                             }
                         });
                     }
                 }
-            }, next || nxt);
+            }, context.$next ? context.$next() : undefined);
         };
         this.status = () => {
             return status;
@@ -94,6 +94,21 @@ export class CH {
             this.spec.push(spec);
             context.addValidator(spec);
         }
+        const failed = (done, context, name, err) => {
+            status = STATUS_FAILED;
+            if (context.$error) {
+                context.set('$err', err);
+                context.set('$errorMessage', err.message);
+                context.set('$name', name);
+                lodash.clone(ChainStorage[context.$error()]()).execute(done, context);
+            } else {
+                done({
+                    $err: () => err,
+                    $errorMessage: () => err ? err.message : ''
+                });
+            }
+        };
+
     }
 
     size() {
@@ -124,7 +139,7 @@ export const Execute = (name, param, done) => {
 };
 
 export class ChainSpec {
-    constructor(field, required, customValidator) {
+    constructor(field, required, customValidator, immutable) {
         if (customValidator && !(customValidator instanceof Function)) {
             throw new Error('customValidator must be a Function instance.');
         }
@@ -142,6 +157,7 @@ export class ChainSpec {
                 });
             }
         }
+        this.immutable = immutable;
     }
 }
 

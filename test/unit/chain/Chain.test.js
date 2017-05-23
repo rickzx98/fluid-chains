@@ -16,8 +16,8 @@ describe('Chain Unit', () => {
                 next();
             });
             chain.addSpec('sample', true, () => { });
-            expect(chain.spec).to.be.defined;
-            expect(chain.spec.length).to.be.defined;
+            expect(chain.spec).to.be.not.undefined;
+            expect(chain.spec.length).to.be.not.undefined;
             expect(chain.spec[0].field).to.be.equal('sample');
         });
     });
@@ -29,20 +29,20 @@ describe('Chain Unit', () => {
             });
             ExecuteChain('hello', {}, (context) => {
                 expect(context.$owner()).to.be.equal('hello');
-                expect(context.saidHello).to.be.defined;
+                expect(context.saidHello).to.be.not.undefined;
                 done();
             });
         });
         it('should get the param value as ChainContext', (done) => {
             new Chain('hello', (context, param, next) => {
                 context.set('saidHello', true);
-                expect(param.hey).to.be.defined;
+                expect(param.hey).to.be.not.undefined;
                 expect(param.hey()).to.be.equal('daydreamer');
                 next();
             });
             ExecuteChain('hello', { hey: 'daydreamer' }, (context) => {
                 expect(context.$owner()).to.be.equal('hello');
-                expect(context.saidHello).to.be.defined;
+                expect(context.saidHello).to.be.not.undefined;
                 done();
             });
         });
@@ -104,7 +104,7 @@ describe('Chain Unit', () => {
         it('should put in ChainStorage', () => {
             const chain = new Chain('sample', () => {
             });
-            expect(ChainStorage.sample).to.be.defined;
+            expect(ChainStorage.sample).to.be.not.undefined;
         });
     });
     describe('action', () => {
@@ -146,7 +146,7 @@ describe('Chain Unit', () => {
                 });
 
                 start.execute((result) => {
-                    expect(result.$error).to.be.defined;
+                    expect(result.$err).to.be.not.undefined;
                     expect(start.status()).to.be.equal('FAILED');
                     done();
                 });
@@ -180,13 +180,13 @@ describe('Chain Unit', () => {
                     next();
                 }, 'second').execute((result) => {
                     expect(result.wasHere).to.not.be.defined;
-                    expect(result.wasHereSecond).to.be.defined;
+                    expect(result.wasHereSecond).to.be.not.undefined;
                     done();
                 });
 
                 new Chain('second', (context, param, next) => {
                     context.set('wasHereSecond', true);
-                    expect(param.wasHere).to.be.defined;
+                    expect(param.wasHere).to.be.not.undefined;
                     next()
                 });
             });
@@ -195,13 +195,13 @@ describe('Chain Unit', () => {
                     context.set('wasHere', true);
                     next();
                 }, 'second').execute((result) => {
-                    expect(result.wasHereSecond).to.be.defined;
+                    expect(result.wasHereSecond).to.be.not.undefined;
                     done();
                 });
 
                 new Chain('second', (context, param, next) => {
                     context.set('wasHereSecond', true);
-                    expect(param.wasHere).to.be.defined;
+                    expect(param.wasHere).to.be.not.undefined;
                     next()
                 });
             });
@@ -214,7 +214,7 @@ describe('Chain Unit', () => {
                 });
 
                 new Chain('second', (context, param, next) => {
-                    expect(param.wasHere).to.be.defined;
+                    expect(param.wasHere).to.be.not.undefined;
                     next()
                 });
             });
@@ -224,8 +224,32 @@ describe('Chain Unit', () => {
                     throw new Error('sample error');
                 }, 'second', 'errorHandler')
                     .execute((result) => {
-                        expect(result.$error).to.be.defined;
-                        expect(result.errorWasTriggered).to.be.defined;
+                        expect(result.$err).to.be.not.undefined;
+                        expect(result.$errorMessage).to.be.not.undefined;
+                        expect(result.$errorMessage()).to.be.equal('sample error');
+                        expect(result.errorWasTriggered).to.be.not.undefined;
+                        done();
+                    });
+
+                new Chain('errorHandler', (context, param, next) => {
+                    context.set('errorWasTriggered', true);
+                    const name = param.$name();
+                    expect(name).to.be.equal('start');
+                    next()
+                });
+
+            });
+
+
+            it('should trigger the errorHandler chain with next(Error) for asycnhronous callback', (done) => {
+                const start = new Chain('start', (context, param, next) => {
+                    setTimeout(() => {
+                        next(new Error('sample error'));
+                    });
+                }, 'second', 'errorHandler')
+                    .execute((result) => {
+                        expect(result.$err).to.be.not.undefined;
+                        expect(result.errorWasTriggered).to.be.not.undefined;
                         done();
                     });
 
@@ -243,8 +267,8 @@ describe('Chain Unit', () => {
                     throw new Error('sample error');
                 }, 'second', 'errorHandler')
                     .execute((result) => {
-                        expect(result.$error).to.be.defined;
-                        expect(result.errorHandlerForStep2WasTriggered).to.be.defined;
+                        expect(result.$err).to.be.not.undefined;
+                        expect(result.errorHandlerForStep2WasTriggered).to.be.not.undefined;
                         expect(result.errorWasTriggered).to.not.be.defined;
                         done();
                     });

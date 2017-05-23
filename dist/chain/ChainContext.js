@@ -15,16 +15,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ChainContext = function () {
-    function ChainContext(name) {
+    function ChainContext() {
         var _this = this;
 
         _classCallCheck(this, ChainContext);
 
         this.validators = [];
-        if (!name) {
-            throw new Error('Owner name is required.');
-        }
-        this.set('$owner', name);
         this.addValidator = function (fieldSpec) {
             _this.validators.push(fieldSpec);
         };
@@ -33,6 +29,14 @@ var ChainContext = function () {
     _createClass(ChainContext, [{
         key: 'set',
         value: function set(name, value) {
+            var fieldSpec = _lodash2.default.filter(this.validators, function (spec) {
+                return spec.field === name;
+            });
+            if (fieldSpec && fieldSpec.length) {
+                if (fieldSpec[0].immutable && _lodash2.default.get(this, name)) {
+                    throw new Error('Field ' + name + ' is already defined and is marked immutable.');
+                }
+            }
             if (value instanceof Function) {
                 throw new Error('Function cannot be set as value');
             }
@@ -43,8 +47,6 @@ var ChainContext = function () {
     }, {
         key: 'clone',
         value: function clone() {
-            var _this2 = this;
-
             var copy = {};
             var validators = _lodash2.default.clone(this.validators) || [];
             _lodash2.default.forIn(this, function (field, key) {
@@ -54,9 +56,6 @@ var ChainContext = function () {
                         _lodash2.default.set(copy, key, function () {
                             return _lodash2.default.clone(value);
                         });
-                    }
-                    if (key !== '$owner') {
-                        _lodash2.default.unset(_this2, key);
                     }
                 }
             });

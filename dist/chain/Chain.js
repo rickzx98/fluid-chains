@@ -41,23 +41,28 @@ var CH = exports.CH = function () {
 
         validate(name, action);
         var status = STATUS_UNTOUCHED;
-        var context = new _ChainContext2.default(name);
+        var context = new _ChainContext2.default();
+        context.addValidator(new ChainSpec('$next', true, undefined, true));
+        context.addValidator(new ChainSpec('$error', false, undefined, true));
+        context.addValidator(new ChainSpec('$owner', true, undefined, true));
+        context.set('$owner', name);
         this.spec = [];
-        if (error) {
-            context.set('$error', error);
-        }
         (0, _ChainStorage.putChain)(name, this);
         this.terminate = function () {
             context.set('$isTerminated', true);
         };
+
         this.execute = function (done, pr, nxt) {
-            context = new _ChainContext2.default(name);
+            if (error) {
+                context.set('$error', error, true);
+            }
+            context.set('$next', nxt || next, true);
             var param = pr && pr.clone ? pr.clone() : pr;
             status = STATUS_IN_PROGRESS;
             (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
                 if (errMiddleware) {
                     done({
-                        $error: function $error() {
+                        $err: function $err() {
                             return errMiddleware;
                         },
                         $errorMessage: function $errorMessage() {
@@ -77,37 +82,30 @@ var CH = exports.CH = function () {
                     } else {
                         _lodash2.default.defer(function () {
                             try {
-                                action(context, param, function () {
-                                    if (next) {
-                                        if (context.$isTerminated && context.$isTerminated()) {
-                                            status = STATUS_TERMINATED;
-                                            done(context);
-                                        } else {
-                                            _lodash2.default.clone(_ChainStorage.ChainStorage[next]()).execute(done, context);
-                                        }
+                                action(context, param, function (err) {
+                                    if (err && err instanceof Error) {
+                                        failed(done, context, name, err);
                                     } else {
-                                        done(context);
+                                        if (context.$next && context.$next()) {
+                                            if (context.$isTerminated && context.$isTerminated()) {
+                                                status = STATUS_TERMINATED;
+                                                done(context);
+                                            } else {
+                                                _lodash2.default.clone(_ChainStorage.ChainStorage[next]()).execute(done, context);
+                                            }
+                                        } else {
+                                            done(context);
+                                        }
+                                        status = STATUS_DONE;
                                     }
-                                    status = STATUS_DONE;
                                 });
                             } catch (err) {
-                                status = STATUS_FAILED;
-                                if (context.$error) {
-                                    context.set('$errorMessage', err.message);
-                                    context.set('$name', name);
-                                    _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, context);
-                                } else {
-                                    done({
-                                        $error: function $error() {
-                                            return err;
-                                        }
-                                    });
-                                }
+                                failed(done, context, name, err);
                             }
                         });
                     }
                 }
-            }, next || nxt);
+            }, context.$next ? context.$next() : undefined);
         };
         this.status = function () {
             return status;
@@ -124,6 +122,24 @@ var CH = exports.CH = function () {
             var spec = new ChainSpec(field, required, customValidator);
             _this.spec.push(spec);
             context.addValidator(spec);
+        };
+        var failed = function failed(done, context, name, err) {
+            status = STATUS_FAILED;
+            if (context.$error) {
+                context.set('$err', err);
+                context.set('$errorMessage', err.message);
+                context.set('$name', name);
+                _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, context);
+            } else {
+                done({
+                    $err: function $err() {
+                        return err;
+                    },
+                    $errorMessage: function $errorMessage() {
+                        return err ? err.message : '';
+                    }
+                });
+            }
         };
     }
 
@@ -158,7 +174,7 @@ var Execute = exports.Execute = function Execute(name, param, done) {
     };
 };
 
-var ChainSpec = exports.ChainSpec = function ChainSpec(field, required, customValidator) {
+var ChainSpec = exports.ChainSpec = function ChainSpec(field, required, customValidator, immutable) {
     _classCallCheck(this, ChainSpec);
 
     if (customValidator && !(customValidator instanceof Function)) {
@@ -178,6 +194,7 @@ var ChainSpec = exports.ChainSpec = function ChainSpec(field, required, customVa
             });
         }
     };
+    this.immutable = immutable;
 };
 
 function validate(name, action) {

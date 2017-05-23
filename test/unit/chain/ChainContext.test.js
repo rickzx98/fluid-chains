@@ -32,16 +32,7 @@ describe('ChainContext Unit', () => {
             }).to.throw('Value is not hi.');
         });
     });
-    describe('constructor', () => {
-        it('should have $owner', () => {
-            const context = new ChainContext('sample');
-            assert(context.$owner() === 'sample');
-        });
-        it('should throw error if $owner is not specified', () => {
-            expect(ChainContext).to.throw(Error);
-        });
-    });
-
+    
     describe('set', () => {
         it('should return value as function', () => {
             const context = new ChainContext('sample');
@@ -65,6 +56,14 @@ describe('ChainContext Unit', () => {
                 context.set('tryFunction', () => { });
             }).to.throw(Error);
         });
+        it('should throw an error when setting immutable field twice', () => {
+            const context = new ChainContext('sample');
+            context.addValidator(new ChainSpec('name', true, undefined, true));
+            expect(() => {
+                context.set('name', 'hello');
+                context.set('name', 'hello again');
+            }).to.throw('Field name is already defined and is marked immutable.');
+        });
     });
 
     describe('copy', () => {
@@ -76,18 +75,15 @@ describe('ChainContext Unit', () => {
                 firstname: 'Jane',
                 lastname: 'Doe'
             });
+            context.set('$error', 'errorChain');
             const initialSize = sizeOf(context);
             const clone = context.clone();
-            expect(context.$owner).to.be.defined;
-            expect(context.addValidator).to.be.defined;
+            expect(context.addValidator).to.not.be.undefined;
             expect(context.id).to.not.be.defined;
             expect(context.person).to.not.be.defined;
-
-            expect(sizeOf(context) < initialSize).to.be.true;
-
-            expect(clone.$owner()).to.be.equal('copyContext');
+            expect(clone.$error).to.not.be.undefined;
             expect(clone.id()).to.be.equal('123405');
-            expect(clone.person).to.be.defined;
+            expect(clone.person).to.not.be.undefined;
             const person = clone.person();
             expect(person.firstname).to.be.equal('Jane');
             expect(person.lastname).to.be.equal('Doe');
