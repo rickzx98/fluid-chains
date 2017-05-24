@@ -23,13 +23,14 @@ describe('Chain Unit', () => {
     });
     describe('execute', () => {
         it('should execute a specific chain', (done) => {
-            new Chain('hello0', (context, param, next) => {
-                context.set('saidHello', true);
-                next();
+            const hello0 = new Chain('hello0', (context, param, next) => {
+              context.set('saidHello', true);
+              next();
             });
             ExecuteChain('hello0', {}, (context) => {
                 expect(context.$owner()).to.be.equal('hello0');
                 expect(context.saidHello).to.be.not.undefined;
+                console.log('hello0', hello0.info());
                 done();
             });
         });
