@@ -61,6 +61,28 @@ describe('Chain Unit', () => {
                 done();
             });
         });
+        it('should execute non predefined next chain in sequence', (done) => {
+            new Chain('hello_seq_0_0', (context, param, next) => {
+                context.set('hello_seq_0', true);
+                next();
+            }, 'hello_seq_0_1_trial');
+
+            new Chain('hello_seq_0_1_trial', (context, param, next) => {
+                context.set('hello_seq_1_trial', true);
+                next();
+            });
+
+            new Chain('hello_seq_0_1', (context, param, next) => {
+                context.set('hello_seq_1', true);
+                next();
+            }, 'hello_seq_0_1_trial');
+
+            ExecuteChain(['hello_seq_0_0', 'hello_seq_0_1'], {}, (context) => {
+                expect(context.hello_seq_1_trial).to.be.undefined;
+                expect(context.hello_seq_1).to.be.not.undefined;
+                done();
+            });
+        });
         it('should throw an error if param contains functions', () => {
             new Chain('hello3', (context, param, next) => {
                 context.set('saidHello', true);

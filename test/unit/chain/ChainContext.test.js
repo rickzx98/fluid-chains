@@ -1,7 +1,7 @@
 import 'babel-polyfill';
 
 import ChainContext from '../../../src/chain/ChainContext';
-import { ChainSpec } from '../../../src/chain/Chain';
+import ChainSpec from '../../../src/chain/ChainSpec';
 import assert from 'assert';
 import chai from 'chai';
 import sizeOf from 'object-sizeof';
@@ -27,12 +27,12 @@ describe('ChainContext Unit', () => {
                 const context = new ChainContext();
                 context.addValidator(spec);
                 const param = new ChainContext();
-                param.set('sampleField','hello');
+                param.set('sampleField', 'hello');
                 context.validate(param);
             }).to.throw('Value is not hi.');
         });
     });
-    
+
     describe('set', () => {
         it('should return value as function', () => {
             const context = new ChainContext();

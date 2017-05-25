@@ -81,6 +81,21 @@ ExecuteChain('firstChain', (result) => {
 ```
 Note: You cannot put Function as a value in context.set(key, value). You can put value and object.
 
+### Can I reuse Chain?
+- ExecuteChains(Array, Parameter, Done);
+```
+    new Chain('first', (context,param, next)=>{next()},'second');
+    new Chain('second',(context,param,next)=>{next()},'third');
+    new Chain('third',(context,param,next)=>{next()},'fourth');
+    new Chain('fourth',(context,param,next)=>{next()});
+
+    ExecuteChain(['first','third'],{},(result)=>{
+        // last chain processed was "third"
+    });
+
+```
+Executing chains like the sample above will ignore the chain's predefined sequence and it will follow the chain sequence in the array. The sample above will run the "first" chain then "third" as long as you satify their parameter and it will complete the sequence even if there is a sequence defined in the "third" chain (which is the "fourth") thus make the chains reuseable. 
+
 ### Error handling
 
 You can also use a chain as an error handler. Basically you're just creating another chain.
