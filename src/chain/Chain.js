@@ -1,11 +1,11 @@
 import {
   ChainStorage,
-  putChain
+  putChain,
 } from './ChainStorage';
 
 import ChainContext from './ChainContext';
 import {
-  RunMiddleware
+  RunMiddleware,
 } from './ChainMiddleware';
 import lodash from 'lodash';
 import sizeOf from 'object-sizeof';
@@ -23,13 +23,14 @@ export class CH {
     validate(name, action);
     let status = STATUS_UNTOUCHED;
     let context = new ChainContext();
+    context.set('$owner', name);
     let responseTime = 0;
     this.spec = [];
     this.terminate = () => {
       context.set('$isTerminated', true);
     };
     this.execute = (done, pr, nxt) => {
-      context = CreateContext(name, next, error);
+      context = CreateContext(context, name, next, error);
       const param = ConvertToContext(pr).clone();
       status = STATUS_IN_PROGRESS;
       RunMiddleware(param, (errMiddleware) => {
@@ -40,7 +41,7 @@ export class CH {
           });
         } else {
           if (param) {
-            param.validate();
+            context.validate(param);
           }
           if ((param && param.$error) && !context.$error) {
             context.set('$error', param.$error());
@@ -68,7 +69,7 @@ export class CH {
                         context.set('$responseTime', new Date().getTime() - startTime);
                         lodash.clone(ChainStorage[context.$next()]()).execute(done, context);
                       }
-                    } else { 
+                    } else {
                       context.set('$responseTime', new Date().getTime() - startTime);
                       const clonedContext = context.clone();
                       done(clonedContext);
@@ -133,7 +134,6 @@ export const Execute = (name, param, done) => {
     chain.execute(done, context, name);
   }
 };
-
 export class ChainSpec {
   constructor(field, required, customValidator, immutable) {
     if (customValidator && !(customValidator instanceof Function)) {
@@ -156,7 +156,6 @@ export class ChainSpec {
     this.immutable = immutable;
   }
 }
-
 function validate(name, action) {
   if (!name) {
     throw new Error('Name is required.');
@@ -165,22 +164,19 @@ function validate(name, action) {
     throw new Error('Action (Function) is required.');
   }
 }
-
-function CreateContext(name, next, error) {
-  const context = new ChainContext();
-  context.addValidator(new ChainSpec('$next', false, undefined, true));
-  context.addValidator(new ChainSpec('$error', false, undefined, true));
-  context.addValidator(new ChainSpec('$owner', true, undefined, true));
-  context.set('$owner', name);
-  if (error) {
+function CreateContext(original, name, next, error) {
+  original.addValidator(new ChainSpec('$next', false, undefined, true));
+  original.addValidator(new ChainSpec('$error', false, undefined, true));
+  original.addValidator(new ChainSpec('$owner', false, undefined, true));
+  const context = original.clone();
+  if (error && !context.$error) {
     context.set('$error', error);
   }
-  if (next) {
+  if (next && !context.$next) {
     context.set('$next', next);
   }
   return context;
 }
-
 function CreateErrorContext(name, errorFrom, err) {
   const context = new ChainContext();
   context.addValidator(new ChainSpec('$err', true, undefined, true));
@@ -194,7 +190,6 @@ function CreateErrorContext(name, errorFrom, err) {
   context.set('$errorFrom', errorFrom);
   return context;
 }
-
 function ConvertToContext(param) {
   if (!(param instanceof ChainContext)) {
     let context = new ChainContext();

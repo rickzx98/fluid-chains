@@ -42,13 +42,14 @@ var CH = exports.CH = function () {
     validate(name, action);
     var status = STATUS_UNTOUCHED;
     var context = new _ChainContext2.default();
+    context.set('$owner', name);
     var responseTime = 0;
     this.spec = [];
     this.terminate = function () {
       context.set('$isTerminated', true);
     };
     this.execute = function (done, pr, nxt) {
-      context = CreateContext(name, next, error);
+      context = CreateContext(context, name, next, error);
       var param = ConvertToContext(pr).clone();
       status = STATUS_IN_PROGRESS;
       (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
@@ -63,7 +64,7 @@ var CH = exports.CH = function () {
           });
         } else {
           if (param) {
-            param.validate();
+            context.validate(param);
           }
           if (param && param.$error && !context.$error) {
             context.set('$error', param.$error());
@@ -163,7 +164,7 @@ var Execute = exports.Execute = function Execute(name, param, done) {
   if (_ChainStorage.ChainStorage[name]) {
     var chain = _lodash2.default.clone(_lodash2.default.get(_ChainStorage.ChainStorage, name)());
     chain.execute(done, context, name);
-  };
+  }
 };
 
 var ChainSpec = exports.ChainSpec = function ChainSpec(field, required, customValidator, immutable) {
@@ -197,22 +198,19 @@ function validate(name, action) {
     throw new Error('Action (Function) is required.');
   }
 }
-
-function CreateContext(name, next, error) {
-  var context = new _ChainContext2.default();
-  context.addValidator(new ChainSpec('$next', false, undefined, true));
-  context.addValidator(new ChainSpec('$error', false, undefined, true));
-  context.addValidator(new ChainSpec('$owner', true, undefined, true));
-  context.set('$owner', name);
-  if (error) {
+function CreateContext(original, name, next, error) {
+  original.addValidator(new ChainSpec('$next', false, undefined, true));
+  original.addValidator(new ChainSpec('$error', false, undefined, true));
+  original.addValidator(new ChainSpec('$owner', false, undefined, true));
+  var context = original.clone();
+  if (error && !context.$error) {
     context.set('$error', error);
   }
-  if (next) {
+  if (next && !context.$next) {
     context.set('$next', next);
   }
   return context;
 }
-
 function CreateErrorContext(name, errorFrom, err) {
   var context = new _ChainContext2.default();
   context.addValidator(new ChainSpec('$err', true, undefined, true));
@@ -226,7 +224,6 @@ function CreateErrorContext(name, errorFrom, err) {
   context.set('$errorFrom', errorFrom);
   return context;
 }
-
 function ConvertToContext(param) {
   if (!(param instanceof _ChainContext2.default)) {
     var context = new _ChainContext2.default();

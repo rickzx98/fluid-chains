@@ -1,8 +1,8 @@
 import lodash from 'lodash';
 
 export default class ChainContext {
-    constructor() {
-        this.validators = {};
+    constructor(validators) {
+        this.validators = validators || {};
         this.addValidator = (fieldSpec) => {
             this.validators[fieldSpec.field] = fieldSpec;
         }
@@ -18,28 +18,21 @@ export default class ChainContext {
         lodash.set(this, name, () => lodash.clone(value));
     }
     clone() {
-        const copy = {};
         const validators = lodash.clone(this.validators) || {};
+        const copy = new ChainContext(validators);
         lodash.forIn(this, (field, key) => {
             if (key !== 'addValidator' &&
                 key !== 'validate' &&
                 key !== 'set') {
                 if (field instanceof Function) {
                     const value = field();
-                    lodash.set(copy, key, () => lodash.clone(value));
+                    copy.set(key, value);
                 }
             }
         });
-        copy.set = (name, value) => {
-            if (value instanceof Function) {
-                throw new Error('Function cannot be set as value');
-            }
-            lodash.set(copy, name, () => lodash.clone(value));
-        };
-        copy.validate = () => {
-            lodash.forIn(validators, validator => validator.validate(copy));
-        }
         return copy;
     }
-
+    validate(param) {
+        lodash.forIn(this.validators, validator => validator.validate(param));
+    }
 }

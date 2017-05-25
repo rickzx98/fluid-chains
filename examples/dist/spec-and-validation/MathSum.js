@@ -12,19 +12,23 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SayHelloWorldErrorHandler = function (_Chain) {
-    _inherits(SayHelloWorldErrorHandler, _Chain);
+var MathSum = function (_Chain) {
+    _inherits(MathSum, _Chain);
 
-    function SayHelloWorldErrorHandler() {
-        _classCallCheck(this, SayHelloWorldErrorHandler);
+    function MathSum() {
+        _classCallCheck(this, MathSum);
 
-        return _possibleConstructorReturn(this, (SayHelloWorldErrorHandler.__proto__ || Object.getPrototypeOf(SayHelloWorldErrorHandler)).call(this, 'SayHelloWorldErrorHandler', function (context, param, next) {
-            console.log('An error has occured in chain ' + param.$owner() + '. Error message: ' + param.$errorMessage());
-            next();
+        var _this = _possibleConstructorReturn(this, (MathSum.__proto__ || Object.getPrototypeOf(MathSum)).call(this, 'MathSum', function (context, param, done) {
+            context.set('sum', param.firstNumber() + param.secondNumber());
+            done();
         }));
+
+        _this.addSpec('firstNumber', true, undefined, true);
+        _this.addSpec('secondNumber', true, undefined, true);
+        return _this;
     }
 
-    return SayHelloWorldErrorHandler;
+    return MathSum;
 }(_fluidChains.Chain);
 
-exports.default = SayHelloWorldErrorHandler;
+exports.default = MathSum;

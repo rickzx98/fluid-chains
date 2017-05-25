@@ -14,10 +14,9 @@ describe('ChainContext Unit', () => {
         it('should throw error if required field is empty', () => {
             const spec = new ChainSpec('sampleField', true);
             expect(() => {
-                const context = new ChainContext('sample');
+                const context = new ChainContext();
                 context.addValidator(spec);
-                const clone = context.clone();
-                clone.validate();
+                context.validate(new ChainContext());
             }).to.throw('Field sampleField is required.');
         });
         it('should throw error if custom validation field', () => {
@@ -25,39 +24,40 @@ describe('ChainContext Unit', () => {
                 valid(value === 'hi', 'Value is not hi.');
             });
             expect(() => {
-                const context = new ChainContext('sample');
-                context.set('sampleField', 'hello');
+                const context = new ChainContext();
                 context.addValidator(spec);
-                context.clone().validate();
+                const param = new ChainContext();
+                param.set('sampleField','hello');
+                context.validate(param);
             }).to.throw('Value is not hi.');
         });
     });
     
     describe('set', () => {
         it('should return value as function', () => {
-            const context = new ChainContext('sample');
+            const context = new ChainContext();
             context.set('hello', 'hi');
             assert(context.hello instanceof Function);
         });
         it('should set value', () => {
-            const context = new ChainContext('sample');
+            const context = new ChainContext();
             context.set('hello', 'hi');
             assert(context.hello() === 'hi');
         });
         it('should not be mutated', () => {
-            const context = new ChainContext('sample');
+            const context = new ChainContext();
             context.set('hello', { remark: 'hi' });
             context.hello().remark = 'hello';
             assert(context.hello().remark === 'hi');
         });
         it('should throw an error if a Function is set to value', () => {
-            const context = new ChainContext('sample');
+            const context = new ChainContext();
             expect(() => {
                 context.set('tryFunction', () => { });
             }).to.throw(Error);
         });
         it('should throw an error when setting immutable field twice', () => {
-            const context = new ChainContext('sample');
+            const context = new ChainContext();
             context.addValidator(new ChainSpec('name', true, undefined, true));
             expect(() => {
                 context.set('name', 'hello');
@@ -68,7 +68,7 @@ describe('ChainContext Unit', () => {
 
     describe('copy', () => {
         it('should make its own copy', () => {
-            const context = new ChainContext('copyContext');
+            const context = new ChainContext();
             context.addValidator(new ChainSpec('phone', true));
             context.set('id', '123405');
             context.set('person', {
@@ -90,7 +90,7 @@ describe('ChainContext Unit', () => {
             clone.set('newValue', 'hello');
             expect(clone.newValue()).to.be.equal('hello');
             expect(() => {
-                clone.validate();
+                context.validate(clone);
             }).to.throw('Field phone is required.');
         });
     });

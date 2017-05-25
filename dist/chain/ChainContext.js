@@ -15,12 +15,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ChainContext = function () {
-    function ChainContext() {
+    function ChainContext(validators) {
         var _this = this;
 
         _classCallCheck(this, ChainContext);
 
-        this.validators = {};
+        this.validators = validators || {};
         this.addValidator = function (fieldSpec) {
             _this.validators[fieldSpec.field] = fieldSpec;
         };
@@ -43,32 +43,24 @@ var ChainContext = function () {
     }, {
         key: 'clone',
         value: function clone() {
-            var copy = {};
             var validators = _lodash2.default.clone(this.validators) || {};
+            var copy = new ChainContext(validators);
             _lodash2.default.forIn(this, function (field, key) {
                 if (key !== 'addValidator' && key !== 'validate' && key !== 'set') {
                     if (field instanceof Function) {
                         var value = field();
-                        _lodash2.default.set(copy, key, function () {
-                            return _lodash2.default.clone(value);
-                        });
+                        copy.set(key, value);
                     }
                 }
             });
-            copy.set = function (name, value) {
-                if (value instanceof Function) {
-                    throw new Error('Function cannot be set as value');
-                }
-                _lodash2.default.set(copy, name, function () {
-                    return _lodash2.default.clone(value);
-                });
-            };
-            copy.validate = function () {
-                _lodash2.default.forIn(validators, function (validator) {
-                    return validator.validate(copy);
-                });
-            };
             return copy;
+        }
+    }, {
+        key: 'validate',
+        value: function validate(param) {
+            _lodash2.default.forIn(this.validators, function (validator) {
+                return validator.validate(param);
+            });
         }
     }]);
 

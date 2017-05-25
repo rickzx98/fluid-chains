@@ -24,8 +24,8 @@ describe('Chain Unit', () => {
     describe('execute', () => {
         it('should execute a specific chain', (done) => {
             const hello0 = new Chain('hello0', (context, param, next) => {
-              context.set('saidHello', true);
-              next();
+                context.set('saidHello', true);
+                next();
             });
             ExecuteChain('hello0', {}, (context) => {
                 expect(context.$owner()).to.be.equal('hello0');
@@ -44,6 +44,20 @@ describe('Chain Unit', () => {
             ExecuteChain('hello2', { hey: 'daydreamer' }, (context) => {
                 expect(context.$owner()).to.be.equal('hello2');
                 expect(context.saidHello).to.be.not.undefined;
+                done();
+            });
+        });
+        it('should execute chain in sequence', (done) => {
+            new Chain('hello_seq_0', (context, param, next) => {
+                context.set('hello_seq_0', true);
+                next();
+            }, 'hello_seq_1');
+            new Chain('hello_seq_1', (context, param, next) => {
+                context.set('hello_seq_1', true);
+                next();
+            });
+            ExecuteChain('hello_seq_0', {}, (context) => {
+                expect(context.hello_seq_1).to.be.not.undefined;
                 done();
             });
         });

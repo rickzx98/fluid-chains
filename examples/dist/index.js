@@ -12,4 +12,8 @@ var _singleChain = require('./single-chain/');
 
 var _singleChain2 = _interopRequireDefault(_singleChain);
 
+var _specAndValidation = require('./spec-and-validation/');
+
+var _specAndValidation2 = _interopRequireDefault(_specAndValidation);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
