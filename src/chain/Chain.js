@@ -29,8 +29,8 @@ export class CH {
     this.terminate = () => {
       context.set('$isTerminated', true);
     };
-    this.execute = (done, pr, nxt) => {
-      context = CreateContext(context, name, next, error);
+    this.execute = (done, pr, nxt, belt) => {
+      context = CreateContext(context, name, belt ? nxt : next, error);
       const param = ConvertToContext(pr).clone();
       status = STATUS_IN_PROGRESS;
       RunMiddleware(param, (errMiddleware) => {
@@ -129,11 +129,36 @@ export const Execute = (name, param, done) => {
   }
   let context = ConvertToContext(param);
   context.set('$owner', name + '_starter');
-  if (ChainStorage[name]) {
+  if (name instanceof Array) {
+    ExecuteChains(name, done, index, param);
+  } else if (ChainStorage[name]) {
     const chain = lodash.clone(lodash.get(ChainStorage, name)());
     chain.execute(done, context, name);
   }
 };
+
+function ExecuteChains(chains, done, index, param) {
+  if (!index) {
+    index = 0;
+  }
+  if (index < chains.length) {
+    const chain = lodash.clone(lodash.get(ChainStorage, chains.shift())());
+    chain.execute((result) => {
+      index++;
+      ExecuteChains(chains, done, index, result);
+    }, param, nextChain(chains, index), true);
+  } else {
+    done(param);
+  }
+}
+
+function nextChain(chains, index) {
+  const nextIndex = index + 1;
+  if (chains.length > nextIndex) {
+    return chains[nextIndex];
+  }
+}
+
 export class ChainSpec {
   constructor(field, required, customValidator, immutable) {
     if (customValidator && !(customValidator instanceof Function)) {
