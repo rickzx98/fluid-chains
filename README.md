@@ -1,6 +1,6 @@
 # Fluid-chains
 
-Just a simple way to process actions in sequence.
+Just a simple way to run asynchronous functions in sequence.
 
 ## Getting Started
 
