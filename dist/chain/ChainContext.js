@@ -56,6 +56,24 @@ var ChainContext = function () {
             return copy;
         }
     }, {
+        key: 'cloneFor',
+        value: function cloneFor(context) {
+            if (!(context instanceof ChainContext)) {
+                throw new Error('Argument must be an instance of ChainContext');
+            }
+            var validators = _lodash2.default.clone(this.validators) || {};
+            var copy = new ChainContext(validators);
+            _lodash2.default.forIn(this, function (field, key) {
+                if (key !== 'addValidator' && key !== 'validate' && key !== 'set' && context.validators && context.validators[key]) {
+                    if (field instanceof Function) {
+                        var value = field();
+                        copy.set(key, value);
+                    }
+                }
+            });
+            return copy;
+        }
+    }, {
         key: 'validate',
         value: function validate(param) {
             _lodash2.default.forIn(this.validators, function (validator) {

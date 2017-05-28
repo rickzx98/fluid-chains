@@ -46,14 +46,15 @@ describe('ChainContext Unit', () => {
         });
         it('should not be mutated', () => {
             const context = new ChainContext();
-            context.set('hello', { remark: 'hi' });
+            context.set('hello', {remark: 'hi'});
             context.hello().remark = 'hello';
             assert(context.hello().remark === 'hi');
         });
         it('should throw an error if a Function is set to value', () => {
             const context = new ChainContext();
             expect(() => {
-                context.set('tryFunction', () => { });
+                context.set('tryFunction', () => {
+                });
             }).to.throw(Error);
         });
         it('should throw an error when setting immutable field twice', () => {
@@ -94,4 +95,20 @@ describe('ChainContext Unit', () => {
             }).to.throw('Field phone is required.');
         });
     });
+
+    describe('clone for parameter', () => {
+        it('should only get the value of the specified field', () => {
+            const context1 = new ChainContext();
+            context1.set('name', 'John');
+            context1.set('lastName', 'Wick');
+            const context2 = new ChainContext();
+            context2.addValidator(new ChainSpec('name', true));
+            const clonedContext = context1.cloneFor(context2);
+            expect(clonedContext instanceof ChainContext).to.be.true;
+            expect(clonedContext).to.be.not.undefined;
+            expect(clonedContext.name).to.be.not.undefined;
+            expect(clonedContext.lastName).to.be.undefined;
+        });
+    });
+
 });
