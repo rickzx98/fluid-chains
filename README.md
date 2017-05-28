@@ -96,6 +96,7 @@ Note: You cannot put Function as a value in context.set(key, value). You can put
 ```
 Executing chains like the sample above will ignore the chain's predefined sequence and it will follow the chain sequence in the array. The sample above will run the "first" chain then "third" as long as you satify their parameter and it will complete the sequence even if there is a sequence defined in the "third" chain (which is the "fourth") thus make the chains reuseable. 
 
+
 ### Error handling
 
 You can also use a chain as an error handler. Basically you're just creating another chain.
@@ -205,6 +206,39 @@ FindPeopleChain.addSpec('type',true, (done)=> {
 
 ```
 
+### Strict mode
+
+You can turn on strict mode by setting adding boolean true to the fourth argument of the constructor.
+
+```
+const strictChain = new Chain('StrictModeChain02', (context, param, next) => {
+            }, null, null, true);
+```
+
+
+With strict mode "on", chains can will only accept parameter that is specified in addSpec. 
+
+```
+ new Chain('StrictModeChain01', (context, param, next) => {
+    context.set('name', 'John');
+    context.set('surname', 'Wick');
+    context.set('age', 'unknown');
+    next();
+ }, 'StrictModeChain02');
+
+
+const strictChain = new Chain('StrictModeChain02', (context, param, next) => {
+    param.name() // is available
+    param.surname() // is available
+    param.age() // is not available 
+    next();
+}, null, null, true);
+
+strictChain.addSpec('name', true);
+strictChain.addSpec('surname', true)
+
+```
+
 ### Running with Middlewares
 
 Creating middlewares are never been as easy as the following
@@ -233,16 +267,6 @@ new ChainMiddleware('ChainAuthentication', (param, nextChain, next) => {
 
 ```
 
-## Running the tests
-
-To run the test just clone the project and install everything with 
-```
-npm install
-```
-then run 
-```
-npm test
-```
 ### Examples
 
 * [Examples](https://github.com/rickzx98/fluid-chains/tree/master/examples) 

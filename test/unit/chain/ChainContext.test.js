@@ -46,7 +46,7 @@ describe('ChainContext Unit', () => {
         });
         it('should not be mutated', () => {
             const context = new ChainContext();
-            context.set('hello', {remark: 'hi'});
+            context.set('hello', { remark: 'hi' });
             context.hello().remark = 'hello';
             assert(context.hello().remark === 'hi');
         });

@@ -49,6 +49,9 @@ export default class ChainContext {
                     const value = field();
                     copy.set(key, value);
                 }
+            } else if (key === '$error' || key === '$owner' || key === '$errorMessage' || key === '$next' || key === '$err') {
+                const value = field();
+                copy.set(key, value);
             }
         });
         return copy;

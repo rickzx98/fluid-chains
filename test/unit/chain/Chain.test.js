@@ -345,4 +345,64 @@ describe('Chain Unit', () => {
             });
         });
     });
+    describe('Strict mode', () => {
+        it('should only accepts parameter that is specified in addSpec()', (done) => {
+            new Chain('StrictModeChain01', (context, param, next) => {
+                context.set('name', 'John');
+                context.set('surname', 'Wick');
+                context.set('age', 'unknown');
+                next();
+            }, 'StrictModeChain02');
+
+            const strictChain = new Chain('StrictModeChain02', (context, param, next) => {
+                expect(param.name).to.be.not.undefined;
+                expect(param.surname).to.be.not.undefined;
+                expect(param.age).to.be.undefined;
+                expect(param.$owner).to.be.not.undefined;
+                context.set('fullname', param.name() + ' ' + param.surname());
+                next();
+            }, null, null, true);
+
+            strictChain.addSpec('name', true);
+            strictChain.addSpec('surname', true)
+
+            ExecuteChain('StrictModeChain01', {}, (result) => {
+                if (result.$err) {
+                    console.log('result', result.$err());
+                }
+                else {
+                    expect(result.fullname).to.be.not.undefined;
+                    expect(result.fullname()).to.be.equal('John Wick');
+                    done();
+                }
+            });
+
+        });
+        it('should not get any parameter', (done) => {
+            new Chain('StrictModeChain01_1', (context, param, next) => {
+                context.set('name', 'John');
+                context.set('surname', 'Wick');
+                context.set('age', 'unknown');
+                next();
+            }, 'StrictModeChain02_1');
+
+            new Chain('StrictModeChain02_1', (context, param, next) => {
+                expect(param.name).to.be.undefined;
+                expect(param.surname).to.be.undefined;
+                expect(param.age).to.be.undefined;
+                expect(param.$owner).to.be.not.undefined;
+                console.log('param', param);
+                next();
+            }, null, null, true);
+
+            ExecuteChain('StrictModeChain01_1', {}, (result) => {
+                if (result.$err) {
+                    console.log('result', result.$err());
+                }
+                else {
+                    done();
+                }
+            });
+        });
+    });
 });

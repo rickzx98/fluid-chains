@@ -69,6 +69,9 @@ var ChainContext = function () {
                         var value = field();
                         copy.set(key, value);
                     }
+                } else if (key === '$error' || key === '$owner' || key === '$errorMessage' || key === '$next' || key === '$err') {
+                    var _value = field();
+                    copy.set(key, _value);
                 }
             });
             return copy;

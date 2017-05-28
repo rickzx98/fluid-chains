@@ -42,7 +42,7 @@ var STATUS_FAILED = 'FAILED';
 var STATUS_TERMINATED = 'TERMINATED';
 
 var CH = exports.CH = function () {
-  function CH(name, action, next, error) {
+  function CH(name, action, next, error, strict) {
     var _this = this;
 
     _classCallCheck(this, CH);
@@ -51,14 +51,13 @@ var CH = exports.CH = function () {
     var status = STATUS_UNTOUCHED;
     var context = new _ChainContext2.default();
     context.set('$owner', name);
-    var responseTime = 0;
     this.spec = [];
     this.terminate = function () {
       context.set('$isTerminated', true);
     };
     this.execute = function (done, pr, nxt, belt) {
       context = (0, _ContextFactory.CreateContext)(context, name, belt ? nxt : next, error);
-      var param = (0, _ContextFactory.ConvertToContext)(pr).clone();
+      var param = strict ? (0, _ContextFactory.ConvertToContext)(pr).cloneFor(context) : (0, _ContextFactory.ConvertToContext)(pr).clone();
       status = STATUS_IN_PROGRESS;
       (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
         if (errMiddleware) {
@@ -146,6 +145,7 @@ var CH = exports.CH = function () {
         });
       }
     }
+
     (0, _ChainStorage.putChain)(name, this);
   }
 
