@@ -208,7 +208,7 @@ FindPeopleChain.addSpec('type',true, (done)=> {
 
 ### Strict mode
 
-You can turn on strict mode by setting adding boolean true to the fourth argument of the constructor.
+You can turn on strict mode by putting boolean "true" to the fourth argument of the constructor.
 
 ```
 const strictChain = new Chain('StrictModeChain02', (context, param, next) => {
