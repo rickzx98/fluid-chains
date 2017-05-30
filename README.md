@@ -12,20 +12,29 @@ These instructions will get you a copy of the project up and running on your loc
 npm install --save fluid-chains
 ```
 
+- Javascript (ES6)
+
 ```
 import {Chain} from 'fluid-chains';
+```
+
+- Javascript 
+```
+var FluidChains = require('fluid-chains');
+var Chain  = FluidChains.Chain;
 ```
 
 ### Creating your first chain
 
 ```
-new Chain('FindPeople', (context, param, next) => {
+new Chain('FindPeople', function(context, param, next) {
     const people = ['john','jane','sam'];
-    context.set('people', people.filter((person) => person === param.filterBy()));
+    context.set('people', people.filter(function(person) { 
+        person === param.filterBy() }));
     next();
 });
-```
 
+```
 ### Starting the chain
 
 ```
