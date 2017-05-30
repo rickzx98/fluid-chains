@@ -1,4 +1,4 @@
-# Fluid-chains
+# [Fluid-chains](https://rickzx98.github.io/fluid-chains/)
 
 Just a simple way to run asynchronous functions in sequence.
 
