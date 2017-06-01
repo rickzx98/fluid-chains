@@ -12,6 +12,9 @@ describe('ChainStorage Unit', () => {
             assert(ChainStorage.sample() === 1);
         });
     });
+    describe('Chain state', () => {
+      
+    });
     it('should get all middlewares', () => {
         new ChainMiddleware('middleWareOne', (param, next) => { });
         new ChainMiddleware('middleWareTwo', (param, next) => { });
