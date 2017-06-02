@@ -1,9 +1,12 @@
-import { putConfig } from './ChainStorage';
+import { getConfig, putConfig } from './ChainStorage';
 
-export const ChainCacheEnabled = () => {
+export const CacheEnabled = () => {
+    if (!getConfig()['$strict']) {
+        throw new Error('ChainCacheEnabled Failed: Strict mode must be enabled.');
+    }
     putConfig('$cache', true);
 }
 
-export const ChainStrictModeEnabled = () => {
+export const StrictModeEnabled = () => {
     putConfig('$strict', true);
 }

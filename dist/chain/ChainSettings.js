@@ -3,14 +3,17 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.ChainStrictModeEnabled = exports.ChainCacheEnabled = undefined;
+exports.StrictModeEnabled = exports.CacheEnabled = undefined;
 
 var _ChainStorage = require('./ChainStorage');
 
-var ChainCacheEnabled = exports.ChainCacheEnabled = function ChainCacheEnabled() {
+var CacheEnabled = exports.CacheEnabled = function CacheEnabled() {
+    if (!(0, _ChainStorage.getConfig)()['$strict']) {
+        throw new Error('ChainCacheEnabled Failed: Strict mode must be enabled.');
+    }
     (0, _ChainStorage.putConfig)('$cache', true);
 };
 
-var ChainStrictModeEnabled = exports.ChainStrictModeEnabled = function ChainStrictModeEnabled() {
+var StrictModeEnabled = exports.StrictModeEnabled = function StrictModeEnabled() {
     (0, _ChainStorage.putConfig)('$strict', true);
 };

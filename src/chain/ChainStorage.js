@@ -52,8 +52,10 @@ export const getState = (key, name, param) => {
 }
 export const getMiddlewares = () => {
     return lodash.filter(ChainStorage, (storage) => {
-        const chain = storage();
-        return chain.type && chain.type === 'MIDDLEWARE';
+        if (storage instanceof Function) {
+            const chain = storage();
+            return chain.type && chain.type === 'MIDDLEWARE';
+        }
     });
 }
 

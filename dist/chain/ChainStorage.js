@@ -68,8 +68,10 @@ var getState = exports.getState = function getState(key, name, param) {
 };
 var getMiddlewares = exports.getMiddlewares = function getMiddlewares() {
     return _lodash2.default.filter(ChainStorage, function (storage) {
-        var chain = storage();
-        return chain.type && chain.type === 'MIDDLEWARE';
+        if (storage instanceof Function) {
+            var chain = storage();
+            return chain.type && chain.type === 'MIDDLEWARE';
+        }
     });
 };
 
