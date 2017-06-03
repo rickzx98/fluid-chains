@@ -1,8 +1,10 @@
 import {
   ChainStorage,
+  getConfig,
   putChain,
 } from './ChainStorage';
 import { ConvertToContext, CreateContext, CreateErrorContext } from './ContextFactory';
+import { STATUS_DONE, STATUS_FAILED, STATUS_IN_PROGRESS, STATUS_TERMINATED, STATUS_UNTOUCHED } from './ChainStatus.js';
 
 import ChainContext from './ChainContext';
 import ChainSpec from './ChainSpec';
@@ -13,15 +15,8 @@ import { ValidateConstructor } from './Validation';
 import lodash from 'lodash';
 import sizeOf from 'object-sizeof';
 
-const STATUS_IN_PROGRESS = 'IN_PROGRESS';
-const STATUS_UNTOUCHED = 'UNTOUCHED';
-const STATUS_DONE = 'DONE';
-const STATUS_FAILED = 'FAILED';
-const STATUS_TERMINATED = 'TERMINATED';
-
-
 export class CH {
-  constructor(name, action, next, error, strict) {
+  constructor(name, action, next, error) {
     ValidateConstructor(name, action);
     let status = STATUS_UNTOUCHED;
     let context = new ChainContext();
@@ -32,7 +27,7 @@ export class CH {
     };
     this.execute = (done, pr, nxt, belt) => {
       context = CreateContext(context, name, belt ? nxt : next, error);
-      const param = strict ? ConvertToContext(pr).cloneFor(context) : ConvertToContext(pr).clone();
+      const param = !!getConfig()['$strict'] ? ConvertToContext(pr).cloneFor(context) : ConvertToContext(pr).clone();
       status = STATUS_IN_PROGRESS;
       RunMiddleware(param, (errMiddleware) => {
         if (errMiddleware) {
@@ -115,7 +110,6 @@ export class CH {
 
     putChain(name, this);
   }
-
   size() {
     return sizeOf(this);
   }

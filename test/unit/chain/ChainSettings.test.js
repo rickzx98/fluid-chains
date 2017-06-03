@@ -6,6 +6,9 @@ import { expect } from 'chai';
 import { getConfig } from '../../../src/chain/ChainStorage';
 
 describe('Chain Settings spec', () => {
+    before(() => {
+        getConfig()['$strict'] = false;
+    })
     it('should not enable cache when strinct mode is disabled', () => {
         expect(() => {
             CacheEnabled();
@@ -15,7 +18,7 @@ describe('Chain Settings spec', () => {
         StrictModeEnabled();
         expect(getConfig()['$strict']).to.be.true;
     });
-     it('should enable cache mode', () => {
+    it('should enable cache mode', () => {
         StrictModeEnabled();
         CacheEnabled();
         expect(getConfig()['$cache']).to.be.true;

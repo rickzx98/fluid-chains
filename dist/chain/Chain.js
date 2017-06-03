@@ -11,6 +11,8 @@ var _ChainStorage = require('./ChainStorage');
 
 var _ContextFactory = require('./ContextFactory');
 
+var _ChainStatus = require('./ChainStatus.js');
+
 var _ChainContext = require('./ChainContext');
 
 var _ChainContext2 = _interopRequireDefault(_ChainContext);
@@ -35,20 +37,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var STATUS_IN_PROGRESS = 'IN_PROGRESS';
-var STATUS_UNTOUCHED = 'UNTOUCHED';
-var STATUS_DONE = 'DONE';
-var STATUS_FAILED = 'FAILED';
-var STATUS_TERMINATED = 'TERMINATED';
-
 var CH = exports.CH = function () {
-  function CH(name, action, next, error, strict) {
+  function CH(name, action, next, error) {
     var _this = this;
 
     _classCallCheck(this, CH);
 
     (0, _Validation.ValidateConstructor)(name, action);
-    var status = STATUS_UNTOUCHED;
+    var status = _ChainStatus.STATUS_UNTOUCHED;
     var context = new _ChainContext2.default();
     context.set('$owner', name);
     this.spec = [];
@@ -57,8 +53,8 @@ var CH = exports.CH = function () {
     };
     this.execute = function (done, pr, nxt, belt) {
       context = (0, _ContextFactory.CreateContext)(context, name, belt ? nxt : next, error);
-      var param = strict ? (0, _ContextFactory.ConvertToContext)(pr).cloneFor(context) : (0, _ContextFactory.ConvertToContext)(pr).clone();
-      status = STATUS_IN_PROGRESS;
+      var param = !!(0, _ChainStorage.getConfig)()['$strict'] ? (0, _ContextFactory.ConvertToContext)(pr).cloneFor(context) : (0, _ContextFactory.ConvertToContext)(pr).clone();
+      status = _ChainStatus.STATUS_IN_PROGRESS;
       (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
         if (errMiddleware) {
           done({
@@ -75,7 +71,7 @@ var CH = exports.CH = function () {
             context.set('$error', param.$error());
           }
           if (context.$isTerminated && context.$isTerminated()) {
-            status = STATUS_TERMINATED;
+            status = _ChainStatus.STATUS_TERMINATED;
             var clonedContext = context.clone();
             done(clonedContext);
           } else {
@@ -86,13 +82,13 @@ var CH = exports.CH = function () {
                   if (err && err instanceof Error) {
                     failed(done, context, name, err);
                   } else {
-                    status = STATUS_DONE;
+                    status = _ChainStatus.STATUS_DONE;
                     if (belt && nxt) {
                       context.set('$responseTime', new Date().getTime() - startTime);
                       _lodash2.default.clone(_ChainStorage.ChainStorage[nxt]()).execute(done, context);
                     } else if (!belt && context.$next && context.$next()) {
                       if (context.$isTerminated && context.$isTerminated()) {
-                        status = STATUS_TERMINATED;
+                        status = _ChainStatus.STATUS_TERMINATED;
                         ChainResponse(done, context, startTime);
                       } else {
                         context.set('$responseTime', new Date().getTime() - startTime);
@@ -130,7 +126,7 @@ var CH = exports.CH = function () {
       context.addValidator(spec);
     };
     function failed(done, context, name, err) {
-      status = STATUS_FAILED;
+      status = _ChainStatus.STATUS_FAILED;
       if (context.$error) {
         _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, (0, _ContextFactory.CreateErrorContext)(context.$error(), name, err));
       } else {

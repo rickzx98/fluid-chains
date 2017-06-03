@@ -4,6 +4,9 @@ import lodash from 'lodash';
 export const ChainStorage = {};
 
 export const putChain = (name, chain) => {
+    if (lodash.get(ChainStorage, name)) {
+        throw Error('A chain with the same name as "' + name + '" has already been stored.')
+    }
     lodash.set(ChainStorage, name, () => chain);
 };
 
@@ -70,4 +73,10 @@ export const getConfig = () => {
         config = lodash.get(ChainStorage, '$chain.$config');
     }
     return config;
+}
+
+export const clearStorage = () => {
+    lodash.forIn(ChainStorage, (field, key) => {
+        lodash.unset(ChainStorage, key);
+    });
 }
