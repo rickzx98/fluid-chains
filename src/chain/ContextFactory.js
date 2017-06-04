@@ -14,7 +14,7 @@ export const CreateErrorContext = (name, errorFrom, err) => {
     context.set('$errorMessage', err.message);
     context.set('$errorFrom', errorFrom);
     return context;
-}
+};
 
 export const ConvertToContext = (param) => {
     if (!(param instanceof ChainContext)) {
@@ -32,7 +32,7 @@ export const ConvertToContext = (param) => {
         return context;
     }
     return param;
-}
+};
 
 
 export const CreateContext = (original, name, next, error) => {
@@ -47,4 +47,4 @@ export const CreateContext = (original, name, next, error) => {
         context.set('$next', next);
     }
     return context;
-}
+};

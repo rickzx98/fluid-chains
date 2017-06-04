@@ -11,6 +11,7 @@ const expect = chai.expect;
 
 describe('Chain Unit', () => {
     before(() => {
+        getConfig()['$cache'] = false;
         getConfig()['$strict'] = false;
     });
     describe('spec', () => {
