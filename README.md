@@ -2,7 +2,7 @@
 
 Just a simple way to run asynchronous functions with functional programming in mind.
 
-c## Getting Started
+### Getting Started
 
 Installing fluid-chains is easy. It is not a framework and we want to make it light and simple.
 
@@ -33,7 +33,7 @@ new Chain('FindPeople', function(context, param, next) {
       function(person) { 
          person === param.filterBy() 
         }));
-u      next();
+      next();
 });
 
 ```
@@ -143,7 +143,7 @@ new Chain('firstChain', function(context, param, next) {
     next();
 
 }, 'secondChain', 'firstErrorHandler' 
-n  /*error handler is on the fourth argument*/); 
+  /*error handler is on the fourth argument*/); 
 
 new Chain('firstErrorHandler', function(context, param, next) { 
     /*
@@ -153,7 +153,7 @@ new Chain('firstErrorHandler', function(context, param, next) {
     console.log('error', param.$error());  
         // Error('Name is required.');
     console.log('errorMessage), param.$errorMessage()); 
-u        // 'Name is required.'
+        // 'Name is required.'
     next(); 
     /* 
         You can call next() to finish the chain or 
@@ -220,7 +220,7 @@ new Chain('firstChain', function(context, param, next) {
 For each chain we can specify required fields and custom validations
 
 ```
-const FindPeopleChain = new Chain('FindPeople', function(context, param, next) { 
+var FindPeopleChain = new Chain('FindPeople', function(context, param, next) { 
     param.name() // should not be null or empty
     param.type() // should not be null or empty and must be "quick"
     next();
@@ -240,18 +240,25 @@ FindPeopleChain.addSpec('type',true, function(done) {
 
 ### Strict mode
 
-You can turn on strict mode by putting boolean "true" to the fourth argument of the constructor.
+You can turn on strict mode by invoking "ChainStrictModeEnabled" function.
+
+- ES6
+```
+import {ChainStrictModeEnabled} from 'fluid-chains';
+ChainStrictModeEnabled();
+```
+
+- Javascript
 
 ```
-const strictChain = new Chain('StrictModeChain02', (context, param, next) => {
-            }, null, null, true);
+var FluidChains = require('fluid-chains');
+var ChainStrictModeEnabled = FluidChains.ChainStrictModeEnabled;
+ChainStrictModeEnabled();
 ```
-
 
 With strict mode "on", chains can will only accept parameter that is specified in addSpec. 
 
-```
- new Chain('StrictModeChain01', (context, param, next) => {
+ new Chain('StrictModeChain01', function(context, param, next) {
     context.set('name', 'John');
     context.set('surname', 'Wick');
     context.set('age', 'unknown');
@@ -259,12 +266,12 @@ With strict mode "on", chains can will only accept parameter that is specified i
  }, 'StrictModeChain02');
 
 
-const strictChain = new Chain('StrictModeChain02', (context, param, next) => {
+var strictChain = new Chain('StrictModeChain02', function(context, param, next) {
     param.name() // is available
     param.surname() // is available
     param.age() // is not available 
     next();
-}, null, null, true);
+}, null, null);
 
 strictChain.addSpec('name', true);
 strictChain.addSpec('surname', true)
