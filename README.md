@@ -12,7 +12,7 @@ Installing fluid-chains is easy. It is not a framework and we want to make it li
 npm install --save fluid-chains
 ```
 
-n- Javascript (ES6)
+- Javascript (ES6)
 
 ```
 import {Chain} from 'fluid-chains';
@@ -258,6 +258,7 @@ ChainStrictModeEnabled();
 
 With strict mode "on", chains can will only accept parameter that is specified in addSpec. 
 
+```
  new Chain('StrictModeChain01', function(context, param, next) {
     context.set('name', 'John');
     context.set('surname', 'Wick');
@@ -278,24 +279,60 @@ strictChain.addSpec('surname', true)
 
 ```
 
+### Caching
+
+Since the chain output can be based on the value of its parameter it is possible 
+to cache the output of a chain. 
+
+To enable caching you must have strict mode enabled. 
+
+- ES6
+```
+import {ChainStrictModeEnabled, ChainCacheEnabled} from 'fluid-chains';
+ChainStrictModeEnabled();
+ChainCacheEnabled();
+```
+
+- Javascript
+
+```
+var FluidChains = require('fluid-chains');
+var ChainStrictModeEnabled = FluidChains.ChainStrictModeEnabled;
+var ChainCacheEnabled = FluidChains.ChainCacheEnabled;
+ChainStrictModeEnabled();
+ChainCacheEnabled();
+```
+
+Note: Only the fields specified in Chain.addSpec() will be used
+as identifier of the chain cache.
+
 ### Running with Middlewares
 
-Creating middlewares are never been as easy as the following
+- ES6
 ```
 import { ChainMiddleware } from 'fluid-chains';
+```
+- Javascript
+```
+var FluidChains = require('fluid-chains');
+var ChainMiddleware = FluidChains.ChainMiddleware;
+```
+
+```
 
 /*
     @param param: object = parameters for the next chain
     @param nextChain: string = name of the next chain
     @param next: Function = proceeds to the next chain
 */
-new ChainMiddleware('ChainInfoLogger', (param, nextChain, next) => { 
+
+new ChainMiddleware('ChainInfoLogger', function(param, nextChain, next) { 
     console.log('from chain', param.$owner());
     console.log('to chain', nextChain);
     next();
 });
 
-new ChainMiddleware('ChainAuthentication', (param, nextChain, next) => { 
+new ChainMiddleware('ChainAuthentication', function(param, nextChain, next) { 
     if(nextChain === 'CreatePeopleChain' && param.sessionKey){
         //validates 
     } else {
