@@ -281,7 +281,7 @@ strictChain.addSpec('surname', true)
 
 ### Caching
 
-Since the chain output can be based on the value of its parameter it is possible 
+Since the chain output can be based on the value of its parameter making it possible 
 to cache the output of a chain. 
 
 To enable caching you must have strict mode enabled. 
