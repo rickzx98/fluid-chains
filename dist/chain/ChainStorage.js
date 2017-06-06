@@ -38,8 +38,8 @@ var addChainState = exports.addChainState = function addChainState(key, name, sp
         });
         _lodash2.default.set(state, 'spec', spec);
         _lodash2.default.set(state, 'params', param);
-        _lodash2.default.set(state, 'context', _lodash2.default.clone(context));
     }
+    _lodash2.default.set(state, 'context', _lodash2.default.clone(context));
     if (!_lodash2.default.get(ChainStorage, key)) {
         _lodash2.default.set(ChainStorage, key, {});
     }
@@ -54,16 +54,20 @@ var getState = exports.getState = function getState(key, name, param) {
     var state = _lodash2.default.get(ChainStorage, key);
     var stateChain = _lodash2.default.get(state, name);
     var context = undefined;
-    if (stateChain && stateChain.spec) {
-        var valid = [];
-        stateChain.spec.forEach(function (fieldSpec) {
-            if (param[fieldSpec.field]) {
-                valid.push(param[fieldSpec.field]() === stateChain.params[fieldSpec.field]());
+    if (stateChain) {
+        if (stateChain.spec) {
+            var valid = [];
+            stateChain.spec.forEach(function (fieldSpec) {
+                if (param[fieldSpec.field]) {
+                    valid.push(param[fieldSpec.field]() === stateChain.params[fieldSpec.field]());
+                }
+            });
+            if (_lodash2.default.filter(valid, function (value) {
+                return value;
+            }).length === stateChain.spec.length) {
+                context = stateChain.context;
             }
-        });
-        if (_lodash2.default.filter(valid, function (value) {
-            return value;
-        }).length === stateChain.spec.length) {
+        } else {
             context = stateChain.context;
         }
     }
