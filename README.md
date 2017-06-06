@@ -230,11 +230,12 @@ var FindPeopleChain = new Chain('FindPeople', function(context, param, next) {
     @param field: string,
     @param required: boolean
     @param customerValidation (Optional) : Function(callback) => callback(valid, message) 
+    @param immutable: boolean - will make object immutable and can only be set once
 */
 FindPeopleChain.addSpec('name', true);
 FindPeopleChain.addSpec('type',true, function(done) {
     done(type ==='quick', 'Type should be "quick"');
-});
+}, true);
 
 ```
 

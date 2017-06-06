@@ -87,7 +87,7 @@ const failed = (done, context, name, err) => {
     }
 };
 
-const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, cacheEnabled)=> {
+const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) => {
     RunMiddleware(param, (errMiddleware) => {
         if (errMiddleware) {
             done({
@@ -147,7 +147,7 @@ const invokeAction = (action, name, spec, context, param, belt, nxt, cacheEnable
     });
 };
 
-const concludeNextAction = (context, param, belt, nxt, startTime, done)=> {
+const concludeNextAction = (context, param, belt, nxt, startTime, done) => {
     context.set('$$chain.status', STATUS_DONE);
     if (belt && nxt) {
         context.set('$responseTime', new Date().getTime() - startTime);
