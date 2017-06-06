@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.getConfig = exports.putConfig = exports.getMiddlewares = exports.getState = exports.removeState = exports.addChainState = exports.createChainState = exports.putChain = exports.ChainStorage = undefined;
+exports.clearStorage = exports.getConfig = exports.putConfig = exports.getMiddlewares = exports.getState = exports.removeState = exports.addChainState = exports.createChainState = exports.putChain = exports.ChainStorage = undefined;
 
 var _Util = require('./Util');
 
@@ -16,6 +16,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var ChainStorage = exports.ChainStorage = {};
 
 var putChain = exports.putChain = function putChain(name, chain) {
+    if (_lodash2.default.get(ChainStorage, name)) {
+        throw Error('A chain with the same name as "' + name + '" has already been stored.');
+    }
     _lodash2.default.set(ChainStorage, name, function () {
         return chain;
     });
@@ -86,4 +89,10 @@ var getConfig = exports.getConfig = function getConfig() {
         config = _lodash2.default.get(ChainStorage, '$chain.$config');
     }
     return config;
+};
+
+var clearStorage = exports.clearStorage = function clearStorage() {
+    _lodash2.default.forIn(ChainStorage, function (field, key) {
+        _lodash2.default.unset(ChainStorage, key);
+    });
 };

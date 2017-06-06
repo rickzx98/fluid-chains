@@ -2,9 +2,9 @@
 
 Just a simple way to run asynchronous functions with functional programming in mind.
 
-## Getting Started
+### Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Installing fluid-chains is easy. It is not a framework and we want to make it light and simple.
 
 ### Installing
 
@@ -28,10 +28,12 @@ var Chain  = FluidChains.Chain;
 
 ```
 new Chain('FindPeople', function(context, param, next) {
-    const people = ['john','jane','sam'];
-    context.set('people', people.filter(function(person) { 
-        person === param.filterBy() }));
-    next();
+    var people = ['john','jane','sam'];
+    context.set('people', people.filter(
+      function(person) { 
+         person === param.filterBy() 
+        }));
+      next();
 });
 
 ```
@@ -40,9 +42,10 @@ new Chain('FindPeople', function(context, param, next) {
 ```
 import {ExecuteChain} from 'fluid-chains';
 
-ExecuteChain('FindPeople', {filterBy: 'jane'}, (result) => {
-   const people = result.people();;
-   console.log('people', people);
+ExecuteChain('FindPeople', {filterBy: 'jane'}, 
+    function(result) {
+       var people = result.people();;
+     console.log('people', people);
 });
 ```
 
@@ -51,36 +54,39 @@ ExecuteChain('FindPeople', {filterBy: 'jane'}, (result) => {
 ```
 import {Chain, ExecuteChain} from 'fluid-chains';
 
-new Chain('firstChain', (context, param, next) => {
+new Chain('firstChain', function(context, param, next) {
     /* 
-        context.set(key, value) will set param value of the 
-        next chain. 
+        context.set(key, value) will set 
+        param value of the next chain. 
     */ 
-
-    if (param.name){
+    if (param.name) {
         context.set('remarksTo', param.name());
     } else {
         context.set('remarksTo','everyone');
     }
 
-    next(); /* call to proceed to the next chain. Good for asynchronous callbacks */
+    next(); 
+    /* call to proceed to the next chain. 
+    Good for asynchronous callbacks */
 
 }, 'secondChain' /* name of the next chain */); 
 
-new Chain('secondChain', (context, param, next) => { 
+new Chain('secondChain', function(context, param, next) { 
 
     /* 
         the context value of the previous chain can
         be accessed with param.{field}() and it's always
         a Function.
     */
-
+    
     context.set('remarks','Hello, '+param.remarksTo()+'!');
 
-    next(); /* not calling next() will break the chain and will not trigger the callback below.*/
+    next(); 
+    /* not calling next() will break the chain 
+    and will not trigger the callback below.*/
 });
 
-ExecuteChain('firstChain', (result) => {
+ExecuteChain('firstChain', function(result) {
     /* 
         This will run because you call next()
         from the last chain.
@@ -88,53 +94,66 @@ ExecuteChain('firstChain', (result) => {
     console.log(result.remarks());
 });
 ```
-Note: You cannot put Function as a value in context.set(key, value). You can put value and object.
+Note: You cannot put Function as a value in context.set(key, value). 
+    You can put value and object.
 
 ### Can I reuse Chain?
 ExecuteChains(Array, Parameter, Done);
 
 ```
-new Chain('first', (context,param, next)=>{next()},'second');
-new Chain('second',(context,param,next)=>{next()},'third');
-new Chain('third',(context,param,next)=>{next()},'fourth');
-new Chain('fourth',(context,param,next)=>{next()});
+new Chain('first', function(context,param, next){
+   next()},'second');
+new Chain('second', function(context,param,next) {
+   next()},'third');
+new Chain('third', function(context,param,next { 
+   next()},'fourth');
+new Chain('fourth', function(context,param,next) {
+   next()});
 
-ExecuteChain(['first','third'],{},(result)=>{
+ExecuteChain(['first','third'],{}, function(result) {
     // last chain processed was "third"
 });
 
 ```
-Executing chains like the sample above will ignore the chain's predefined sequence and it will follow the chain sequence in the array. The sample above will run the "first" chain then "third" as long as you satify their parameter and it will complete the sequence even if there is a sequence defined in the "third" chain (which is the "fourth") thus make the chains reuseable. 
+Note: Executing chains like the sample above will ignore the chain's predefined 
+  sequence and it will follow the chain sequence in the array. The sample 
+  above will run the "first" chain then "third" as long as you satify their 
+  parameter and it will complete the sequence even if there is a sequence 
+  defined in the "third" chain (which is the "fourth") thus make the chains reuseable. 
 
 
 ### Error handling
 
-You can also use a chain as an error handler. Basically you're just creating another chain.
+You can also use a chain as an error handler. Basically you're just 
+creating another chain.
 ```
 
-new Chain('firstChain', (context, param, next) => {
+new Chain('firstChain', function(context, param, next) {
 
     /* 
         context.set(key, value) will set param value of the 
         next chain. 
     */ 
 
-    if (param.name){
+    if (param.name) {
         context.set('remarksTo', param.name());
     } else {
       throw new Error('Name is required.');
     }
     next();
 
-}, 'secondChain', 'firstErrorHandler' /*error handler is on the fourth argument*/); 
+}, 'secondChain', 'firstErrorHandler' 
+  /*error handler is on the fourth argument*/); 
 
-new Chain('firstErrorHandler', (context, param, next) => { 
+new Chain('firstErrorHandler', function(context, param, next) { 
     /*
         param.$error and param.$errorMessage functions
         are created.
     */
-    console.log('error', param.$error());  // Error('Name is required.');
-    console.log('errorMessage), param.$errorMessage()); // 'Name is required.'
+    console.log('error', param.$error());  
+        // Error('Name is required.');
+    console.log('errorMessage), param.$errorMessage()); 
+        // 'Name is required.'
     next(); 
     /* 
         You can call next() to finish the chain or 
@@ -143,10 +162,11 @@ new Chain('firstErrorHandler', (context, param, next) => {
     */
 });
 ```
-Note: You can place an error handler for each chain otherwise it will be thrown to the nearest error handler of its previous chain.
+Note: You can place an error handler for each chain otherwise it will be thrown 
+    to the nearest error handler of its previous chain.
 
 ```
-new Chain('firstChain', (context, param, next) => {
+new Chain('firstChain', function(context, param, next) {
     if (param.name){
         context.set('remarksTo', param.name());
     } else {
@@ -156,13 +176,13 @@ new Chain('firstChain', (context, param, next) => {
 
 }, 'secondChain', 'firstErrorHandler'); 
 
-new Chain('secondChain', (context, param, next) => {
+new Chain('secondChain', function(context, param, next) {
     context.set('remarks','Hello, '+param.remarksTo()+'!');
     next();
 
 }, 'thirdChain', 'anotherErrorHandler'); 
 
-new Chain('thirdChain', (context, param, next) => {
+new Chain('thirdChain', function(context, param, next) {
    if (param.name){
         context.set('remarksTo', param.name());
     } else {
@@ -171,13 +191,15 @@ new Chain('thirdChain', (context, param, next) => {
     next();
 }); 
 
-new Chain('firstErrorHandler', (context, param, next) => { 
-    console.log('error', param.$error());  // Error('Name is required.');
-    console.log('errorMessage), param.$errorMessage()); // 'Name is required.'
+new Chain('firstErrorHandler', function(context, param, next) { 
+    console.log('error', param.$error());  
+        // Error('Name is required.');
+    console.log('errorMessage), param.$errorMessage()); 
+        // 'Name is required.'
     next();
 });
 
-new Chain('anotherErrorHandler', (context, param, next) => { 
+new Chain('anotherErrorHandler', function(context, param, next) { 
     //thirdChain error will also be handled here.
     next();
 });
@@ -186,8 +208,8 @@ new Chain('anotherErrorHandler', (context, param, next) => {
 Note: For asynchronous callback errors you may do "next(Error)".
 
 ```
-new Chain('firstChain', (context, param, next) => {
-    setTimeout(()=>{
+new Chain('firstChain', function(context, param, next) {
+    setTimeout(function() {
         next(new Error('sample'));
     });
 }, 'secondChain', 'firstErrorHandler'); 
@@ -198,7 +220,7 @@ new Chain('firstChain', (context, param, next) => {
 For each chain we can specify required fields and custom validations
 
 ```
-const FindPeopleChain = new Chain('FindPeople', (context, param, next)=> { 
+var FindPeopleChain = new Chain('FindPeople', function(context, param, next) { 
     param.name() // should not be null or empty
     param.type() // should not be null or empty and must be "quick"
     next();
@@ -208,28 +230,37 @@ const FindPeopleChain = new Chain('FindPeople', (context, param, next)=> {
     @param field: string,
     @param required: boolean
     @param customerValidation (Optional) : Function(callback) => callback(valid, message) 
+    @param immutable: boolean - will make object immutable and can only be set once
 */
 FindPeopleChain.addSpec('name', true);
-FindPeopleChain.addSpec('type',true, (done)=> {
+FindPeopleChain.addSpec('type',true, function(done) {
     done(type ==='quick', 'Type should be "quick"');
-});
+}, true);
 
 ```
 
 ### Strict mode
 
-You can turn on strict mode by putting boolean "true" to the fourth argument of the constructor.
+You can turn on strict mode by invoking "ChainStrictModeEnabled" function.
+
+- ES6
+```
+import {ChainStrictModeEnabled} from 'fluid-chains';
+ChainStrictModeEnabled();
+```
+
+- Javascript
 
 ```
-const strictChain = new Chain('StrictModeChain02', (context, param, next) => {
-            }, null, null, true);
+var FluidChains = require('fluid-chains');
+var ChainStrictModeEnabled = FluidChains.ChainStrictModeEnabled;
+ChainStrictModeEnabled();
 ```
-
 
 With strict mode "on", chains can will only accept parameter that is specified in addSpec. 
 
 ```
- new Chain('StrictModeChain01', (context, param, next) => {
+ new Chain('StrictModeChain01', function(context, param, next) {
     context.set('name', 'John');
     context.set('surname', 'Wick');
     context.set('age', 'unknown');
@@ -237,36 +268,72 @@ With strict mode "on", chains can will only accept parameter that is specified i
  }, 'StrictModeChain02');
 
 
-const strictChain = new Chain('StrictModeChain02', (context, param, next) => {
+var strictChain = new Chain('StrictModeChain02', function(context, param, next) {
     param.name() // is available
     param.surname() // is available
     param.age() // is not available 
     next();
-}, null, null, true);
+}, null, null);
 
 strictChain.addSpec('name', true);
 strictChain.addSpec('surname', true)
 
 ```
 
+### Caching
+
+Since the chain output can be based on the value of its parameter making it possible 
+to cache the output of a chain. 
+
+To enable caching you must have strict mode enabled. 
+
+- ES6
+```
+import {ChainStrictModeEnabled, ChainCacheEnabled} from 'fluid-chains';
+ChainStrictModeEnabled();
+ChainCacheEnabled();
+```
+
+- Javascript
+
+```
+var FluidChains = require('fluid-chains');
+var ChainStrictModeEnabled = FluidChains.ChainStrictModeEnabled;
+var ChainCacheEnabled = FluidChains.ChainCacheEnabled;
+ChainStrictModeEnabled();
+ChainCacheEnabled();
+```
+
+Note: Only the fields specified in Chain.addSpec() will be used
+as identifier of the chain cache.
+
 ### Running with Middlewares
 
-Creating middlewares are never been as easy as the following
+- ES6
 ```
 import { ChainMiddleware } from 'fluid-chains';
+```
+- Javascript
+```
+var FluidChains = require('fluid-chains');
+var ChainMiddleware = FluidChains.ChainMiddleware;
+```
+
+```
 
 /*
     @param param: object = parameters for the next chain
     @param nextChain: string = name of the next chain
     @param next: Function = proceeds to the next chain
 */
-new ChainMiddleware('ChainInfoLogger', (param, nextChain, next) => { 
+
+new ChainMiddleware('ChainInfoLogger', function(param, nextChain, next) { 
     console.log('from chain', param.$owner());
     console.log('to chain', nextChain);
     next();
 });
 
-new ChainMiddleware('ChainAuthentication', (param, nextChain, next) => { 
+new ChainMiddleware('ChainAuthentication', function(param, nextChain, next) { 
     if(nextChain === 'CreatePeopleChain' && param.sessionKey){
         //validates 
     } else {

@@ -1,12 +1,16 @@
 import 'babel-polyfill';
 
 import { CM as ChainMiddleware, RunMiddleware } from '../../../src/chain/ChainMiddleware';
+import { clearStorage, getMiddlewares } from '../../../src/chain/ChainStorage';
 
 import chai from 'chai';
 
 const expect = chai.expect;
 describe('ChaimMiddleware Unit', () => {
     describe('constructor', () => {
+        before(() => {
+            clearStorage();
+        });
         it('should throw an error when name and actions undefined', () => {
             expect(() => {
                 new ChainMiddleware();
@@ -19,13 +23,14 @@ describe('ChaimMiddleware Unit', () => {
     });
     describe('RunMiddleware', () => {
         it('should run middlewares', (done) => {
+            clearStorage();
             let index = 0;
-            new ChainMiddleware('hello', (param, nextChain, next) => {
+            new ChainMiddleware('helloM0', (param, nextChain, next) => {
                 index++;
                 expect(nextChain).to.be.equal('nextChainName');
                 next();
             });
-            new ChainMiddleware('hi', (param, nextChain, next) => {
+            new ChainMiddleware('hiM0', (param, nextChain, next) => {
                 index++;
                 expect(nextChain).to.be.equal('nextChainName');
                 next();
@@ -38,13 +43,15 @@ describe('ChaimMiddleware Unit', () => {
             }, 'nextChainName');
         });
         it('should break when one middleware fails', (done) => {
+            clearStorage();
             let index = 0;
-            new ChainMiddleware('hello', (param, nextChain, next) => {
+            new ChainMiddleware('hello1', (param, nextChain, next) => {
                 index++;
+                console.log('hello1', index);
                 expect(nextChain).to.be.equal('nextSample');
                 next();
             });
-            new ChainMiddleware('hi', (param, nextChain, next) => {
+            new ChainMiddleware('hiM1', (param, nextChain, next) => {
                 index++;
                 throw new Error('Hi');
             });
@@ -56,25 +63,26 @@ describe('ChaimMiddleware Unit', () => {
                 sample: () => 'hello'
             }, (err) => {
                 expect(err).to.be.defined;
-                expect(index).to.be.equal(2);
+                expect(2).to.be.equal(index);
                 done();
             }, 'nextSample');
         });
         it('should share the same parameter', (done) => {
+            clearStorage();
             let index = 0;
-            new ChainMiddleware('hello', (param, nextChain, next) => {
+            new ChainMiddleware('helloM2', (param, nextChain, next) => {
                 if (param.sample() === 'hello') {
                     index++;
                 }
                 next();
             });
-            new ChainMiddleware('hi', (param, nextChain, next) => {
+            new ChainMiddleware('hiM2', (param, nextChain, next) => {
                 if (param.sample() === 'hello') {
                     index++;
                 }
                 next();
             });
-            new ChainMiddleware('bye', (param, next) => {
+            new ChainMiddleware('byeM', (param, next) => {
                 if (param.sample() === 'hello') {
                     index++;
                 }

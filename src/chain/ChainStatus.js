@@ -1,0 +1,5 @@
+export const STATUS_IN_PROGRESS = 'IN_PROGRESS';
+export const STATUS_UNTOUCHED = 'UNTOUCHED';
+export const STATUS_DONE = 'DONE';
+export const STATUS_FAILED = 'FAILED';
+export const STATUS_TERMINATED = 'TERMINATED';

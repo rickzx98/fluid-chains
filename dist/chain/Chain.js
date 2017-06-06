@@ -1,15 +1,19 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 exports.CH = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _ChainSettings = require('./ChainSettings');
+
 var _ChainStorage = require('./ChainStorage');
 
 var _ContextFactory = require('./ContextFactory');
+
+var _ChainStatus = require('./ChainStatus');
 
 var _ChainContext = require('./ChainContext');
 
@@ -35,132 +39,164 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var STATUS_IN_PROGRESS = 'IN_PROGRESS';
-var STATUS_UNTOUCHED = 'UNTOUCHED';
-var STATUS_DONE = 'DONE';
-var STATUS_FAILED = 'FAILED';
-var STATUS_TERMINATED = 'TERMINATED';
-
 var CH = exports.CH = function () {
-  function CH(name, action, next, error, strict) {
-    var _this = this;
+    function CH(name, action, next, error) {
+        var _this = this;
 
-    _classCallCheck(this, CH);
+        _classCallCheck(this, CH);
 
-    (0, _Validation.ValidateConstructor)(name, action);
-    var status = STATUS_UNTOUCHED;
-    var context = new _ChainContext2.default();
-    context.set('$owner', name);
-    this.spec = [];
-    this.terminate = function () {
-      context.set('$isTerminated', true);
-    };
-    this.execute = function (done, pr, nxt, belt) {
-      context = (0, _ContextFactory.CreateContext)(context, name, belt ? nxt : next, error);
-      var param = strict ? (0, _ContextFactory.ConvertToContext)(pr).cloneFor(context) : (0, _ContextFactory.ConvertToContext)(pr).clone();
-      status = STATUS_IN_PROGRESS;
-      (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
-        if (errMiddleware) {
-          done({
-            $err: function $err() {
-              return errMiddleware;
-            },
-            $errorMessage: function $errorMessage() {
-              return errMiddleware && errMiddleware.message;
-            }
-          });
-        } else {
-          context.validate(param);
-          if (param && param.$error && !context.$error) {
-            context.set('$error', param.$error());
-          }
-          if (context.$isTerminated && context.$isTerminated()) {
-            status = STATUS_TERMINATED;
-            var clonedContext = context.clone();
-            done(clonedContext);
-          } else {
-            _lodash2.default.defer(function () {
-              var startTime = new Date().getTime();
-              try {
-                action(context, param, function (err) {
-                  if (err && err instanceof Error) {
-                    failed(done, context, name, err);
-                  } else {
-                    status = STATUS_DONE;
-                    if (belt && nxt) {
-                      context.set('$responseTime', new Date().getTime() - startTime);
-                      _lodash2.default.clone(_ChainStorage.ChainStorage[nxt]()).execute(done, context);
-                    } else if (!belt && context.$next && context.$next()) {
-                      if (context.$isTerminated && context.$isTerminated()) {
-                        status = STATUS_TERMINATED;
-                        ChainResponse(done, context, startTime);
-                      } else {
-                        context.set('$responseTime', new Date().getTime() - startTime);
-                        _lodash2.default.clone(_ChainStorage.ChainStorage[context.$next()]()).execute(done, context);
-                      }
-                    } else {
-                      ChainResponse(done, context, startTime);
-                    }
-                  }
-                });
-              } catch (err) {
-                context.set('$responseTime', new Date().getTime() - startTime);
-                failed(done, context, name, err);
-              }
-            });
-          }
+        (0, _Validation.ValidateConstructor)(name, action);
+        var context = new _ChainContext2.default();
+        context.set('$owner', name);
+        context.set('$$chain.status', _ChainStatus.STATUS_UNTOUCHED);
+        context.set('$$chain.next', next);
+        context.set('$$chain.name', name);
+        context.set('$$chain.error', error);
+        this.spec = [];
+        this.terminate = function () {
+            context.set('$isTerminated', true);
+        };
+        this.execute = function (done, pr, nxt, belt) {
+            var cacheEnabled = !!(0, _ChainStorage.getConfig)()[_ChainSettings.$CACHE];
+            context = (0, _ContextFactory.CreateContext)(context, name, belt ? nxt : next, error);
+            var param = !!(0, _ChainStorage.getConfig)()[_ChainSettings.$STRICT] ? (0, _ContextFactory.ConvertToContext)(pr).cloneFor(context) : (0, _ContextFactory.ConvertToContext)(pr).clone();
+            context.set('$$chain.status', _ChainStatus.STATUS_IN_PROGRESS);
+            invokeChain(done, name, next, action, _this.spec, context, param, nxt, belt, cacheEnabled);
+        };
+        this.status = function () {
+            return context.$$chain.status();
+        };
+        this.info = function () {
+            return {
+                name: name,
+                status: context.$$chain.status(),
+                next: next,
+                errorHandler: error,
+                responseTime: context.$responseTime ? context.$responseTime() : 0
+            };
+        };
+        this.addSpec = function (field, required, customValidator) {
+            var spec = new _ChainSpec2.default(field, required, customValidator);
+            _this.spec.push(spec);
+            context.addValidator(spec);
+        };
+        (0, _ChainStorage.putChain)(name, this);
+    }
+
+    _createClass(CH, [{
+        key: 'size',
+        value: function size() {
+            return (0, _objectSizeof2.default)(this);
         }
-      }, belt ? nxt : nxt || next);
-    };
-    this.status = function () {
-      return status;
-    };
-    this.info = function () {
-      return {
-        name: name,
-        status: status,
-        next: next,
-        errorHandler: error,
-        responseTime: context.$responseTime ? context.$responseTime() : 0
-      };
-    };
-    this.addSpec = function (field, required, customValidator) {
-      var spec = new _ChainSpec2.default(field, required, customValidator);
-      _this.spec.push(spec);
-      context.addValidator(spec);
-    };
-    function failed(done, context, name, err) {
-      status = STATUS_FAILED;
-      if (context.$error) {
-        _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, (0, _ContextFactory.CreateErrorContext)(context.$error(), name, err));
-      } else {
-        console.warn('UnhandledErrorCallback', err);
-        done({
-          $err: function $err() {
-            return err;
-          },
-          $errorMessage: function $errorMessage() {
-            return err ? err.message : '';
-          }
-        });
-      }
-    }
+    }]);
 
-    (0, _ChainStorage.putChain)(name, this);
-  }
-
-  _createClass(CH, [{
-    key: 'size',
-    value: function size() {
-      return (0, _objectSizeof2.default)(this);
-    }
-  }]);
-
-  return CH;
+    return CH;
 }();
 
 var ChainResponse = function ChainResponse(done, context, startTime) {
-  context.set('$responseTime', new Date().getTime() - startTime);
-  var clonedContext = context.clone();
-  done(clonedContext);
+    context.set('$responseTime', new Date().getTime() - startTime);
+    var clonedContext = context.clone();
+    if ((0, _ChainStorage.getConfig)()[_ChainSettings.$CACHE] && context.$$chain && context.$$chain.id) {
+        (0, _ChainStorage.removeState)(context.$$chain.id);
+    }
+    done(clonedContext);
+};
+
+var failed = function failed(done, context, name, err) {
+    context.set('$$chain.status', _ChainStatus.STATUS_FAILED);
+    if (context.$error) {
+        _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, (0, _ContextFactory.CreateErrorContext)(context.$error(), name, err));
+    } else {
+        console.warn('UnhandledErrorCallback', err);
+        done({
+            $err: function $err() {
+                return err;
+            },
+            $errorMessage: function $errorMessage() {
+                return err ? err.message : '';
+            }
+        });
+    }
+};
+
+var invokeChain = function invokeChain(done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) {
+    (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
+        if (errMiddleware) {
+            done({
+                $err: function $err() {
+                    return errMiddleware;
+                },
+                $errorMessage: function $errorMessage() {
+                    return errMiddleware && errMiddleware.message;
+                }
+            });
+        } else {
+            context.validate(param);
+            if (param && param.$error && !context.$error) {
+                context.set('$error', param.$error());
+            }
+            if (context.$isTerminated && context.$isTerminated()) {
+                context.set('$$chain.status', _ChainStatus.STATUS_TERMINATED);
+                var clonedContext = context.clone();
+                done(clonedContext);
+            } else {
+                _lodash2.default.defer(function () {
+                    var startTime = new Date().getTime();
+                    try {
+                        if (cacheEnabled && param.$$chain && param.$$chain.id) {
+                            var key = param.$$chain.id;
+                            if ((0, _ChainStorage.getState)(key, name, param)) {
+                                var cachedContext = (0, _ChainStorage.getState)(key, name, param).clone();
+                                concludeNextAction(cachedContext, param, belt, nxt, startTime, done);
+                            } else {
+                                invokeAction(action, name, spec, context, param, belt, nxt, cacheEnabled, startTime, done);
+                            }
+                        } else {
+                            invokeAction(action, name, spec, context, param, belt, nxt, cacheEnabled, startTime, done);
+                        }
+                    } catch (err) {
+                        context.set('$responseTime', new Date().getTime() - startTime);
+                        failed(done, context, name, err);
+                    }
+                });
+            }
+        }
+    }, belt ? nxt : nxt || next);
+};
+var invokeAction = function invokeAction(action, name, spec, context, param, belt, nxt, cacheEnabled, startTime, done) {
+    action(context, param, function (err) {
+        if (err && err instanceof Error) {
+            failed(done, context, name, err);
+        } else {
+            if (cacheEnabled) {
+                var key = void 0;
+                if (!param.$$chain || !param.$$chain.id) {
+                    key = (0, _ChainStorage.createChainState)(name, spec, param, context);
+                } else {
+                    key = param.$$chain.id;
+                    (0, _ChainStorage.addChainState)(key, name, spec, param, context);
+                }
+                context.set('$$chain.id', key);
+            }
+            concludeNextAction(context, param, belt, nxt, startTime, done);
+        }
+    });
+};
+
+var concludeNextAction = function concludeNextAction(context, param, belt, nxt, startTime, done) {
+    context.set('$$chain.status', _ChainStatus.STATUS_DONE);
+    if (belt && nxt) {
+        context.set('$responseTime', new Date().getTime() - startTime);
+        _lodash2.default.clone(_ChainStorage.ChainStorage[nxt]()).execute(done, context);
+    } else if (!belt && context.$next && context.$next()) {
+        if (context.$isTerminated && context.$isTerminated()) {
+            context.set('$$chain.status', _ChainStatus.STATUS_TERMINATED);
+            ChainResponse(done, context, startTime);
+        } else {
+            context.set('$responseTime', new Date().getTime() - startTime);
+            _lodash2.default.clone(_ChainStorage.ChainStorage[context.$next()]()).execute(done, context);
+        }
+    } else {
+        ChainResponse(done, context, startTime);
+    }
 };

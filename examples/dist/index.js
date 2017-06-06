@@ -1,5 +1,9 @@
 'use strict';
 
+var _cache = require('./cache/');
+
+var _cache2 = _interopRequireDefault(_cache);
+
 var _middlewares = require('./middlewares/');
 
 var _middlewares2 = _interopRequireDefault(_middlewares);

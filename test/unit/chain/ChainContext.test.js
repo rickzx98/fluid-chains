@@ -77,7 +77,6 @@ describe('ChainContext Unit', () => {
                 lastname: 'Doe'
             });
             context.set('$error', 'errorChain');
-            const initialSize = sizeOf(context);
             const clone = context.clone();
             expect(context.addValidator).to.not.be.undefined;
             expect(context.id).to.not.be.defined;
