@@ -2,6 +2,8 @@
 
 Just a simple way to run asynchronous functions with functional programming in mind.
 
+[![NPM Download Stats](https://nodei.co/npm/fluid-chains.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/fluid-chains)
+
 ### Getting Started
 
 Installing fluid-chains is easy. It is not a framework and we want to make it light and simple.
