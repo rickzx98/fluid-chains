@@ -43,6 +43,18 @@ describe('ChainStorage Unit', () => {
             expect(cacheContext.field12).to.be.not.undefined;
             expect(cacheContext.field12()).to.be.equal('sample field12');
         });
+        it('should return context of a saved chain state with no spec', () => {
+            const param = new ChainContext();
+            param.set('field1', 'sample field 1');
+            param.set('field2', 'sample field 2');
+            const context = new ChainContext();
+            context.set('field12', 'sample field12');
+            const key = createChainState('samples2', [], param, context);
+            const cacheContext = getState(key, 'samples2', param);
+            expect(key).to.be.not.undefined;
+            expect(cacheContext.field12).to.be.not.undefined;
+            expect(cacheContext.field12()).to.be.equal('sample field12');
+        });
         it('should not return context of an unequal parameter value', () => {
             const param = new ChainContext();
             param.set('field1', 'sample field 1');
@@ -92,9 +104,12 @@ describe('ChainStorage Unit', () => {
         })
     });
     it('should get all middlewares', () => {
-        new ChainMiddleware('middleWareOne', (param, next) => { });
-        new ChainMiddleware('middleWareTwo', (param, next) => { });
-        new ChainMiddleware('middleWareThree', (param, next) => { });
+        new ChainMiddleware('middleWareOne', (param, next) => {
+        });
+        new ChainMiddleware('middleWareTwo', (param, next) => {
+        });
+        new ChainMiddleware('middleWareThree', (param, next) => {
+        });
         const middlewares = getMiddlewares();
         assert(middlewares.length > 0);
     });

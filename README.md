@@ -305,7 +305,8 @@ ChainCacheEnabled();
 ```
 
 Note: Only the fields specified in Chain.addSpec() will be used
-as identifier of the chain cache.
+as identifier of the chain cache. If Chain.addSpec() are not used it will
+cache the chain using its name.
 
 ### Running with Middlewares
 
