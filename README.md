@@ -160,7 +160,7 @@ new Chain('firstErrorHandler', function(context, param, next) {
     */
     console.log('error', param.$error());  
         // Error('Name is required.');
-    console.log('errorMessage), param.$errorMessage()); 
+    console.log('errorMessage', param.$errorMessage()); 
         // 'Name is required.'
     next(); 
     /* 
@@ -202,7 +202,7 @@ new Chain('thirdChain', function(context, param, next) {
 new Chain('firstErrorHandler', function(context, param, next) { 
     console.log('error', param.$error());  
         // Error('Name is required.');
-    console.log('errorMessage), param.$errorMessage()); 
+    console.log('errorMessage', param.$errorMessage()); 
         // 'Name is required.'
     next();
 });
