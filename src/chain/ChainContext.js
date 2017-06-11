@@ -86,7 +86,6 @@ export default class ChainContext {
                 }
             }
         });
-        console.log('merge', copy);
         return copy;
     }
 
