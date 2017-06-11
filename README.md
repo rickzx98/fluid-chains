@@ -109,15 +109,17 @@ ExecuteChains(Array, Parameter, Done);
 
 ```javascript
 new Chain('first', function(context,param, next){
+   // param.host() can be accessed here
    next()},'second');
 new Chain('second', function(context,param,next) {
    next()},'third');
-new Chain('third', function(context,param,next { 
+new Chain('third', function(context,param,next {
+   // param.host() can be accessed here
    next()},'fourth');
 new Chain('fourth', function(context,param,next) {
    next()});
 
-ExecuteChain(['first','third'],{}, function(result) {
+ExecuteChain(['first','third'],{host: 'http://localhost'}, function(result) {
     // last chain processed was "third"
 });
 
@@ -128,6 +130,7 @@ Note: Executing chains like the sample above will ignore the chain's predefined
   parameter and it will complete the sequence even if there is a sequence 
   defined in the "third" chain (which is the "fourth") thus make the chains reuseable. 
 
+Updates: Parameters can now be used throughout the chains.
 
 ### Error handling
 
