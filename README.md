@@ -2,6 +2,8 @@
 
 Just a simple way to run asynchronous functions with functional programming in mind.
 
+[![NPM Download Stats](https://nodei.co/npm/fluid-chains.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/fluid-chains)
+
 ### Getting Started
 
 Installing fluid-chains is easy. It is not a framework and we want to make it light and simple.
@@ -14,19 +16,19 @@ npm install --save fluid-chains
 
 - Javascript (ES6)
 
-```
+```javascript
 import {Chain} from 'fluid-chains';
 ```
 
 - Javascript 
-```
+```javascript
 var FluidChains = require('fluid-chains');
 var Chain  = FluidChains.Chain;
 ```
 
 ### Creating your first chain
 
-```
+```javascript
 new Chain('FindPeople', function(context, param, next) {
     var people = ['john','jane','sam'];
     context.set('people', people.filter(
@@ -38,10 +40,17 @@ new Chain('FindPeople', function(context, param, next) {
 
 ```
 ### Starting the chain
-
-```
+- ES6
+```javascript
 import {ExecuteChain} from 'fluid-chains';
+```
+- Javascript
+```javascript
+var FluidChains = require('fluid-chains');
+var ExecuteChain = FluidChains.ExecuteChain;
+```
 
+```javascript
 ExecuteChain('FindPeople', {filterBy: 'jane'}, 
     function(result) {
        var people = result.people();;
@@ -51,9 +60,7 @@ ExecuteChain('FindPeople', {filterBy: 'jane'},
 
 ### Creating chain sequence
 
-```
-import {Chain, ExecuteChain} from 'fluid-chains';
-
+```javascript
 new Chain('firstChain', function(context, param, next) {
     /* 
         context.set(key, value) will set 
@@ -100,7 +107,7 @@ Note: You cannot put Function as a value in context.set(key, value).
 ### Can I reuse Chain?
 ExecuteChains(Array, Parameter, Done);
 
-```
+```javascript
 new Chain('first', function(context,param, next){
    next()},'second');
 new Chain('second', function(context,param,next) {
@@ -126,7 +133,8 @@ Note: Executing chains like the sample above will ignore the chain's predefined
 
 You can also use a chain as an error handler. Basically you're just 
 creating another chain.
-```
+
+```javascript
 
 new Chain('firstChain', function(context, param, next) {
 
@@ -152,7 +160,7 @@ new Chain('firstErrorHandler', function(context, param, next) {
     */
     console.log('error', param.$error());  
         // Error('Name is required.');
-    console.log('errorMessage), param.$errorMessage()); 
+    console.log('errorMessage', param.$errorMessage()); 
         // 'Name is required.'
     next(); 
     /* 
@@ -165,7 +173,7 @@ new Chain('firstErrorHandler', function(context, param, next) {
 Note: You can place an error handler for each chain otherwise it will be thrown 
     to the nearest error handler of its previous chain.
 
-```
+```javascript
 new Chain('firstChain', function(context, param, next) {
     if (param.name){
         context.set('remarksTo', param.name());
@@ -194,7 +202,7 @@ new Chain('thirdChain', function(context, param, next) {
 new Chain('firstErrorHandler', function(context, param, next) { 
     console.log('error', param.$error());  
         // Error('Name is required.');
-    console.log('errorMessage), param.$errorMessage()); 
+    console.log('errorMessage', param.$errorMessage()); 
         // 'Name is required.'
     next();
 });
@@ -207,7 +215,7 @@ new Chain('anotherErrorHandler', function(context, param, next) {
 
 Note: For asynchronous callback errors you may do "next(Error)".
 
-```
+```javascript
 new Chain('firstChain', function(context, param, next) {
     setTimeout(function() {
         next(new Error('sample'));
@@ -219,7 +227,7 @@ new Chain('firstChain', function(context, param, next) {
 
 For each chain we can specify required fields and custom validations
 
-```
+```javascript
 var FindPeopleChain = new Chain('FindPeople', function(context, param, next) { 
     param.name() // should not be null or empty
     param.type() // should not be null or empty and must be "quick"
@@ -244,14 +252,14 @@ FindPeopleChain.addSpec('type',true, function(done) {
 You can turn on strict mode by invoking "ChainStrictModeEnabled" function.
 
 - ES6
-```
+```javascript
 import {ChainStrictModeEnabled} from 'fluid-chains';
 ChainStrictModeEnabled();
 ```
 
 - Javascript
 
-```
+```javascript
 var FluidChains = require('fluid-chains');
 var ChainStrictModeEnabled = FluidChains.ChainStrictModeEnabled;
 ChainStrictModeEnabled();
@@ -259,7 +267,7 @@ ChainStrictModeEnabled();
 
 With strict mode "on", chains can will only accept parameter that is specified in addSpec. 
 
-```
+```javascript
  new Chain('StrictModeChain01', function(context, param, next) {
     context.set('name', 'John');
     context.set('surname', 'Wick');
@@ -288,7 +296,7 @@ to cache the output of a chain.
 To enable caching you must have strict mode enabled. 
 
 - ES6
-```
+```javascript
 import {ChainStrictModeEnabled, ChainCacheEnabled} from 'fluid-chains';
 ChainStrictModeEnabled();
 ChainCacheEnabled();
@@ -296,7 +304,7 @@ ChainCacheEnabled();
 
 - Javascript
 
-```
+```javascript
 var FluidChains = require('fluid-chains');
 var ChainStrictModeEnabled = FluidChains.ChainStrictModeEnabled;
 var ChainCacheEnabled = FluidChains.ChainCacheEnabled;
@@ -311,16 +319,16 @@ cache the chain using its name.
 ### Running with Middlewares
 
 - ES6
-```
+```javascript
 import { ChainMiddleware } from 'fluid-chains';
 ```
 - Javascript
-```
+```javascript
 var FluidChains = require('fluid-chains');
 var ChainMiddleware = FluidChains.ChainMiddleware;
 ```
 
-```
+```javascript
 
 /*
     @param param: object = parameters for the next chain
