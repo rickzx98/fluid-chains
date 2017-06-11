@@ -6,7 +6,7 @@ export const Execute = (name, param, done) => {
     let context = ConvertToContext(param);
     context.set('$owner', name + '_starter');
     if (name instanceof Array) {
-        ExecuteChains(name, done, 0, param);
+        ExecuteChains(name, done, 0, context);
     } else if (ChainStorage[name]) {
         const chain = lodash.clone(lodash.get(ChainStorage, name)());
         chain.execute(done, context, name);
@@ -15,18 +15,13 @@ export const Execute = (name, param, done) => {
     }
 };
 
-function ExecuteChains(chains, done, index, param) {
-    if (!index) {
-        index = 0;
-    }
+function ExecuteChains(chains, done, index, originalParam, newParam) {
     if (index < chains.length) {
         const chain = lodash.clone(lodash.get(ChainStorage, chains[index])());
-        chain.execute((result) => {
-            index++;
-            ExecuteChains(chains, done, index, result);
-        }, param, nextChain(chains, index), true);
+        const next = nextChain(chains, index)
+        chain.execute(result => ExecuteChains(chains, done, ++index, originalParam, originalParam.merge(result)), newParam || originalParam, next, true);
     } else {
-        done(param);
+        done(newParam);
     }
 }
 
@@ -35,4 +30,5 @@ function nextChain(chains, index) {
     if (chains.length > nextIndex) {
         return chains[nextIndex];
     }
+    return undefined;
 }

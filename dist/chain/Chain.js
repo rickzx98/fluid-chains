@@ -147,12 +147,12 @@ var invokeChain = function invokeChain(done, name, next, action, spec, context, 
                             var key = param.$$chain.id;
                             if ((0, _ChainStorage.getState)(key, name, param)) {
                                 var cachedContext = (0, _ChainStorage.getState)(key, name, param).clone();
-                                concludeNextAction(cachedContext, param, belt, nxt, startTime, done);
+                                concludeNextAction(cachedContext, param, belt, startTime, done);
                             } else {
-                                invokeAction(action, name, spec, context, param, belt, nxt, cacheEnabled, startTime, done);
+                                invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
                             }
                         } else {
-                            invokeAction(action, name, spec, context, param, belt, nxt, cacheEnabled, startTime, done);
+                            invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
                         }
                     } catch (err) {
                         context.set('$responseTime', new Date().getTime() - startTime);
@@ -163,7 +163,7 @@ var invokeChain = function invokeChain(done, name, next, action, spec, context, 
         }
     }, belt ? nxt : nxt || next);
 };
-var invokeAction = function invokeAction(action, name, spec, context, param, belt, nxt, cacheEnabled, startTime, done) {
+var invokeAction = function invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done) {
     action(context, param, function (err) {
         if (err && err instanceof Error) {
             failed(done, context, name, err);
@@ -178,17 +178,14 @@ var invokeAction = function invokeAction(action, name, spec, context, param, bel
                 }
                 context.set('$$chain.id', key);
             }
-            concludeNextAction(context, param, belt, nxt, startTime, done);
+            concludeNextAction(context, param, belt, startTime, done);
         }
     });
 };
 
-var concludeNextAction = function concludeNextAction(context, param, belt, nxt, startTime, done) {
+var concludeNextAction = function concludeNextAction(context, param, belt, startTime, done) {
     context.set('$$chain.status', _ChainStatus.STATUS_DONE);
-    if (belt && nxt) {
-        context.set('$responseTime', new Date().getTime() - startTime);
-        _lodash2.default.clone(_ChainStorage.ChainStorage[nxt]()).execute(done, context);
-    } else if (!belt && context.$next && context.$next()) {
+    if (!belt && context.$next) {
         if (context.$isTerminated && context.$isTerminated()) {
             context.set('$$chain.status', _ChainStatus.STATUS_TERMINATED);
             ChainResponse(done, context, startTime);

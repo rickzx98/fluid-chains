@@ -67,6 +67,7 @@ describe('Chain Unit', () => {
             });
         });
         it('should execute non predefined next chain in sequence', (done) => {
+            let count = 0;
             new Chain('hello_seq_0_0', (context, param, next) => {
                 context.set('hello_seq_0', true);
                 next();
@@ -79,12 +80,42 @@ describe('Chain Unit', () => {
 
             new Chain('hello_seq_0_1', (context, param, next) => {
                 context.set('hello_seq_1', true);
+                count++;
                 next();
             }, 'hello_seq_0_1_trial');
 
             ExecuteChain(['hello_seq_0_0', 'hello_seq_0_1'], {}, (context) => {
                 expect(context.hello_seq_1_trial).to.be.undefined;
                 expect(context.hello_seq_1).to.be.not.undefined;
+                expect(1).to.be.equal(count);
+                done();
+            });
+        });
+        it('should contain the main parameter throughout the chains', (done) => {
+            new Chain('hello_seq_1_1', (context, param, next) => {
+                expect(param.host).to.be.not.undefined;
+                context.set('from_hello_seq_1_1', true);
+                context.set('host','trying to change');
+                next();
+            });
+            new Chain('hello_seq_1_2', (context, param, next) => {
+                expect(param.host).to.be.not.undefined;
+                expect(param.from_hello_seq_1_1).to.be.not.undefined;
+                expect(param.host()).to.be.not.equal('trying to change');
+                context.set('from_hello_seq_1_2', true);
+                next();
+            });
+            new Chain('hello_seq_1_3', (context, param, next) => {
+                expect(param.host).to.be.not.undefined;
+                expect(param.from_hello_seq_1_2).to.be.not.undefined;
+                context.set('from_hello_seq_1_3', true);
+                next();
+            });
+
+            ExecuteChain(['hello_seq_1_1', 'hello_seq_1_2', 'hello_seq_1_3'], {
+                host: 'http://sample'
+            }, result => {
+                expect(result.from_hello_seq_1_3).to.be.not.undefined;
                 done();
             });
         });
