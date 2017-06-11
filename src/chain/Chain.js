@@ -111,12 +111,12 @@ const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, 
                             let key = param.$$chain.id;
                             if (getState(key, name, param)) {
                                 let cachedContext = getState(key, name, param).clone();
-                                concludeNextAction(cachedContext, param, belt, nxt, startTime, done);
+                                concludeNextAction(cachedContext, param, belt, startTime, done);
                             } else {
-                                invokeAction(action, name, spec, context, param, belt, nxt, cacheEnabled, startTime, done);
+                                invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
                             }
                         } else {
-                            invokeAction(action, name, spec, context, param, belt, nxt, cacheEnabled, startTime, done);
+                            invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
                         }
                     } catch (err) {
                         context.set('$responseTime', new Date().getTime() - startTime);
@@ -127,7 +127,7 @@ const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, 
         }
     }, belt ? nxt : nxt || next);
 };
-const invokeAction = (action, name, spec, context, param, belt, nxt, cacheEnabled, startTime, done) => {
+const invokeAction = (action, name, spec, context, param, belt, cacheEnabled, startTime, done) => {
     action(context, param, err => {
         if (err && err instanceof Error) {
             failed(done, context, name, err);
@@ -142,17 +142,14 @@ const invokeAction = (action, name, spec, context, param, belt, nxt, cacheEnable
                 }
                 context.set('$$chain.id', key);
             }
-            concludeNextAction(context, param, belt, nxt, startTime, done);
+            concludeNextAction(context, param, belt, startTime, done);
         }
     });
 };
 
-const concludeNextAction = (context, param, belt, nxt, startTime, done) => {
+const concludeNextAction = (context, param, belt, startTime, done) => {
     context.set('$$chain.status', STATUS_DONE);
-    if (belt && nxt) {
-        context.set('$responseTime', new Date().getTime() - startTime);
-        lodash.clone(ChainStorage[nxt]()).execute(done, context);
-    } else if (!belt && (context.$next && context.$next())) {
+    if (!belt && context.$next) {
         if (context.$isTerminated && context.$isTerminated()) {
             context.set('$$chain.status', STATUS_TERMINATED);
             ChainResponse(done, context, startTime);

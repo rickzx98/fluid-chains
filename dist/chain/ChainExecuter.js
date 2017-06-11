@@ -19,7 +19,7 @@ var Execute = exports.Execute = function Execute(name, param, done) {
     var context = (0, _ContextFactory.ConvertToContext)(param);
     context.set('$owner', name + '_starter');
     if (name instanceof Array) {
-        ExecuteChains(name, done, 0, param);
+        ExecuteChains(name, done, 0, context);
     } else if (_ChainStorage.ChainStorage[name]) {
         var chain = _lodash2.default.clone(_lodash2.default.get(_ChainStorage.ChainStorage, name)());
         chain.execute(done, context, name);
@@ -28,18 +28,15 @@ var Execute = exports.Execute = function Execute(name, param, done) {
     }
 };
 
-function ExecuteChains(chains, done, index, param) {
-    if (!index) {
-        index = 0;
-    }
+function ExecuteChains(chains, done, index, originalParam, newParam) {
     if (index < chains.length) {
         var chain = _lodash2.default.clone(_lodash2.default.get(_ChainStorage.ChainStorage, chains[index])());
+        var next = nextChain(chains, index);
         chain.execute(function (result) {
-            index++;
-            ExecuteChains(chains, done, index, result);
-        }, param, nextChain(chains, index), true);
+            return ExecuteChains(chains, done, ++index, originalParam, originalParam.merge(result));
+        }, newParam || originalParam, next, true);
     } else {
-        done(param);
+        done(newParam);
     }
 }
 
@@ -48,4 +45,5 @@ function nextChain(chains, index) {
     if (chains.length > nextIndex) {
         return chains[nextIndex];
     }
+    return undefined;
 }

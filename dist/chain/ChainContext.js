@@ -43,7 +43,7 @@ var ChainContext = function () {
     }, {
         key: 'clone',
         value: function clone() {
-            var validators = _lodash2.default.clone(this.validators) || {};
+            var validators = this.validators || {};
             var copy = new ChainContext(validators);
             _lodash2.default.forIn(this, function (field, key) {
                 if (key !== 'addValidator' && key !== 'validate' && key !== 'set') {
@@ -61,7 +61,7 @@ var ChainContext = function () {
             if (!(context instanceof ChainContext)) {
                 throw new Error('Argument must be an instance of ChainContext');
             }
-            var validators = _lodash2.default.clone(this.validators) || {};
+            var validators = this.validators || {};
             var copy = new ChainContext(validators);
             _lodash2.default.forIn(this, function (field, key) {
                 if (key !== 'addValidator' && key !== 'validate' && key !== 'set' && context.validators && context.validators[key]) {
@@ -74,6 +74,36 @@ var ChainContext = function () {
                     copy.set(key, _value);
                 }
             });
+            return copy;
+        }
+    }, {
+        key: 'merge',
+        value: function merge(context) {
+            var validators = this.validators || {};
+            var copy = new ChainContext(validators);
+            _lodash2.default.forIn(this, function (field, key) {
+                if (key !== 'addValidator' && key !== 'validate' && key !== 'set') {
+                    if (field instanceof Function) {
+                        var value = field();
+                        copy.set(key, value);
+                    }
+                } else if (key === '$error' || key === '$owner' || key === '$errorMessage' || key === '$next' || key === '$err') {
+                    var _value2 = field();
+                    copy.set(key, _value2);
+                }
+            });
+
+            _lodash2.default.forIn(context, function (field, key) {
+                if (key !== 'addValidator' && key !== 'validate' && key !== 'set') {
+                    if (field instanceof Function) {
+                        var value = field();
+                        if (!copy[key]) {
+                            copy.set(key, value);
+                        }
+                    }
+                }
+            });
+            console.log('merge', copy);
             return copy;
         }
     }, {

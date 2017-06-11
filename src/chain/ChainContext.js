@@ -20,7 +20,7 @@ export default class ChainContext {
     }
 
     clone() {
-        const validators = lodash.clone(this.validators) || {};
+        const validators = this.validators || {};
         const copy = new ChainContext(validators);
         lodash.forIn(this, (field, key) => {
             if (key !== 'addValidator' &&
@@ -39,7 +39,7 @@ export default class ChainContext {
         if (!(context instanceof ChainContext)) {
             throw new Error('Argument must be an instance of ChainContext');
         }
-        const validators = lodash.clone(this.validators) || {};
+        const validators = this.validators || {};
         const copy = new ChainContext(validators);
         lodash.forIn(this, (field, key) => {
             if (key !== 'addValidator' &&
@@ -54,6 +54,39 @@ export default class ChainContext {
                 copy.set(key, value);
             }
         });
+        return copy;
+    }
+
+    merge(context) {
+        const validators = this.validators || {};
+        const copy = new ChainContext(validators);
+        lodash.forIn(this, (field, key) => {
+            if (key !== 'addValidator' &&
+                key !== 'validate' &&
+                key !== 'set') {
+                if (field instanceof Function) {
+                    const value = field();
+                    copy.set(key, value);
+                }
+            } else if (key === '$error' || key === '$owner' || key === '$errorMessage' || key === '$next' || key === '$err') {
+                const value = field();
+                copy.set(key, value);
+            }
+        });
+
+        lodash.forIn(context, (field, key) => {
+            if (key !== 'addValidator' &&
+                key !== 'validate' &&
+                key !== 'set') {
+                if (field instanceof Function) {
+                    const value = field();
+                    if (!copy[key]) {
+                        copy.set(key, value);
+                    }
+                }
+            }
+        });
+        console.log('merge', copy);
         return copy;
     }
 
