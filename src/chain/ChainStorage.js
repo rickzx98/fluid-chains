@@ -20,7 +20,7 @@ export const addChainState = (key, name, spec, param, context) => {
     if (spec && spec.length) {
         const params = {};
         spec.forEach(chainSpec => {
-            lodash.set(params, chainSpec.field, param[chainSpec.field]());
+            lodash.set(params, chainSpec.field, param[chainSpec.field] ? param[chainSpec.field]() : '');
         });
         lodash.set(state, 'spec', spec);
         lodash.set(state, 'params', param);
@@ -46,6 +46,8 @@ export const getState = (key, name, param) => {
             stateChain.spec.forEach(fieldSpec => {
                 if (param[fieldSpec.field]) {
                     valid.push(param[fieldSpec.field]() === stateChain.params[fieldSpec.field]());
+                } else {
+                    valid.push('' === stateChain.params[fieldSpec.field]());
                 }
             });
             if (lodash.filter(valid, value => value).length === stateChain.spec.length) {

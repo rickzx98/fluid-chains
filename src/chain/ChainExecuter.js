@@ -18,7 +18,7 @@ export const Execute = (name, param, done) => {
 function ExecuteChains(chains, done, index, originalParam, newParam) {
     if (index < chains.length) {
         const chain = lodash.clone(lodash.get(ChainStorage, chains[index])());
-        const next = nextChain(chains, index)
+        const next = nextChain(chains, index);
         chain.execute(result => ExecuteChains(chains, done, ++index, originalParam, originalParam.merge(result)), newParam || originalParam, next, true);
     } else {
         done(newParam);

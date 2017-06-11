@@ -34,7 +34,7 @@ var addChainState = exports.addChainState = function addChainState(key, name, sp
     if (spec && spec.length) {
         var params = {};
         spec.forEach(function (chainSpec) {
-            _lodash2.default.set(params, chainSpec.field, param[chainSpec.field]());
+            _lodash2.default.set(params, chainSpec.field, param[chainSpec.field] ? param[chainSpec.field]() : '');
         });
         _lodash2.default.set(state, 'spec', spec);
         _lodash2.default.set(state, 'params', param);
@@ -60,6 +60,8 @@ var getState = exports.getState = function getState(key, name, param) {
             stateChain.spec.forEach(function (fieldSpec) {
                 if (param[fieldSpec.field]) {
                     valid.push(param[fieldSpec.field]() === stateChain.params[fieldSpec.field]());
+                } else {
+                    valid.push('' === stateChain.params[fieldSpec.field]());
                 }
             });
             if (_lodash2.default.filter(valid, function (value) {

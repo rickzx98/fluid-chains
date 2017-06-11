@@ -20,7 +20,8 @@ describe('Chain Unit', () => {
                 context.set('saidHello', true);
                 next();
             });
-            chain.addSpec('sample', true, () => { });
+            chain.addSpec('sample', true, () => {
+            });
             expect(chain.spec).to.be.not.undefined;
             expect(chain.spec.length).to.be.not.undefined;
             expect(chain.spec[0].field).to.be.equal('sample');
@@ -46,7 +47,7 @@ describe('Chain Unit', () => {
                 expect(param.hey()).to.be.equal('daydreamer');
                 next();
             });
-            ExecuteChain('hello2', { hey: 'daydreamer' }, (context) => {
+            ExecuteChain('hello2', {hey: 'daydreamer'}, (context) => {
                 expect(context.$owner()).to.be.equal('hello2');
                 expect(context.saidHello).to.be.not.undefined;
                 done();
@@ -93,22 +94,31 @@ describe('Chain Unit', () => {
         });
         it('should contain the main parameter throughout the chains', (done) => {
             new Chain('hello_seq_1_1', (context, param, next) => {
+                const domain = [];
+                domain.push('first');
                 expect(param.host).to.be.not.undefined;
                 context.set('from_hello_seq_1_1', true);
-                context.set('host','trying to change');
+                context.set('host', 'trying to change');
+                context.set('domain', domain);
                 next();
             });
             new Chain('hello_seq_1_2', (context, param, next) => {
+                const domain = param.domain();
+                domain.push('second');
                 expect(param.host).to.be.not.undefined;
                 expect(param.from_hello_seq_1_1).to.be.not.undefined;
                 expect(param.host()).to.be.not.equal('trying to change');
                 context.set('from_hello_seq_1_2', true);
+                context.set('domain', domain);
                 next();
             });
             new Chain('hello_seq_1_3', (context, param, next) => {
+                const domain = param.domain();
+                domain.push('third');
                 expect(param.host).to.be.not.undefined;
                 expect(param.from_hello_seq_1_2).to.be.not.undefined;
                 context.set('from_hello_seq_1_3', true);
+                context.set('domain', domain);
                 next();
             });
 
@@ -116,6 +126,8 @@ describe('Chain Unit', () => {
                 host: 'http://sample'
             }, result => {
                 expect(result.from_hello_seq_1_3).to.be.not.undefined;
+                expect(result.domain).to.be.not.undefined;
+                expect(result.domain().length).to.be.equal(3);
                 done();
             });
         });
@@ -125,7 +137,10 @@ describe('Chain Unit', () => {
                 next();
             });
             expect(() => {
-                ExecuteChain('hello3', { hi: () => { } }, (context) => {
+                ExecuteChain('hello3', {
+                    hi: () => {
+                    }
+                }, (context) => {
                 });
             }).to.throw(Error);
 

@@ -103,7 +103,6 @@ var ChainContext = function () {
                     }
                 }
             });
-            console.log('merge', copy);
             return copy;
         }
     }, {
