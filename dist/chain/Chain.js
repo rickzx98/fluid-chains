@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.CH = undefined;
+exports.Action = exports.CH = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -196,4 +196,17 @@ var concludeNextAction = function concludeNextAction(context, param, belt, start
     } else {
         ChainResponse(done, context, startTime);
     }
+};
+
+var Action = exports.Action = function Action(target, key, descriptor) {
+    var chain = void 0;
+    if (target) {
+        _lodash2.default.set(target, 'CHAIN_' + key.toUpperCase(), key);
+    }
+    if (descriptor && descriptor.value instanceof Function) {
+        new CH(key, descriptor.value);
+    } else {
+        throw new Error('Must be declared in a function with (context, paran, next).');
+    }
+    return chain;
 };

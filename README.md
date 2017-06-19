@@ -225,6 +225,41 @@ new Chain('firstChain', function(context, param, next) {
     });
 }, 'secondChain', 'firstErrorHandler'); 
 ```
+### Using decorator with @ChainAction (ES6 only)
+
+You can create a chain by using decorator @ChainAction. 
+
+```javascript
+import {ChainAction, ExecuteChain} from 'fluid-chains';
+
+class Student {
+
+    @ChainAction
+    createStudent(context, param, next) {
+        //param.name();
+        //context.set('studentId',####);
+    }
+
+    @ChainAction
+    findAll(context, param, next) {
+
+    }
+
+}
+
+const student = new Student();
+
+ExecuteChain(student.CHAIN_CREATESTUDENT, {
+        name:'John Doe'
+    }, result =>{
+        //result.studentId
+    })
+// student.CHAIN_FINDALL
+// student.CHAIN_CREATESTUDENT
+```
+
+ChainAction can only be used in a function inside a class. It will initialize a chain based on the function name and
+will set a string constant CHAIN_{Name of the function in upper case} in the current class.
 
 ### Adding specifications and validation
 

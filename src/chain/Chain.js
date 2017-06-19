@@ -161,3 +161,16 @@ const concludeNextAction = (context, param, belt, startTime, done) => {
         ChainResponse(done, context, startTime);
     }
 };
+
+export const Action = (target, key, descriptor) => {
+    let chain;
+    if (target) {
+        lodash.set(target, `CHAIN_${key.toUpperCase()}`, key);
+    }
+    if (descriptor && descriptor.value instanceof Function) {
+        new CH(key, descriptor.value);
+    } else {
+        throw new Error('Must be declared in a function with (context, paran, next).');
+    }
+    return chain;
+}

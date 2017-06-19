@@ -3,16 +3,17 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ChainStrictModeEnabled = exports.ChainCacheEnabled = exports.ExecuteChain = exports.ChainMiddleware = exports.Chain = undefined;
-
-var _ChainSettings = require('./chain/ChainSettings');
+exports.ChainStrictModeEnabled = exports.ChainCacheEnabled = exports.ExecuteChain = exports.ChainMiddleware = exports.Chain = exports.ChainAction = undefined;
 
 var _Chain = require('./chain/Chain');
+
+var _ChainSettings = require('./chain/ChainSettings');
 
 var _ChainMiddleware = require('./chain/ChainMiddleware');
 
 var _ChainExecuter = require('./chain/ChainExecuter');
 
+var ChainAction = exports.ChainAction = _Chain.Action;
 var Chain = exports.Chain = _Chain.CH;
 var ChainMiddleware = exports.ChainMiddleware = _ChainMiddleware.CM;
 var ExecuteChain = exports.ExecuteChain = _ChainExecuter.Execute;

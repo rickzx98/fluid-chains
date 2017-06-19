@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 
-import { Chain, ExecuteChain } from '../../../src/';
+import { Chain, ChainAction, ExecuteChain } from '../../../src/';
 import { ChainStorage, getConfig } from '../../../src/chain/ChainStorage';
 
 import { StrictModeEnabled } from '../../../src/chain/ChainSettings';
@@ -47,7 +47,7 @@ describe('Chain Unit', () => {
                 expect(param.hey()).to.be.equal('daydreamer');
                 next();
             });
-            ExecuteChain('hello2', {hey: 'daydreamer'}, (context) => {
+            ExecuteChain('hello2', { hey: 'daydreamer' }, (context) => {
                 expect(context.$owner()).to.be.equal('hello2');
                 expect(context.saidHello).to.be.not.undefined;
                 done();
@@ -455,6 +455,55 @@ describe('Chain Unit', () => {
                 else {
                     done();
                 }
+            });
+        });
+    });
+    describe('Chain decorator', () => {
+        it('should set decoration target chain constant', () => {
+            class Sample {
+                @ChainAction
+                ChainNameSampleOne(context, param, next) {
+                    context.set('ChainNameSampleOneGotHere', true);
+                    next();
+                }
+            }
+            const sm = new Sample();
+            expect(sm).to.be.not.undefined;
+            expect(sm.CHAIN_CHAINNAMESAMPLEONE).to.be.equal('ChainNameSampleOne');
+        });
+        it('should run the chain in decorator', (done) => {
+            class Sample {
+                @ChainAction
+                ChainNameSampleTwo(context, param, next) {
+                    context.set('ChainNameSampleTwoGotHere', true);
+                    next();
+                }
+            }
+            const sm = new Sample();
+            ExecuteChain(sm.CHAIN_CHAINNAMESAMPLETWO, {}, result => {
+                expect(result.ChainNameSampleTwoGotHere).to.be.not.undefined;
+                expect(result.ChainNameSampleTwoGotHere()).to.be.true;
+                done();
+            });
+        });
+        it('should run multiple chains using the decorator', (done) => {
+            class Sample {
+                @ChainAction
+                ChainNameSampleThree(context, param, next) {
+                    context.set('ChainNameSampleThreeGotHere', true);
+                    next();
+                }
+                @ChainAction
+                ChainNameSampleFour(context, param, next) {
+                    context.set('ChainNameSampleFourGotHere', true);
+                    next();
+                }
+            }
+            const sm = new Sample();
+            ExecuteChain([sm.CHAIN_CHAINNAMESAMPLETHREE, sm.CHAIN_CHAINNAMESAMPLEFOUR], {}, result => {
+                expect(result.ChainNameSampleFourGotHere).to.be.not.undefined;
+                expect(result.ChainNameSampleFourGotHere()).to.be.true;
+                done();
             });
         });
     });
