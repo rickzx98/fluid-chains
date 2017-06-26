@@ -13,7 +13,11 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ChainStorage = exports.ChainStorage = {};
+if (!global._$$chainStorage) {
+    global._$$chainStorage = {};
+}
+
+var ChainStorage = exports.ChainStorage = global._$$chainStorage;
 
 var putChain = exports.putChain = function putChain(name, chain) {
     if (_lodash2.default.get(ChainStorage, name)) {
