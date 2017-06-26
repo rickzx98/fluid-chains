@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 
-import { ChainStorage, addChainState, createChainState, getConfig, getMiddlewares, getState, putChain, putConfig, removeState } from '../../../src/chain/ChainStorage';
+import { ChainStorage, addChainState, createChainState, exists, getConfig, getMiddlewares, getState, info, putChain, putConfig, removeState } from '../../../src/chain/ChainStorage';
 
 import ChainContext from '../../../src/chain/ChainContext';
 import { ChainMiddleware } from '../../../src/';
@@ -112,5 +112,9 @@ describe('ChainStorage Unit', () => {
         });
         const middlewares = getMiddlewares();
         assert(middlewares.length > 0);
+    });
+    it('should check if chain exists', () => {
+        putChain('sample10', 1);
+        expect(exists('sample10')).to.be.true;
     });
 });

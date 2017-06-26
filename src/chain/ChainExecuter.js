@@ -7,7 +7,7 @@ export const Execute = (name, param, done) => {
     context.set('$owner', name + '_starter');
     if (name instanceof Array) {
         ExecuteChains(name, done, 0, context);
-    } else if (ChainStorage[name]) {
+    } else if (lodash.get(ChainStorage, name)) {
         const chain = lodash.clone(lodash.get(ChainStorage, name)());
         chain.execute(done, context, name);
     } else {

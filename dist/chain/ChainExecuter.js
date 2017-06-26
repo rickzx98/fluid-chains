@@ -20,7 +20,7 @@ var Execute = exports.Execute = function Execute(name, param, done) {
     context.set('$owner', name + '_starter');
     if (name instanceof Array) {
         ExecuteChains(name, done, 0, context);
-    } else if (_ChainStorage.ChainStorage[name]) {
+    } else if (_lodash2.default.get(_ChainStorage.ChainStorage, name)) {
         var chain = _lodash2.default.clone(_lodash2.default.get(_ChainStorage.ChainStorage, name)());
         chain.execute(done, context, name);
     } else {

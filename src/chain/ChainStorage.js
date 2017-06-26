@@ -1,11 +1,7 @@
 import { generateUUID } from './Util';
 import lodash from 'lodash';
 
-if (!global._$$chainStorage) {
-    global._$$chainStorage = {};
-}
-
-export const ChainStorage = global._$$chainStorage;
+export const ChainStorage = {};
 
 export const putChain = (name, chain) => {
     if (lodash.get(ChainStorage, name)) {
@@ -90,3 +86,7 @@ export const clearStorage = () => {
         lodash.unset(ChainStorage, key);
     });
 };
+
+export const exists = (chainName) => {
+    return !!lodash.get(ChainStorage, chainName);
+}
