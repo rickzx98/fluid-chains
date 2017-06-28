@@ -3,7 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.exists = exports.clearStorage = exports.getConfig = exports.putConfig = exports.getMiddlewares = exports.getState = exports.removeState = exports.addChainState = exports.createChainState = exports.putChain = exports.ChainStorage = undefined;
+exports.exists = exports.clearStorage = exports.getConfig = exports.putConfig = exports.getChains = exports.getMiddlewares = exports.getState = exports.removeState = exports.addChainState = exports.createChainState = exports.putChain = exports.ChainStorage = undefined;
+
+var _Chain = require('./Chain');
 
 var _Util = require('./Util');
 
@@ -84,6 +86,18 @@ var getMiddlewares = exports.getMiddlewares = function getMiddlewares() {
     });
 };
 
+var getChains = exports.getChains = function getChains() {
+    var chains = [];
+    _lodash2.default.forEach(ChainStorage, function (storage) {
+        if (storage instanceof Function) {
+            var chain = storage();
+            if (chain instanceof _Chain.CH) {
+                chains.push(chain.info().name);
+            }
+        }
+    });
+    return chains;
+};
 var putConfig = exports.putConfig = function putConfig(name, value) {
     _lodash2.default.set(getConfig(), name, value);
 };

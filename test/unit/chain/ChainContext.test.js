@@ -57,6 +57,14 @@ describe('ChainContext Unit', () => {
                 });
             }).to.throw(Error);
         });
+        it('should throw an error when setting immutable field twice', () => {
+            const context = new ChainContext();
+            context.addValidator(new ChainSpec('name', true, undefined, true));
+            expect(() => {
+                context.set('name', 'hello');
+                context.set('name', 'hello again');
+            }).to.throw('Field name is already defined and is marked readOnly.');
+        });
     });
 
     describe('copy', () => {

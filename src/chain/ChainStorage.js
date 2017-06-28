@@ -1,3 +1,4 @@
+import { CH } from './Chain';
 import { generateUUID } from './Util';
 import lodash from 'lodash';
 
@@ -68,6 +69,18 @@ export const getMiddlewares = () => {
     });
 };
 
+export const getChains = () => {
+    const chains = [];
+    lodash.forEach(ChainStorage, (storage) => {
+        if (storage instanceof Function) {
+            const chain = storage();
+            if (chain instanceof CH) {
+                chains.push(chain.info().name);
+            }
+        }
+    });
+    return chains;
+}
 export const putConfig = (name, value) => {
     lodash.set(getConfig(), name, value);
 };

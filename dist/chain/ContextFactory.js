@@ -19,7 +19,7 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var CreateErrorContext = exports.CreateErrorContext = function CreateErrorContext(name, errorFrom, err) {
+var CreateErrorContext = exports.CreateErrorContext = function CreateErrorContext(name, errorFrom, err, next) {
     var context = new _ChainContext2.default();
     context.addValidator(new _ChainSpec2.default('$err', true, undefined, true));
     context.addValidator(new _ChainSpec2.default('$errorMessage', true, undefined, true));
@@ -30,6 +30,7 @@ var CreateErrorContext = exports.CreateErrorContext = function CreateErrorContex
     context.set('$err', err);
     context.set('$errorMessage', err.message);
     context.set('$errorFrom', errorFrom);
+    context.set('$next', next);
     return context;
 };
 

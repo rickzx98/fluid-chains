@@ -106,7 +106,7 @@ var ChainResponse = function ChainResponse(done, context, startTime) {
 var failed = function failed(done, context, name, err) {
     context.set('$$chain.status', _ChainStatus.STATUS_FAILED);
     if (context.$error) {
-        _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, (0, _ContextFactory.CreateErrorContext)(context.$error(), name, err));
+        _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, (0, _ContextFactory.CreateErrorContext)(context.$error(), name, err, context.$next()));
     } else {
         console.warn('UnhandledErrorCallback', err);
         done({
