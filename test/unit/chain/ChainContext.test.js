@@ -57,13 +57,21 @@ describe('ChainContext Unit', () => {
                 });
             }).to.throw(Error);
         });
-        it('should throw an error when setting immutable field twice', () => {
+        it('should throw an error when setting readonly field twice', () => {
             const context = new ChainContext();
             context.addValidator(new ChainSpec('name', true, undefined, true));
             expect(() => {
                 context.set('name', 'hello');
                 context.set('name', 'hello again');
-            }).to.throw('Field name is already defined and is marked readOnly.');
+            }).to.throw('Field name is already defined and can only be written once.');
+
+            context.addValidator(new ChainSpec('lastname').require().writeOnce());
+
+            expect(() => {
+                context.set('lastname', 'hello');
+                context.set('lastname', 'hello again');
+            }).to.throw('Field lastname is already defined and can only be written once.');
+
         });
     });
 

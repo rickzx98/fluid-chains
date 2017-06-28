@@ -6,7 +6,9 @@ Object.defineProperty(exports, "__esModule", {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ChainSpec = function ChainSpec(field, required, customValidator, readOnly) {
+var ChainSpec = function ChainSpec(field, required, customValidator, once) {
+    var _this = this;
+
     _classCallCheck(this, ChainSpec);
 
     if (customValidator && !(customValidator instanceof Function)) {
@@ -14,7 +16,7 @@ var ChainSpec = function ChainSpec(field, required, customValidator, readOnly) {
     }
     this.field = field;
     this.required = required;
-
+    this.once = once;
     this.validate = function (context) {
         if (_this.required && (!context[field] || context[field]() === '')) {
             throw new Error(_this.requiredMessage || 'Field ' + field + ' is required.');
@@ -27,7 +29,6 @@ var ChainSpec = function ChainSpec(field, required, customValidator, readOnly) {
             });
         }
     };
-    this.readOnly = readOnly;
 
     this.default = function (defaultValue) {
         _this.defaultValue = defaultValue;
@@ -45,6 +46,11 @@ var ChainSpec = function ChainSpec(field, required, customValidator, readOnly) {
         if (customValidator && !(customValidator instanceof Function)) {
             throw new Error('customValidator must be a Function instance.');
         }
+        return _this;
+    };
+
+    this.writeOnce = function () {
+        _this.once = true;
         return _this;
     };
 };

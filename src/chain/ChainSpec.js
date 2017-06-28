@@ -1,11 +1,11 @@
 export default class ChainSpec {
-    constructor(field, required, customValidator, readOnly) {
+    constructor(field, required, customValidator, once) {
         if (customValidator && !(customValidator instanceof Function)) {
             throw new Error('customValidator must be a Function instance.');
         }
         this.field = field;
         this.required = required;
-
+        this.once = once;
         this.validate = (context) => {
             if (this.required && (!context[field] || context[field]() === '')) {
                 throw new Error(this.requiredMessage || `Field ${field} is required.`);
@@ -19,7 +19,7 @@ export default class ChainSpec {
             }
         };
 
-        this.default = (defaultValue)=>{
+        this.default = (defaultValue)=> {
             this.defaultValue = defaultValue;
             return this;
         };
@@ -37,7 +37,10 @@ export default class ChainSpec {
             }
             return this;
         };
+
+        this.writeOnce = ()=> {
+            this.once = true;
+            return this;
         }
-        this.readOnly = readOnly;
     }
 }

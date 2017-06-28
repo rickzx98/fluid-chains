@@ -10,8 +10,8 @@ export default class ChainContext {
 
     set(name, value) {
         const fieldSpec = this.validators[name];
-        if (fieldSpec && fieldSpec.readOnly && lodash.get(this, name)) {
-            throw new Error('Field ' + name + ' is already defined and is marked readOnly.');
+        if (fieldSpec && fieldSpec.once && lodash.get(this, name)) {
+            throw new Error('Field ' + name + ' is already defined and can only be written once.');
         }
         if (value instanceof Function) {
             throw new Error('Function cannot be set as value');
