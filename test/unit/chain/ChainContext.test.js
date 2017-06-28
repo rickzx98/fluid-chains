@@ -46,7 +46,7 @@ describe('ChainContext Unit', () => {
         });
         it('should not be mutated', () => {
             const context = new ChainContext();
-            context.set('hello', { remark: 'hi' });
+            context.set('hello', {remark: 'hi'});
             context.hello().remark = 'hello';
             assert(context.hello().remark === 'hi');
         });
@@ -56,14 +56,6 @@ describe('ChainContext Unit', () => {
                 context.set('tryFunction', () => {
                 });
             }).to.throw(Error);
-        });
-        it('should throw an error when setting immutable field twice', () => {
-            const context = new ChainContext();
-            context.addValidator(new ChainSpec('name', true, undefined, true));
-            expect(() => {
-                context.set('name', 'hello');
-                context.set('name', 'hello again');
-            }).to.throw('Field name is already defined and is marked immutable.');
         });
     });
 
@@ -110,4 +102,41 @@ describe('ChainContext Unit', () => {
         });
     });
 
+    describe('spec properties', ()=> {
+        it('should initialize all spec with default value', () => {
+            const spec = new ChainSpec('sampleField');
+            spec.default('hello');
+            const context = new ChainContext();
+            context.addValidator(spec);
+            context.initDefaults();
+            expect(context.sampleField).to.be.not.undefined;
+            expect(context.sampleField()).to.be.equal('hello');
+            context.set('sampleField', 'hi');
+            expect(context.sampleField()).to.be.equal('hi');
+        });
+
+        it('should make the field required', () => {
+            const spec = new ChainSpec('sampleField');
+            spec.require();
+            const context = new ChainContext();
+            context.addValidator(spec);
+            expect(() => {
+                context.validate(new ChainContext());
+            }).to.throw('Field sampleField is required.');
+        });
+
+        it('should be able to add custom validator using validator function', () => {
+            const spec = new ChainSpec('sampleField');
+            spec.validator((value, valid) => {
+                valid(value === 'hi', 'Value is not hi.');
+            });
+            expect(() => {
+                const context = new ChainContext();
+                context.addValidator(spec);
+                const param = new ChainContext();
+                param.set('sampleField', 'hello');
+                context.validate(param);
+            }).to.throw('Value is not hi.');
+        });
+    });
 });

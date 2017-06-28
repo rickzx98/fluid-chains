@@ -30,10 +30,6 @@ var ChainContext = function () {
     _createClass(ChainContext, [{
         key: 'set',
         value: function set(name, value) {
-            var fieldSpec = this.validators[name];
-            if (fieldSpec && fieldSpec.immutable && _lodash2.default.get(this, name)) {
-                throw new Error('Field ' + name + ' is already defined and is marked immutable.');
-            }
             if (value instanceof Function) {
                 throw new Error('Function cannot be set as value');
             }
@@ -111,6 +107,17 @@ var ChainContext = function () {
         value: function validate(param) {
             _lodash2.default.forIn(this.validators, function (validator) {
                 return validator.validate(param);
+            });
+        }
+    }, {
+        key: 'initDefaults',
+        value: function initDefaults() {
+            var _this2 = this;
+
+            _lodash2.default.forIn(this.validators, function (validator, field) {
+                if (validator.defaultValue) {
+                    _this2.set(field, validator.defaultValue);
+                }
             });
         }
     }]);

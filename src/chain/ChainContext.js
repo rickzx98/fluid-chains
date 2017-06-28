@@ -9,10 +9,6 @@ export default class ChainContext {
     }
 
     set(name, value) {
-        const fieldSpec = this.validators[name];
-        if (fieldSpec && fieldSpec.immutable && lodash.get(this, name)) {
-            throw new Error('Field ' + name + ' is already defined and is marked immutable.');
-        }
         if (value instanceof Function) {
             throw new Error('Function cannot be set as value');
         }
@@ -91,5 +87,13 @@ export default class ChainContext {
 
     validate(param) {
         lodash.forIn(this.validators, validator => validator.validate(param));
+    }
+
+    initDefaults() {
+        lodash.forIn(this.validators, (validator, field)=> {
+            if (validator.defaultValue) {
+                this.set(field, validator.defaultValue);
+            }
+        });
     }
 }

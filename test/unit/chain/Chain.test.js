@@ -20,8 +20,7 @@ describe('Chain Unit', () => {
                 context.set('saidHello', true);
                 next();
             });
-            chain.addSpec('sample', true, () => {
-            });
+            chain.addSpec('sample');
             expect(chain.spec).to.be.not.undefined;
             expect(chain.spec.length).to.be.not.undefined;
             expect(chain.spec[0].field).to.be.equal('sample');

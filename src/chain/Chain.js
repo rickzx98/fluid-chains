@@ -56,6 +56,7 @@ export class CH {
             const spec = new ChainSpec(field, required, customValidator);
             this.spec.push(spec);
             context.addValidator(spec);
+            return spec;
         };
         putChain(name, this);
     }
@@ -128,6 +129,7 @@ const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, 
     }, belt ? nxt : nxt || next);
 };
 const invokeAction = (action, name, spec, context, param, belt, cacheEnabled, startTime, done) => {
+    context.initDefaults();
     action(context, param, err => {
         if (err && err instanceof Error) {
             failed(done, context, name, err);
@@ -168,10 +170,10 @@ export const Action = (target, key, descriptor) => {
         lodash.set(target, `CHAIN_${key.toUpperCase()}`, key);
     }
     if (descriptor && descriptor.value instanceof Function) {
-        new CH(key, descriptor.value);
+        chain = new CH(key, descriptor.value);
     } else {
         throw new Error('Must be declared in a function with (context, paran, next).');
     }
     return chain;
-}
+};
 

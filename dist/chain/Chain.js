@@ -79,6 +79,7 @@ var CH = exports.CH = function () {
             var spec = new _ChainSpec2.default(field, required, customValidator);
             _this.spec.push(spec);
             context.addValidator(spec);
+            return spec;
         };
         (0, _ChainStorage.putChain)(name, this);
     }
@@ -164,6 +165,7 @@ var invokeChain = function invokeChain(done, name, next, action, spec, context, 
     }, belt ? nxt : nxt || next);
 };
 var invokeAction = function invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done) {
+    context.initDefaults();
     action(context, param, function (err) {
         if (err && err instanceof Error) {
             failed(done, context, name, err);
@@ -204,7 +206,7 @@ var Action = exports.Action = function Action(target, key, descriptor) {
         _lodash2.default.set(target, 'CHAIN_' + key.toUpperCase(), key);
     }
     if (descriptor && descriptor.value instanceof Function) {
-        new CH(key, descriptor.value);
+        chain = new CH(key, descriptor.value);
     } else {
         throw new Error('Must be declared in a function with (context, paran, next).');
     }

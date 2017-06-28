@@ -1,6 +1,6 @@
 {
   "name": "fluid-chains",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Just a simple way to run asynchronous functions with functional programming in mind.",
   "main": "dist/index.js",
   "scripts": {
