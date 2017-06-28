@@ -63,7 +63,7 @@ describe('ChainContext Unit', () => {
             expect(() => {
                 context.set('name', 'hello');
                 context.set('name', 'hello again');
-            }).to.throw('Field name is already defined and is marked immutable.');
+            }).to.throw('Field name is already defined and is marked readOnly.');
         });
     });
 

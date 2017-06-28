@@ -1,5 +1,5 @@
 export default class ChainSpec {
-    constructor(field, required, customValidator, immutable) {
+    constructor(field, required, customValidator, readOnly) {
         if (customValidator && !(customValidator instanceof Function)) {
             throw new Error('customValidator must be a Function instance.');
         }
@@ -17,6 +17,6 @@ export default class ChainSpec {
                 });
             }
         }
-        this.immutable = immutable;
+        this.readOnly = readOnly;
     }
 }

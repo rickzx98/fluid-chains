@@ -2,7 +2,7 @@ import ChainContext from './ChainContext';
 import ChainSpec from './ChainSpec';
 import lodash from 'lodash';
 
-export const CreateErrorContext = (name, errorFrom, err) => {
+export const CreateErrorContext = (name, errorFrom, err, next) => {
     const context = new ChainContext();
     context.addValidator(new ChainSpec('$err', true, undefined, true));
     context.addValidator(new ChainSpec('$errorMessage', true, undefined, true));
@@ -13,6 +13,7 @@ export const CreateErrorContext = (name, errorFrom, err) => {
     context.set('$err', err);
     context.set('$errorMessage', err.message);
     context.set('$errorFrom', errorFrom);
+    context.set('$next', next);
     return context;
 };
 

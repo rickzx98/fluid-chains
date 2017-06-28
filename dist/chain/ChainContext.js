@@ -31,8 +31,8 @@ var ChainContext = function () {
         key: 'set',
         value: function set(name, value) {
             var fieldSpec = this.validators[name];
-            if (fieldSpec && fieldSpec.immutable && _lodash2.default.get(this, name)) {
-                throw new Error('Field ' + name + ' is already defined and is marked immutable.');
+            if (fieldSpec && fieldSpec.readOnly && _lodash2.default.get(this, name)) {
+                throw new Error('Field ' + name + ' is already defined and is marked readOnly.');
             }
             if (value instanceof Function) {
                 throw new Error('Function cannot be set as value');

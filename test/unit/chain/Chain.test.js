@@ -36,7 +36,6 @@ describe('Chain Unit', () => {
             ExecuteChain('hello0', {}, (context) => {
                 expect(context.$owner()).to.be.equal('hello0');
                 expect(context.saidHello).to.be.not.undefined;
-                console.log('hello0', hello0.info());
                 done();
             });
         });
@@ -340,6 +339,8 @@ describe('Chain Unit', () => {
                 new Chain('errorHandler_start_0', (context, param, next) => {
                     context.set('errorWasTriggered', true);
                     const name = param.$errorFrom();
+                    expect(param.$next).to.be.not.undefined;
+                    expect(param.$next()).to.be.equal('second');
                     expect(name).to.be.equal('start_0');
                     next()
                 });
@@ -420,7 +421,6 @@ describe('Chain Unit', () => {
 
             ExecuteChain('StrictModeChain01', {}, (result) => {
                 if (result.$err) {
-                    console.log('result', result.$err());
                 }
                 else {
                     expect(result.fullname).to.be.not.undefined;
@@ -444,13 +444,11 @@ describe('Chain Unit', () => {
                 expect(param.surname).to.be.undefined;
                 expect(param.age).to.be.undefined;
                 expect(param.$owner).to.be.not.undefined;
-                console.log('param', param);
                 next();
             }, null, null);
 
             ExecuteChain('StrictModeChain01_1', {}, (result) => {
                 if (result.$err) {
-                    console.log('result', result.$err());
                 }
                 else {
                     done();

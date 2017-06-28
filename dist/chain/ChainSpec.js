@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ChainSpec = function ChainSpec(field, required, customValidator, immutable) {
+var ChainSpec = function ChainSpec(field, required, customValidator, readOnly) {
     _classCallCheck(this, ChainSpec);
 
     if (customValidator && !(customValidator instanceof Function)) {
@@ -26,7 +26,7 @@ var ChainSpec = function ChainSpec(field, required, customValidator, immutable) 
             });
         }
     };
-    this.immutable = immutable;
+    this.readOnly = readOnly;
 };
 
 exports.default = ChainSpec;

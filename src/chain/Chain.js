@@ -77,7 +77,7 @@ const ChainResponse = (done, context, startTime) => {
 const failed = (done, context, name, err) => {
     context.set('$$chain.status', STATUS_FAILED);
     if (context.$error) {
-        lodash.clone(ChainStorage[context.$error()]()).execute(done, CreateErrorContext(context.$error(), name, err));
+        lodash.clone(ChainStorage[context.$error()]()).execute(done, CreateErrorContext(context.$error(), name, err, context.$next()));
     } else {
         console.warn('UnhandledErrorCallback', err);
         done({
