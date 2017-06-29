@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ChainSpec = function ChainSpec(field, required, customValidator, once) {
+var ChainSpec = function ChainSpec(field, required, customValidator) {
     var _this = this;
 
     _classCallCheck(this, ChainSpec);
@@ -16,7 +16,6 @@ var ChainSpec = function ChainSpec(field, required, customValidator, once) {
     }
     this.field = field;
     this.required = required;
-    this.once = once;
     this.validate = function (context) {
         if (_this.required && (!context[field] || context[field]() === '')) {
             throw new Error(_this.requiredMessage || 'Field ' + field + ' is required.');
@@ -49,8 +48,12 @@ var ChainSpec = function ChainSpec(field, required, customValidator, once) {
         return _this;
     };
 
-    this.writeOnce = function () {
-        _this.once = true;
+    this.transform = function () {
+        var transformer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function (currentValue) {
+            var done = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (newValue) {};
+        };
+
+        _this.transformer = transformer;
         return _this;
     };
 };

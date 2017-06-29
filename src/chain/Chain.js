@@ -56,7 +56,7 @@ export class CH {
             const spec = new ChainSpec(field, required, customValidator);
             this.spec.push(spec);
             context.addValidator(spec);
-            return spec;
+            return new SpecWrapper(spec);
         };
         putChain(name, this);
     }
@@ -65,7 +65,30 @@ export class CH {
         return sizeOf(this);
     }
 }
+class SpecWrapper {
+    constructor(spec) {
 
+        this.require = (message) => {
+            spec.require(message);
+            return this;
+        }
+
+        this.validator = (validator) => {
+            spec.validator(validator);
+            return this;
+        }
+
+        this.transform = (transformer) => {
+            spec.transform(transformer);
+            return this;
+        }
+
+        this.default = (defaultValue) => {
+            spec.default(defaultValue);
+            return this;
+        }
+    }
+}
 const ChainResponse = (done, context, startTime) => {
     context.set('$responseTime', new Date().getTime() - startTime);
     const clonedContext = context.clone();
@@ -96,7 +119,11 @@ const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, 
                 $errorMessage: () => errMiddleware && errMiddleware.message
             });
         } else {
+
+            param.initDefaults(context);
+            param.transform(context);
             context.validate(param);
+
             if ((param && param.$error) && !context.$error) {
                 context.set('$error', param.$error());
             }
@@ -129,7 +156,6 @@ const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, 
     }, belt ? nxt : nxt || next);
 };
 const invokeAction = (action, name, spec, context, param, belt, cacheEnabled, startTime, done) => {
-    context.initDefaults();
     action(context, param, err => {
         if (err && err instanceof Error) {
             failed(done, context, name, err);

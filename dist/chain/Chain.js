@@ -79,7 +79,7 @@ var CH = exports.CH = function () {
             var spec = new _ChainSpec2.default(field, required, customValidator);
             _this.spec.push(spec);
             context.addValidator(spec);
-            return spec;
+            return new SpecWrapper(spec);
         };
         (0, _ChainStorage.putChain)(name, this);
     }
@@ -93,6 +93,32 @@ var CH = exports.CH = function () {
 
     return CH;
 }();
+
+var SpecWrapper = function SpecWrapper(spec) {
+    var _this2 = this;
+
+    _classCallCheck(this, SpecWrapper);
+
+    this.require = function (message) {
+        spec.require(message);
+        return _this2;
+    };
+
+    this.validator = function (validator) {
+        spec.validator(validator);
+        return _this2;
+    };
+
+    this.transform = function (transformer) {
+        spec.transform(transformer);
+        return _this2;
+    };
+
+    this.default = function (defaultValue) {
+        spec.default(defaultValue);
+        return _this2;
+    };
+};
 
 var ChainResponse = function ChainResponse(done, context, startTime) {
     context.set('$responseTime', new Date().getTime() - startTime);
@@ -132,7 +158,11 @@ var invokeChain = function invokeChain(done, name, next, action, spec, context, 
                 }
             });
         } else {
+
+            param.initDefaults(context);
+            param.transform(context);
             context.validate(param);
+
             if (param && param.$error && !context.$error) {
                 context.set('$error', param.$error());
             }
@@ -165,7 +195,6 @@ var invokeChain = function invokeChain(done, name, next, action, spec, context, 
     }, belt ? nxt : nxt || next);
 };
 var invokeAction = function invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done) {
-    context.initDefaults();
     action(context, param, function (err) {
         if (err && err instanceof Error) {
             failed(done, context, name, err);

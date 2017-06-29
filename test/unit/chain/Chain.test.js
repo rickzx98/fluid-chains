@@ -504,4 +504,76 @@ describe('Chain Unit', () => {
             });
         });
     });
+    describe('Chain spec', () => {
+        it('should set spec required properties', (done) => {
+            const SpecChainTest = new Chain('SpecChainTest', (context, param, next) => {
+                next();
+            });
+            SpecChainTest.addSpec('sampleField')
+                .require();
+
+            expect(() => {
+                ExecuteChain('SpecChainTest', {}, result => {
+                });
+            }).to.throw('Field sampleField is required.');
+
+            done();
+        });
+
+        it('should set spec required properties with customer message', (done) => {
+            const SpecChainTest = new Chain('SpecChainTest2', (context, param, next) => {
+                next();
+            });
+            SpecChainTest.addSpec('sampleField')
+                .require('I am required.');
+
+            expect(() => {
+                ExecuteChain('SpecChainTest2', {}, result => {
+                });
+            }).to.throw('I am required.');
+            done();
+        });
+
+        it('should set spec default & transform properties', (done) => {
+            const SpecChainTest = new Chain('SpecChainTest3', (context, param, next) => {
+                context.set('defaultValue', param.sampleField());
+                next();
+            });
+
+            SpecChainTest.addSpec('sampleField')
+                .transform((currentValue, newForm) => {
+                    if (currentValue === 'hi') {
+                        newForm('hello');
+                    }
+                })
+                .default('hi');
+
+            ExecuteChain('SpecChainTest3', {}, result => {
+                expect(result.defaultValue).to.be.not.undefined;
+                expect(result.defaultValue()).to.be.equal('hello');
+                done();
+            });
+        });
+
+        it('should set spec validator', (done) => {
+            const SpecChainTest = new Chain('SpecChainTest4', (context, param, next) => {
+                context.set('defaultValue', param.sampleField());
+                next();
+            });
+
+            SpecChainTest.addSpec('sampleField')
+                .validator((currentValue, valid) => {
+                    if (currentValue === 'hi') {
+                        valid(false, 'Do not say hi!');
+                    }
+                })
+                .default('hi');
+            expect(() => {
+                ExecuteChain('SpecChainTest4', {}, result => {
+                });
+            }).to.throw('Do not say hi!');
+
+            done();
+        });
+    });
 });

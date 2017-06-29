@@ -31,9 +31,9 @@ var ChainContext = function () {
         key: 'set',
         value: function set(name, value) {
             var fieldSpec = this.validators[name];
-            if (fieldSpec && fieldSpec.once && _lodash2.default.get(this, name)) {
-                throw new Error('Field ' + name + ' is already defined and can only be written once.');
-            }
+            /* if (fieldSpec && fieldSpec.once && lodash.get(this, name)) {
+                 throw new Error('Field ' + name + ' is already defined and can only be written once.');
+             }*/
             if (value instanceof Function) {
                 throw new Error('Function cannot be set as value');
             }
@@ -114,13 +114,29 @@ var ChainContext = function () {
             });
         }
     }, {
-        key: 'initDefaults',
-        value: function initDefaults() {
+        key: 'transform',
+        value: function transform(context) {
             var _this2 = this;
 
-            _lodash2.default.forIn(this.validators, function (validator, field) {
+            _lodash2.default.forIn(context.validators, function (validator, field) {
+                if (validator.transformer) {
+                    var currentValue = _lodash2.default.get(_this2, field);
+                    if (currentValue) {
+                        validator.transformer(currentValue(), function (newValue) {
+                            _this2.set(field, newValue);
+                        });
+                    }
+                }
+            });
+        }
+    }, {
+        key: 'initDefaults',
+        value: function initDefaults(context) {
+            var _this3 = this;
+
+            _lodash2.default.forIn(context.validators, function (validator, field) {
                 if (validator.defaultValue) {
-                    _this2.set(field, validator.defaultValue);
+                    _this3.set(field, validator.defaultValue);
                 }
             });
         }
