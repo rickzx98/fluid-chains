@@ -1,12 +1,19 @@
 # [Fluid-chains](https://rickzx98.github.io/fluid-chains/)
 
-Just a simple way to run asynchronous functions with functional programming in mind.
+A simple way to organize asynchronous Javascript functions that looks like this:
+
+
+
+
+And turn it into something like this:
+
+
 
 [![NPM Download Stats](https://nodei.co/npm/fluid-chains.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/fluid-chains)
 
 ### Getting Started
 
-Installing fluid-chains is easy. It is not a framework and we want to make it light and simple.
+Installing fluid-chains is easy. We want to make it light and simple.
 
 ### Installing
 
