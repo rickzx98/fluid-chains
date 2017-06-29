@@ -275,13 +275,17 @@ var FindPeopleChain = new Chain('FindPeople', function(context, param, next) {
 /*
     @param field: string,
     @param required: boolean
-    @param customerValidation (Optional) : Function(callback) => callback(valid, message) 
-    @param immutable: boolean - will make object immutable and can only be set once
+    @param customerValidation (Optional) : Function(callback) => callback(valid, message)
 */
 FindPeopleChain.addSpec('name', true);
 FindPeopleChain.addSpec('type',true, function(done) {
-    done(type ==='quick', 'Type should be "quick"');
-}, true);
+    done(type ==='quick', 'Type should be "quick"'); });
+
+// or
+
+FindPeopleChain.addSpec('email').require('custom message').validator((currentValue, valid)=>{
+    valid(currentValue.match('email regex here'));
+});
 
 ```
 
