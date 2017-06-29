@@ -5,7 +5,9 @@ A simple way to organize asynchronous Javascript functions that looks like this:
 
 
 
-And turn it into something like this:
+And turn it into something like this: (ES6)
+
+
 
 
 
