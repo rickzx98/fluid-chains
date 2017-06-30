@@ -108,7 +108,7 @@ export default class ChainContext {
 
     initDefaults(context) {
         lodash.forIn(context.validators, (validator, field) => {
-            if (validator.defaultValue) {
+            if (validator.defaultValue && !lodash.get(this, field)) {
                 this.set(field, validator.defaultValue);
             }
         });

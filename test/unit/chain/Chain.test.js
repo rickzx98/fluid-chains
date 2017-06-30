@@ -555,6 +555,24 @@ describe('Chain Unit', () => {
             });
         });
 
+        it('should override spec default value with the paramater set', (done) => {
+            const SpecChainTest = new Chain('SpecChainTest3_2', (context, param, next) => {
+                context.set('defaultValue', param.sampleField());
+                next();
+            });
+
+            SpecChainTest.addSpec('sampleField')
+                .default('hi');
+
+            ExecuteChain('SpecChainTest3_2', {
+                sampleField: 'A complicated hi!'
+            }, result => {
+                expect(result.defaultValue).to.be.not.undefined;
+                expect(result.defaultValue()).to.be.equal('A complicated hi!');
+                done();
+            });
+        });
+
         it('should set spec validator', (done) => {
             const SpecChainTest = new Chain('SpecChainTest4', (context, param, next) => {
                 context.set('defaultValue', param.sampleField());

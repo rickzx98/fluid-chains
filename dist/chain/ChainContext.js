@@ -135,7 +135,7 @@ var ChainContext = function () {
             var _this3 = this;
 
             _lodash2.default.forIn(context.validators, function (validator, field) {
-                if (validator.defaultValue) {
+                if (validator.defaultValue && !_lodash2.default.get(_this3, field)) {
                     _this3.set(field, validator.defaultValue);
                 }
             });
