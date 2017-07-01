@@ -13,6 +13,14 @@ And turn it into something like this: (ES6)
 
 ![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/to.PNG)
 
+
+### How it works
+
+![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-off.png)
+
+![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-on.png)
+
+
 ### Getting Started
 
 Installing fluid-chains is easy. We want to make it light and simple.
@@ -403,13 +411,6 @@ new ChainMiddleware('ChainAuthentication', function(param, nextChain, next) {
 });
 
 ```
-
-### How it works
-
-![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-off.png)
-
-![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-on.png)
-
 
 ### Examples
 
