@@ -1,6 +1,9 @@
 # [Fluid-chains](https://rickzx98.github.io/fluid-chains/)
 
+[![NPM Download Stats](https://nodei.co/npm/fluid-chains.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/fluid-chains)
+
 A simple way to organize asynchronous Javascript functions that looks like this:
+
 
 ![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/from.PNG)
 
@@ -9,9 +12,6 @@ And turn it into something like this: (ES6)
 
 
 ![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/to.PNG)
-
-
-[![NPM Download Stats](https://nodei.co/npm/fluid-chains.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/fluid-chains)
 
 ### Getting Started
 
