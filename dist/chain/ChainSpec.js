@@ -6,7 +6,9 @@ Object.defineProperty(exports, "__esModule", {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ChainSpec = function ChainSpec(field, required, customValidator, immutable) {
+var ChainSpec = function ChainSpec(field, required, customValidator) {
+    var _this = this;
+
     _classCallCheck(this, ChainSpec);
 
     if (customValidator && !(customValidator instanceof Function)) {
@@ -15,8 +17,8 @@ var ChainSpec = function ChainSpec(field, required, customValidator, immutable) 
     this.field = field;
     this.required = required;
     this.validate = function (context) {
-        if (required && (!context[field] || context[field]() === '')) {
-            throw new Error('Field ' + field + ' is required.');
+        if (_this.required && (!context[field] || context[field]() === '')) {
+            throw new Error(_this.requiredMessage || 'Field ' + field + ' is required.');
         }
         if (customValidator && context[field]) {
             customValidator(context[field](), function (valid, message) {
@@ -26,7 +28,34 @@ var ChainSpec = function ChainSpec(field, required, customValidator, immutable) 
             });
         }
     };
-    this.immutable = immutable;
+
+    this.default = function (defaultValue) {
+        _this.defaultValue = defaultValue;
+        return _this;
+    };
+
+    this.require = function (message) {
+        _this.required = true;
+        _this.requiredMessage = message;
+        return _this;
+    };
+
+    this.validator = function (validator) {
+        customValidator = validator;
+        if (customValidator && !(customValidator instanceof Function)) {
+            throw new Error('customValidator must be a Function instance.');
+        }
+        return _this;
+    };
+
+    this.transform = function () {
+        var transformer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function (currentValue) {
+            var done = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (newValue) {};
+        };
+
+        _this.transformer = transformer;
+        return _this;
+    };
 };
 
 exports.default = ChainSpec;

@@ -1,12 +1,21 @@
 # [Fluid-chains](https://rickzx98.github.io/fluid-chains/)
 
-Just a simple way to run asynchronous functions with functional programming in mind.
+A simple way to organize asynchronous Javascript functions that looks like this:
+
+![alt text](https://github.com/rickzx98/fluid-chains/blob/develop/docs/img/from.PNG)
+
+
+And turn it into something like this: (ES6)
+
+
+![alt text](https://github.com/rickzx98/fluid-chains/blob/develop/docs/img/to.PNG)
+
 
 [![NPM Download Stats](https://nodei.co/npm/fluid-chains.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/fluid-chains)
 
 ### Getting Started
 
-Installing fluid-chains is easy. It is not a framework and we want to make it light and simple.
+Installing fluid-chains is easy. We want to make it light and simple.
 
 ### Installing
 
@@ -275,13 +284,17 @@ var FindPeopleChain = new Chain('FindPeople', function(context, param, next) {
 /*
     @param field: string,
     @param required: boolean
-    @param customerValidation (Optional) : Function(callback) => callback(valid, message) 
-    @param immutable: boolean - will make object immutable and can only be set once
+    @param customerValidation (Optional) : Function(callback) => callback(valid, message)
 */
 FindPeopleChain.addSpec('name', true);
 FindPeopleChain.addSpec('type',true, function(done) {
-    done(type ==='quick', 'Type should be "quick"');
-}, true);
+    done(type ==='quick', 'Type should be "quick"'); });
+
+// or
+
+FindPeopleChain.addSpec('email').require('custom message').validator((currentValue, valid)=>{
+    valid(currentValue.match('email regex here'));
+});
 
 ```
 

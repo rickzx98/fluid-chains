@@ -1,22 +1,45 @@
 export default class ChainSpec {
-    constructor(field, required, customValidator, immutable) {
+    constructor(field, required, customValidator) {
         if (customValidator && !(customValidator instanceof Function)) {
             throw new Error('customValidator must be a Function instance.');
         }
         this.field = field;
         this.required = required;
         this.validate = (context) => {
-            if (required && (!context[field] || context[field]() === '')) {
-                throw new Error('Field ' + field + ' is required.');
+            if (this.required && (!context[field] || context[field]() === '')) {
+                throw new Error(this.requiredMessage || `Field ${field} is required.`);
             }
             if (customValidator && context[field]) {
                 customValidator(context[field](), (valid, message) => {
                     if (!valid) {
-                        throw new Error(message || 'Validation failed for field ' + field);
+                        throw new Error(message || `Validation failed for field ${field}`);
                     }
                 });
             }
+        };
+
+        this.default = (defaultValue) => {
+            this.defaultValue = defaultValue;
+            return this;
+        };
+
+        this.require = (message) => {
+            this.required = true;
+            this.requiredMessage = message;
+            return this;
+        };
+
+        this.validator = (validator) => {
+            customValidator = validator;
+            if (customValidator && !(customValidator instanceof Function)) {
+                throw new Error('customValidator must be a Function instance.');
+            }
+            return this;
+        };
+
+        this.transform = (transformer = (currentValue, done = (newValue) => { }) => { }) => {
+            this.transformer = transformer;
+            return this;
         }
-        this.immutable = immutable;
     }
 }
