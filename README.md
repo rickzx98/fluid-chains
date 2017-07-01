@@ -112,8 +112,8 @@ ExecuteChain('firstChain', function(result) {
 ```
 Note: You cannot put Function as a value in context.set(key, value). 
     You can put value and object.
-
-### Can I reuse Chain?
+    
+### Reusing Chains
 ExecuteChains(Array, Parameter, Done);
 
 ```javascript
@@ -403,6 +403,13 @@ new ChainMiddleware('ChainAuthentication', function(param, nextChain, next) {
 });
 
 ```
+
+### How it works
+
+![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-off.PNG)
+
+![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-on.PNG)
+
 
 ### Examples
 
