@@ -13,23 +13,23 @@ And turn it into something like this: (ES6)
 
 ![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/to.PNG)
 
-
-### How it works
-
-![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-off.png)
-
-![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-on.png)
-
 # Table of Contents
 * [Getting Started](#getting-started)
 * [Installation](#installation)
-* [Creating your first chain](#creating-your-fisrt-chain)
+* [Creating your first chain](#creating-your-first-chain)
 * [Starting the chain](#starting-the-chain)
 * [Creating chain sequence](#creating-chain-sequence)
 * [Reusing Chains](#reusing-chains)
 * [Error handling](#error-handling)
 * [Using decorator](#using-decorator)
-
+* [Adding specifications and validation](#adding-specifications-and-validation)
+* [Strict mode](#strict-mode)
+* [Caching](#caching)
+* [Middlewares](#running-with-middlewares)
+* [How it works](#how-it-works)
+* [Examples](#examples)
+* [Authors](#authors)
+* [License](#license)
 
 ### Getting Started
 
@@ -421,21 +421,22 @@ new ChainMiddleware('ChainAuthentication', function(param, nextChain, next) {
 });
 
 ```
+### How it works
+
+![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-off.png)
+
+![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-on.png)
 
 ### Examples
 
 * [Examples](https://github.com/rickzx98/fluid-chains/tree/master/examples) 
 
-## Built With
-
-* [Babel](https://babeljs.io/) - A javascript compiler.
-
-## Authors
+### Authors
 
 * **Jerico de Guzman** - [LinkedIn](https://www.linkedin.com/in/jerico-de-guzman-35126657)
 
 See also the list of [contributors](https://github.com/rickzx98/fluid-chains/contributors) who participated in this project.
 
-## License
+### License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
