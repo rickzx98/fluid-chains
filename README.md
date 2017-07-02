@@ -31,6 +31,10 @@ And turn it into something like this: (ES6)
 * [Documentation](#documentation)
      * [Chain](#chain)
      * [ChainSpec](#chainspec)
+     * [ChainMiddleware](#chainmiddleware)
+     * [ExecuteChain](#executechain)
+     * [ChainExists](#chainexists)
+     * [ChainList](#chainlist)
 * [Authors](#authors)
 * [License](#license)
 
@@ -492,6 +496,58 @@ require()    | mark the field as a required input in chain | chain.addSpec(field
 default()    | defines the default value                   | chain.addSpec(field:String).default(value:String)
 validator()  | defines the validator                       | chain.addSpec(field:String).validator(validate:Function)
 transform()  | defines the transformer                     | chain.addSpec(field:String).transform(transformer:Function)
+
+#### ChainMiddleware
+
+constructor(name:String, action:Function, next:String, errorHandler:String)
+
+``` javascript
+ var chainMiddlewareSample = new ChainMiddleware('chainMiddlewareSample', function(param, nextChain, next) {
+    param.name() 
+    param.email() 
+    next();
+   });
+
+```
+
+- name: defines the name of the chain middleware
+- action: function(param:ChainContext, nextChain: String, [next:Function]) 
+    - param: consist of root parameters and context or the previous chain
+    - nextChain: name of the next chain in sequence
+    - next (optional): triggers the callback of the chain
+    
+#### ExecuteChain
+
+Executes and composes sequence of chains.
+
+- function([name:String|Array], parameters, callback);
+
+``` javascript
+    
+    ExecuteChain('ChainSample', {
+        hello: 'hello'
+     }, function(result) {
+     
+     });
+     
+      ExecuteChain(['ChainSample','ChainSample_2'], {
+        hello: 'hello'
+     }, function(result) {
+     
+     });
+     
+```
+
+#### ChainExists
+
+Availability checker of chain in the current instance.
+
+ChainExists = function(name:String):Boolean
+
+#### ChainList
+
+Returns an array of all the available chains in the current instance
+
 
 ### Authors
 
