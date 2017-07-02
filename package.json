@@ -1,6 +1,6 @@
 {
   "name": "fluid-chains",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A simple way to organize asynchronous Javascript functions.",
   "main": "dist/index.js",
   "scripts": {

@@ -5,13 +5,13 @@
 A simple way to organize asynchronous Javascript functions that looks like this:
 
 
-![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/from.PNG)
+![alt text](https://raw.githubusercontent.com/rickzx98/fluid-chains/master/docs/img/from.PNG)
 
 
 And turn it into something like this: (ES6)
 
 
-![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/to.PNG)
+![alt text](https://raw.githubusercontent.com/rickzx98/fluid-chains/master/docs/img/to.PNG)
 
 # Table of Contents
 * [Getting Started](#getting-started)
@@ -163,8 +163,8 @@ Note: Executing chains like the sample above will ignore the chain's predefined
   above will run the "first" chain then "third" as long as you satify their 
   parameter and it will complete the sequence even if there is a sequence 
   defined in the "third" chain (which is the "fourth") thus make the chains reuseable. 
-
-Updates: Parameters can now be used throughout the chains.
+  
+Additional note: Parameters can be used throughout the chains.
 
 ### Error handling
 
@@ -430,9 +430,9 @@ new ChainMiddleware('ChainAuthentication', function(param, nextChain, next) {
 ```
 ### How it works
 
-![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-off.png)
+![alt text](https://raw.githubusercontent.com/rickzx98/fluid-chains/master/docs/img/strict-mode-off.png)
 
-![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-on.png)
+![alt text](https://raw.githubusercontent.com/rickzx98/fluid-chains/master/docs/img/strict-mode-on.png)
 
 ### Examples
 
@@ -444,7 +444,7 @@ new ChainMiddleware('ChainAuthentication', function(param, nextChain, next) {
 
 The star of this package. 
 
-``` javascript
+```javascript
 
     var chainSample = new Chain('ChainSample', function(context, param) {
         // do something
@@ -460,7 +460,7 @@ constructor(name:String, action:Function, next:String, errorHandler:String)
 - next: defines the next chain in sequence
 - errorHandler: defines the name of the error handler chain
 
-Note: chain will run synchronously is next is not defined in action parameters
+Note: chain will run synchronously if next is not defined in action parameters
 
 
 field        | description                                | usage
