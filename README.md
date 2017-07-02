@@ -29,7 +29,8 @@ And turn it into something like this: (ES6)
 * [How it works](#how-it-works)
 * [Examples](#examples)
 * [Documentation](#documentation)
-     * [Chain](#chainb)
+     * [Chain](#chain)
+     * [ChainSpec](#chainspec)
 * [Authors](#authors)
 * [License](#license)
 
@@ -432,6 +433,65 @@ new ChainMiddleware('ChainAuthentication', function(param, nextChain, next) {
 ### Examples
 
 * [Examples](https://github.com/rickzx98/fluid-chains/tree/master/examples) 
+
+### Documentation
+
+#### Chain
+
+The star of this package. 
+
+``` javascript
+
+    var chainSample = new Chain('ChainSample', function(context, param) {
+        // do something
+    })
+```
+constructor(name:String, action:Function, next:String, errorHandler:String)
+
+- name: defines the name of the chain
+- action: function(context:ChainContext, param: ChainContext, [next:Function]) 
+    - context: context of the current chain
+    - param: consist of root parameters and context or the previous chain
+    - next (optional): triggers the callback of the chain
+- next: defines the next chain in sequence
+- errorHandler: defines the name of the error handler chain
+
+Note: chain will run synchronously is next is not defined in action parameters
+
+
+field        | description                                | usage
+-------------|--------------------------------------------|--------
+addSpec()    | sets the chain parameter spec              | chain.addSpec(ChainSpec)
+info()       | returns the name, status & response time   | chain.info()
+status()     | returns thes current status of chain       | chain.status()
+terminate()  | stops the running chain                    | chain.terminate()
+execute()    | executes the chain                         | chain.execute(callback, ChainContext, NextChain, disableNext)
+
+#### ChainSpec
+
+Defines the input of the chain.
+
+```javascript
+   var chainSample = new Chain('ChainSample', function(context, param) {
+    param.name() // this is required for this chain
+    param.email() // this is required for this email and validated before going here
+   });
+   
+   chainSample.addSpec('name',true);
+   chainSample.addSpec('email')
+            .require()
+            .validator(function(currentValue, valid) {
+                valid(currentValue.match(/email-regex/g));
+            });
+   
+```
+
+field        | description                                 | usage
+-------------|---------------------------------------------|--------
+require()    | mark the field as a required input in chain | chain.addSpec(field:String).require(customMessage:String)
+default()    | defines the default value                   | chain.addSpec(field:String).default(value:String)
+validator()  | defines the validator                       | chain.addSpec(field:String).validator(validate:Function)
+transform()  | defines the transformer                     | chain.addSpec(field:String).transform(transformer:Function)
 
 ### Authors
 
