@@ -20,12 +20,22 @@ And turn it into something like this: (ES6)
 
 ![alt text](https://github.com/rickzx98/fluid-chains/blob/master/docs/img/strict-mode-on.png)
 
+# Table of Contents
+* [Getting Started](#getting-started)
+* [Installation](#installation)
+* [Creating your first chain](#creating-your-fisrt-chain)
+* [Starting the chain](#starting-the-chain)
+* [Creating chain sequence](#creating-chain-sequence)
+* [Reusing Chains](#reusing-chains)
+* [Error handling](#error-handling)
+* [Using decorator](#using-decorator)
+
 
 ### Getting Started
 
 Installing fluid-chains is easy. We want to make it light and simple.
 
-### Installing
+### Installation
 
 ```
 npm install --save fluid-chains
@@ -242,7 +252,7 @@ new Chain('firstChain', function(context, param, next) {
     });
 }, 'secondChain', 'firstErrorHandler'); 
 ```
-### Using decorator with @ChainAction (ES6 only)
+### Using decorator
 
 You can create a chain by using decorator @ChainAction. 
 
