@@ -28,6 +28,8 @@ And turn it into something like this: (ES6)
 * [Middlewares](#running-with-middlewares)
 * [How it works](#how-it-works)
 * [Examples](#examples)
+* [Documentation](#documentation)
+     * [Chain](#chainb)
 * [Authors](#authors)
 * [License](#license)
 
