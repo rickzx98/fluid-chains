@@ -1,7 +1,7 @@
 {
   "name": "fluid-chains",
-  "version": "0.5.0",
-  "description": "Just a simple way to run asynchronous functions with functional programming in mind.",
+  "version": "0.5.1",
+  "description": "A simple way to organize asynchronous Javascript functions.",
   "main": "dist/index.js",
   "scripts": {
     "babel-node": "node_modules/.bin/babel-node",
