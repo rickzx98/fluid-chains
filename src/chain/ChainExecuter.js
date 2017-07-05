@@ -11,12 +11,14 @@ export const Execute = (name, param, done) => {
         const chain = lodash.clone(lodash.get(ChainStorage, name)());
         chain.execute(done, context, name);
     } else {
+        //TODO: RunMiddleware here
         throw new Error('Chain ' + name + ' does not exist.');
     }
 };
 
 function ExecuteChains(chains, done, index, originalParam, newParam) {
     if (index < chains.length) {
+        //TODO: RunMiddleware here if chain does not exists
         const chain = lodash.clone(lodash.get(ChainStorage, chains[index])());
         const next = nextChain(chains, index);
         chain.execute(result => ExecuteChains(chains, done, ++index, originalParam, originalParam.merge(result)), newParam || originalParam, next, true);
