@@ -35,7 +35,7 @@ import {
 import lodash from 'lodash';
 import sizeOf from 'object-sizeof';
 
-export class CH {
+export class Chain {
   constructor(name, action, next, error) {
     ValidateConstructor(name, action);
     let context = new ChainContext();
@@ -75,11 +75,11 @@ export class CH {
     };
     putChain(name, this);
   }
-
   size() {
     return sizeOf(this);
   }
 }
+
 class SpecWrapper {
   constructor(spec) {
 
@@ -112,7 +112,6 @@ const ChainResponse = (done, context, startTime) => {
   }
   done(clonedContext);
 };
-
 const failed = (done, context, name, err) => {
   context.set('$$chain.status', STATUS_FAILED);
   if (context.$error) {
@@ -126,8 +125,8 @@ const failed = (done, context, name, err) => {
   }
 };
 
-const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) => {
-  RunMiddleware(name, param, (errMiddleware) => {
+function invokeChain(done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) {
+  RunMiddleware(name, param.clone(), context, (errMiddleware) => {
     if (errMiddleware) {
       done({
         $err: () => errMiddleware,
@@ -168,9 +167,10 @@ const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, 
         });
       }
     }
-  }, belt ? nxt : nxt || next);
-};
-const invokeAction = (action, name, spec, context, param, belt, cacheEnabled, startTime, done) => {
+  });
+}
+
+function invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done) {
   let asyncAction = action.length === 3;
   action(context, param, err => {
     if (err && err instanceof Error) {
@@ -202,9 +202,9 @@ const invokeAction = (action, name, spec, context, param, belt, cacheEnabled, st
     }
     concludeNextAction(context, param, belt, startTime, done);
   }
-};
+}
 
-const concludeNextAction = (context, param, belt, startTime, done) => {
+function concludeNextAction(context, param, belt, startTime, done) {
   context.set('$$chain.status', STATUS_DONE);
   if (!belt && context.$next) {
     if (context.$isTerminated && context.$isTerminated()) {
@@ -217,7 +217,7 @@ const concludeNextAction = (context, param, belt, startTime, done) => {
   } else {
     ChainResponse(done, context, startTime);
   }
-};
+}
 
 export const Action = (target, key, descriptor) => {
   let chain;
@@ -225,7 +225,7 @@ export const Action = (target, key, descriptor) => {
     lodash.set(target, `CHAIN_${key.toUpperCase()}`, key);
   }
   if (descriptor && descriptor.value instanceof Function) {
-    chain = new CH(key, descriptor.value);
+    chain = new Chain(key, descriptor.value);
   } else {
     throw new Error('Must be declared in a function with (context, paran, next).');
   }

@@ -3,7 +3,8 @@ import 'babel-polyfill';
 import {
   Chain,
   ChainAction,
-  ExecuteChain
+  ExecuteChain,
+  ChainMiddleware
 } from '../../../src/';
 import {
   ChainStorage,
@@ -15,7 +16,9 @@ import {
 } from '../../../src/chain/ChainSettings';
 import chai from 'chai';
 import sizeOf from 'object-sizeof';
-
+import {
+  clearMiddleware
+} from '../../../src/middleware/MiddlewareStorage';
 const expect = chai.expect;
 
 describe('Chain Unit', () => {
@@ -606,4 +609,72 @@ describe('Chain Unit', () => {
       done();
     });
   });
+  describe('Chain Middleware', () => {
+    before(() => {
+      clearMiddleware();
+    });
+    it('should go through the middleware with the exact chain name', done => {
+      let index = 0;
+      new Chain('ChainMiddlewareSampleOne', (context, param) => {});
+      new ChainMiddleware('ChainMiddlewareSampleOne', (param, nextChain, next) => {
+        index++;
+        next();
+      });
+      ExecuteChain('ChainMiddlewareSampleOne', {}, result => {
+        expect(index).to.be.equal(1);
+        done();
+      })
+    });
+
+    it('should go through the middleware of chain that matched regex definition of the middleware', done => {
+      clearMiddleware();
+      let index = 0;
+      new Chain('ChainMiddlewareSampleOne_regex', (context, param) => {});
+      new Chain('ChainMiddlewareSampleTwo_regex', (context, param) => {});
+      new Chain('ChainMiddlewareSampleThree_regex', (context, param) => {});
+
+      new ChainMiddleware(/^ChainMiddleware/g, (param, nextChain, next) => {
+        index++;
+        next();
+      });
+      ExecuteChain(['ChainMiddlewareSampleOne_regex', 'ChainMiddlewareSampleTwo_regex'], {}, result => {
+        done();
+      });
+    });
+
+    it('should run middleware even for the non existing chain', done => {
+      clearMiddleware();
+      let index = 0;
+      new ChainMiddleware(/^NonExisting/g, (param, context, next) => {
+        index++;
+        next();
+      });
+      ExecuteChain('NonExistingTrialChainSample', {}, result => {
+        expect(result.$owner()).to.be.equal('NonExistingTrialChainSample');
+        expect(index).to.be.equal(1);
+        done();
+      });
+    });
+
+    it('should run middleware even for the non existing chain in sequece', done => {
+      getConfig()['$strict'] = false;
+      clearMiddleware();
+      let index = 0;
+      new ChainMiddleware(/^NonExisting/g, (param, context, next) => {
+        index++;
+        context.set('forThree', 'hi');
+        next();
+      });
+      new Chain('ExistingChainOne', (context, param) => {});
+      new Chain('ExistingChainTwo', (context, param) => {});
+      new Chain('ExistingChainThree', (context, param) => {
+        context.set('fromNonExistingChain', param.forThree());
+      });
+      ExecuteChain(['ExistingChainOne', 'ExistingChainTwo', 'NonExistingTrialChainSample_inSequence', 'ExistingChainThree'], {}, result => {
+        expect(result.fromNonExistingChain).to.be.not.undefined;
+        expect(result.fromNonExistingChain()).to.be.equal('hi');
+        done();
+      });
+    });
+  })
 });

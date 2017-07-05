@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.exists = exports.clearStorage = exports.getConfig = exports.putConfig = exports.getChains = exports.getMiddlewares = exports.getState = exports.removeState = exports.addChainState = exports.createChainState = exports.putChain = exports.ChainStorage = undefined;
+exports.exists = exports.clearStorage = exports.putConfig = exports.getConfig = exports.getChains = exports.getState = exports.removeState = exports.createChainState = exports.addChainState = exports.putChain = exports.ChainStorage = undefined;
 
 var _Chain = require('./Chain');
 
@@ -16,7 +16,6 @@ var _lodash2 = _interopRequireDefault(_lodash);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var ChainStorage = exports.ChainStorage = {};
-
 var putChain = exports.putChain = function putChain(name, chain) {
     if (_lodash2.default.get(ChainStorage, name)) {
         throw Error('A chain with the same name as "' + name + '" has already been stored.');
@@ -24,12 +23,6 @@ var putChain = exports.putChain = function putChain(name, chain) {
     _lodash2.default.set(ChainStorage, name, function () {
         return chain;
     });
-};
-
-var createChainState = exports.createChainState = function createChainState(name, spec, param, context) {
-    var key = (0, _Util.generateUUID)();
-    addChainState(key, name, spec, param, context);
-    return key;
 };
 var addChainState = exports.addChainState = function addChainState(key, name, spec, param, context) {
     var state = {};
@@ -48,7 +41,11 @@ var addChainState = exports.addChainState = function addChainState(key, name, sp
     var chainState = _lodash2.default.get(ChainStorage, key);
     _lodash2.default.set(chainState, name, state);
 };
-
+var createChainState = exports.createChainState = function createChainState(name, spec, param, context) {
+    var key = (0, _Util.generateUUID)();
+    addChainState(key, name, spec, param, context);
+    return key;
+};
 var removeState = exports.removeState = function removeState(key) {
     _lodash2.default.unset(ChainStorage, key);
 };
@@ -77,31 +74,18 @@ var getState = exports.getState = function getState(key, name, param) {
     }
     return context;
 };
-var getMiddlewares = exports.getMiddlewares = function getMiddlewares() {
-    return _lodash2.default.filter(ChainStorage, function (storage) {
-        if (storage instanceof Function) {
-            var chain = storage();
-            return chain.type && chain.type === 'MIDDLEWARE';
-        }
-    });
-};
-
 var getChains = exports.getChains = function getChains() {
     var chains = [];
     _lodash2.default.forEach(ChainStorage, function (storage) {
         if (storage instanceof Function) {
             var chain = storage();
-            if (chain instanceof _Chain.CH) {
+            if (chain instanceof _Chain.Chain) {
                 chains.push(chain.info().name);
             }
         }
     });
     return chains;
 };
-var putConfig = exports.putConfig = function putConfig(name, value) {
-    _lodash2.default.set(getConfig(), name, value);
-};
-
 var getConfig = exports.getConfig = function getConfig() {
     var config = _lodash2.default.get(ChainStorage, '$chain.$config');
     if (!config) {
@@ -110,13 +94,14 @@ var getConfig = exports.getConfig = function getConfig() {
     }
     return config;
 };
-
+var putConfig = exports.putConfig = function putConfig(name, value) {
+    _lodash2.default.set(getConfig(), name, value);
+};
 var clearStorage = exports.clearStorage = function clearStorage() {
     _lodash2.default.forIn(ChainStorage, function (field, key) {
         _lodash2.default.unset(ChainStorage, key);
     });
 };
-
 var exists = exports.exists = function exists(chainName) {
     return !!_lodash2.default.get(ChainStorage, chainName);
 };

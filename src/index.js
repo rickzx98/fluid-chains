@@ -1,9 +1,22 @@
-import { Action, CH } from './chain/Chain';
-import { CacheEnabled, StrictModeEnabled } from './chain/ChainSettings';
-import { exists, getChains } from './chain/ChainStorage';
+import {
+  Action,
+  Chain as CH
+} from './chain/Chain';
+import {
+  CacheEnabled,
+  StrictModeEnabled
+} from './chain/ChainSettings';
+import {
+  exists,
+  getChains
+} from './chain/ChainStorage';
 
-import { CM } from './chain/ChainMiddleware';
-import { Execute } from './chain/ChainExecuter';
+import {
+  ChainMiddleware as CM
+} from './middleware';
+import {
+  Execute
+} from './chain/ChainExecuter';
 
 export const ChainAction = Action;
 export const Chain = CH;

@@ -11,13 +11,13 @@ var _ChainSettings = require('./chain/ChainSettings');
 
 var _ChainStorage = require('./chain/ChainStorage');
 
-var _ChainMiddleware = require('./chain/ChainMiddleware');
+var _middleware = require('./middleware');
 
 var _ChainExecuter = require('./chain/ChainExecuter');
 
 var ChainAction = exports.ChainAction = _Chain.Action;
-var Chain = exports.Chain = _Chain.CH;
-var ChainMiddleware = exports.ChainMiddleware = _ChainMiddleware.CM;
+var Chain = exports.Chain = _Chain.Chain;
+var ChainMiddleware = exports.ChainMiddleware = _middleware.ChainMiddleware;
 var ExecuteChain = exports.ExecuteChain = _ChainExecuter.Execute;
 var ChainCacheEnabled = exports.ChainCacheEnabled = _ChainSettings.CacheEnabled;
 var ChainStrictModeEnabled = exports.ChainStrictModeEnabled = _ChainSettings.StrictModeEnabled;

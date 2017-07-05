@@ -1,20 +1,13 @@
-import { CH } from './Chain';
+import { Chain } from './Chain';
 import { generateUUID } from './Util';
 import lodash from 'lodash';
 
 export const ChainStorage = {};
-
 export const putChain = (name, chain) => {
     if (lodash.get(ChainStorage, name)) {
         throw Error('A chain with the same name as "' + name + '" has already been stored.')
     }
     lodash.set(ChainStorage, name, () => chain);
-};
-
-export const createChainState = (name, spec, param, context) => {
-    const key = generateUUID();
-    addChainState(key, name, spec, param, context);
-    return key;
 };
 export const addChainState = (key, name, spec, param, context) => {
     const state = {};
@@ -33,7 +26,11 @@ export const addChainState = (key, name, spec, param, context) => {
     const chainState = lodash.get(ChainStorage, key);
     lodash.set(chainState, name, state);
 };
-
+export const createChainState = (name, spec, param, context) => {
+    const key = generateUUID();
+    addChainState(key, name, spec, param, context);
+    return key;
+};
 export const removeState = (key) => {
     lodash.unset(ChainStorage, key);
 };
@@ -60,31 +57,18 @@ export const getState = (key, name, param) => {
     }
     return context;
 };
-export const getMiddlewares = () => {
-    return lodash.filter(ChainStorage, (storage) => {
-        if (storage instanceof Function) {
-            const chain = storage();
-            return chain.type && chain.type === 'MIDDLEWARE';
-        }
-    });
-};
-
 export const getChains = () => {
     const chains = [];
     lodash.forEach(ChainStorage, (storage) => {
         if (storage instanceof Function) {
             const chain = storage();
-            if (chain instanceof CH) {
+            if (chain instanceof Chain) {
                 chains.push(chain.info().name);
             }
         }
     });
     return chains;
 }
-export const putConfig = (name, value) => {
-    lodash.set(getConfig(), name, value);
-};
-
 export const getConfig = () => {
     let config = lodash.get(ChainStorage, '$chain.$config');
     if (!config) {
@@ -93,13 +77,14 @@ export const getConfig = () => {
     }
     return config;
 };
-
+export const putConfig = (name, value) => {
+    lodash.set(getConfig(), name, value);
+};
 export const clearStorage = () => {
     lodash.forIn(ChainStorage, (field, key) => {
         lodash.unset(ChainStorage, key);
     });
 };
-
 export const exists = (chainName) => {
     return !!lodash.get(ChainStorage, chainName);
 }

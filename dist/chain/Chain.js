@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Action = exports.CH = undefined;
+exports.Action = exports.Chain = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -39,11 +39,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var CH = exports.CH = function () {
-  function CH(name, action, next, error) {
+var Chain = exports.Chain = function () {
+  function Chain(name, action, next, error) {
     var _this = this;
 
-    _classCallCheck(this, CH);
+    _classCallCheck(this, Chain);
 
     (0, _Validation.ValidateConstructor)(name, action);
     var context = new _ChainContext2.default();
@@ -84,14 +84,14 @@ var CH = exports.CH = function () {
     (0, _ChainStorage.putChain)(name, this);
   }
 
-  _createClass(CH, [{
+  _createClass(Chain, [{
     key: 'size',
     value: function size() {
       return (0, _objectSizeof2.default)(this);
     }
   }]);
 
-  return CH;
+  return Chain;
 }();
 
 var SpecWrapper = function SpecWrapper(spec) {
@@ -128,7 +128,6 @@ var ChainResponse = function ChainResponse(done, context, startTime) {
   }
   done(clonedContext);
 };
-
 var failed = function failed(done, context, name, err) {
   context.set('$$chain.status', _ChainStatus.STATUS_FAILED);
   if (context.$error) {
@@ -146,8 +145,8 @@ var failed = function failed(done, context, name, err) {
   }
 };
 
-var invokeChain = function invokeChain(done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) {
-  (0, _middleware.RunMiddleware)(name, param, function (errMiddleware) {
+function invokeChain(done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) {
+  (0, _middleware.RunMiddleware)(name, param.clone(), context, function (errMiddleware) {
     if (errMiddleware) {
       done({
         $err: function $err() {
@@ -192,9 +191,10 @@ var invokeChain = function invokeChain(done, name, next, action, spec, context, 
         });
       }
     }
-  }, belt ? nxt : nxt || next);
-};
-var invokeAction = function invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done) {
+  });
+}
+
+function invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done) {
   var asyncAction = action.length === 3;
   action(context, param, function (err) {
     if (err && err instanceof Error) {
@@ -226,9 +226,9 @@ var invokeAction = function invokeAction(action, name, spec, context, param, bel
     }
     concludeNextAction(context, param, belt, startTime, done);
   }
-};
+}
 
-var concludeNextAction = function concludeNextAction(context, param, belt, startTime, done) {
+function concludeNextAction(context, param, belt, startTime, done) {
   context.set('$$chain.status', _ChainStatus.STATUS_DONE);
   if (!belt && context.$next) {
     if (context.$isTerminated && context.$isTerminated()) {
@@ -241,7 +241,7 @@ var concludeNextAction = function concludeNextAction(context, param, belt, start
   } else {
     ChainResponse(done, context, startTime);
   }
-};
+}
 
 var Action = exports.Action = function Action(target, key, descriptor) {
   var chain = void 0;
@@ -249,7 +249,7 @@ var Action = exports.Action = function Action(target, key, descriptor) {
     _lodash2.default.set(target, 'CHAIN_' + key.toUpperCase(), key);
   }
   if (descriptor && descriptor.value instanceof Function) {
-    chain = new CH(key, descriptor.value);
+    chain = new Chain(key, descriptor.value);
   } else {
     throw new Error('Must be declared in a function with (context, paran, next).');
   }
