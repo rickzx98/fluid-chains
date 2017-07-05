@@ -28,7 +28,7 @@ import ChainContext from './ChainContext';
 import ChainSpec from './ChainSpec';
 import {
   RunMiddleware,
-} from './ChainMiddleware';
+} from '../middleware/';
 import {
   ValidateConstructor
 } from './Validation';
@@ -127,7 +127,7 @@ const failed = (done, context, name, err) => {
 };
 
 const invokeChain = (done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) => {
-  RunMiddleware(param, (errMiddleware) => {
+  RunMiddleware(name, param, (errMiddleware) => {
     if (errMiddleware) {
       done({
         $err: () => errMiddleware,

@@ -23,7 +23,7 @@ var _ChainSpec = require('./ChainSpec');
 
 var _ChainSpec2 = _interopRequireDefault(_ChainSpec);
 
-var _ChainMiddleware = require('./ChainMiddleware');
+var _middleware = require('../middleware/');
 
 var _Validation = require('./Validation');
 
@@ -147,7 +147,7 @@ var failed = function failed(done, context, name, err) {
 };
 
 var invokeChain = function invokeChain(done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) {
-  (0, _ChainMiddleware.RunMiddleware)(param, function (errMiddleware) {
+  (0, _middleware.RunMiddleware)(name, param, function (errMiddleware) {
     if (errMiddleware) {
       done({
         $err: function $err() {
