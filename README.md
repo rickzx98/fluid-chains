@@ -405,26 +405,31 @@ var ChainMiddleware = FluidChains.ChainMiddleware;
 ```
 
 ```javascript
-
 /*
-    @param param: object = parameters for the next chain
-    @param nextChain: string = name of the next chain
-    @param next: Function = proceeds to the next chain
+* Will only get here before chain 'FindPeople' is executed
 */
-
-new ChainMiddleware('ChainInfoLogger', function(param, nextChain, next) { 
-    console.log('from chain', param.$owner());
-    console.log('to chain', nextChain);
+new ChainMiddleware('FindPeople', function(param, context, next) { 
     next();
 });
 
-new ChainMiddleware('ChainAuthentication', function(param, nextChain, next) { 
-    if(nextChain === 'CreatePeopleChain' && param.sessionKey){
+/*
+* Will only get here before chain name that starts with "Find" is executed
+*/
+new ChainMiddleware(\^Find\g, function(param, context, next) { 
+    if(context.$next() === 'CreatePeopleChain' && param.sessionKey){
         //validates 
     } else {
         throw new Error('Chain authentication failed.');
     }
     next();
+});
+
+/*
+* Will run before every chains
+*/
+new ChainMiddleware(function(param, context, next) {
+   console.log('param',param.$owner());
+   next();
 });
 
 ```
@@ -499,21 +504,19 @@ transform()  | defines the transformer                     | chain.addSpec(field
 
 #### ChainMiddleware
 
-constructor(name:String, action:Function, next:String, errorHandler:String)
+constructor(target:String, action:Function(param:ChainContext, context:ChainContext, next:Function(err:Error)));
 
 ``` javascript
- var chainMiddlewareSample = new ChainMiddleware('chainMiddlewareSample', function(param, nextChain, next) {
-    param.name() 
-    param.email() 
+new ChainMiddleware('{targetChainName}', function(param, context, next) {
     next();
    });
 
 ```
 
-- name: defines the name of the chain middleware
-- action: function(param:ChainContext, nextChain: String, [next:Function]) 
-    - param: consist of root parameters and context or the previous chain
-    - nextChain: name of the next chain in sequence
+- target: defines the name of the target chain
+- action: function(param:ChainContext, context: ChainContext, [next:Function]) 
+    - param: consist of root parameters and context of the previous chain
+    - context: context of the target chain
     - next (optional): triggers the callback of the chain
     
 #### ExecuteChain
