@@ -18,7 +18,17 @@
     "url": "git+https://github.com/rickzx98/fluid-chains.git"
   },
   "keywords": [
-    "fluid-chains"
+    "fluid-chains",
+    "chain",
+    "chaining",
+    "asynchronous",
+    "organize",
+    "functional",
+    "jerico",
+    "great",
+    "design",
+    "and",
+    "systems"
   ],
   "author": "Jerico de Guzman",
   "license": "ISC",
