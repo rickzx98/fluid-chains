@@ -1,3 +1,4 @@
+import ChainContext from './ChainContext';
 import lodash from 'lodash';
 
 export default class ChainSpec {
@@ -54,7 +55,12 @@ export default class ChainSpec {
         }
 
         this.initTranslator = (context) => {
-            //TODO: How?
+            const currentValue = lodash.get(context, field);
+            if (currentValue) {
+                const newContext = new ChainContext();
+                this.translator(currentValue(), newContext);
+                context.copy(newContext);
+            }
         }
 
         this.default = (defaultValue) => {
@@ -84,6 +90,12 @@ export default class ChainSpec {
             specActions.push('transform');
             return this;
         }
+
+        this.translate = (translator = (currentValue, context) => { }) => {
+            this.translator = translator;
+            specActions.push('translate');
+            return this;
+        };
 
         this.getSpecsSequence = () => {
             return specActions;

@@ -82,13 +82,27 @@ export default class ChainContext {
                 key !== 'set') {
                 if (field instanceof Function) {
                     const value = field();
-                    if (!copy[key]) {
+                    if (!lodash.get(copy, key)) {
                         copy.set(key, value);
                     }
                 }
             }
         });
         return copy;
+    }
+    copy(context) {
+        lodash.forIn(context, (field, key) => {
+            if (key !== 'addValidator' &&
+                key !== 'validate' &&
+                key !== 'set') {
+                if (field instanceof Function) {
+                    const value = field();
+                    if (!lodash.get(this, key)) {
+                        this.set(key, value);
+                    }
+                }
+            }
+        });
     }
     //@deprecated
     validate(param) {
@@ -143,7 +157,8 @@ export default class ChainContext {
                                 });
                                 break;
                             case 'translate':
-                                //TODO: how?
+                                validator.initTranslator(param);
+                                nextSequence();
                                 break;
                         }
 

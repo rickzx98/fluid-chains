@@ -118,6 +118,11 @@ var SpecWrapper = function SpecWrapper(spec) {
     spec.default(defaultValue);
     return _this2;
   };
+
+  this.translate = function (translator) {
+    spec.translate(translator);
+    return _this2;
+  };
 };
 
 var ChainResponse = function ChainResponse(done, context, startTime) {
@@ -158,7 +163,6 @@ function invokeChain(done, name, next, action, spec, context, param, nxt, belt, 
       });
     } else {
       context.initSpecs(param, function (specError) {
-        console.log('initSpecs', specError);
         if (param && param.$error && !context.$error) {
           context.set('$error', param.$error());
         }

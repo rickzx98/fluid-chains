@@ -100,13 +100,29 @@ var ChainContext = function () {
                 if (key !== 'addValidator' && key !== 'validate' && key !== 'set') {
                     if (field instanceof Function) {
                         var value = field();
-                        if (!copy[key]) {
+                        if (!_lodash2.default.get(copy, key)) {
                             copy.set(key, value);
                         }
                     }
                 }
             });
             return copy;
+        }
+    }, {
+        key: 'copy',
+        value: function copy(context) {
+            var _this2 = this;
+
+            _lodash2.default.forIn(context, function (field, key) {
+                if (key !== 'addValidator' && key !== 'validate' && key !== 'set') {
+                    if (field instanceof Function) {
+                        var value = field();
+                        if (!_lodash2.default.get(_this2, key)) {
+                            _this2.set(key, value);
+                        }
+                    }
+                }
+            });
         }
         //@deprecated
 
@@ -122,14 +138,14 @@ var ChainContext = function () {
     }, {
         key: 'transform',
         value: function transform(context) {
-            var _this2 = this;
+            var _this3 = this;
 
             _lodash2.default.forIn(context.validators, function (validator, field) {
                 if (validator.transformer) {
-                    var currentValue = _lodash2.default.get(_this2, field);
+                    var currentValue = _lodash2.default.get(_this3, field);
                     if (currentValue) {
                         validator.transformer(currentValue(), function (newValue) {
-                            _this2.set(field, newValue);
+                            _this3.set(field, newValue);
                         });
                     }
                 }
@@ -140,11 +156,11 @@ var ChainContext = function () {
     }, {
         key: 'initDefaults',
         value: function initDefaults(context) {
-            var _this3 = this;
+            var _this4 = this;
 
             _lodash2.default.forIn(context.validators, function (validator, field) {
-                if (validator.defaultValue && !_lodash2.default.get(_this3, field)) {
-                    _this3.set(field, validator.defaultValue);
+                if (validator.defaultValue && !_lodash2.default.get(_this4, field)) {
+                    _this4.set(field, validator.defaultValue);
                 }
             });
         }
@@ -176,7 +192,8 @@ var ChainContext = function () {
                                 });
                                 break;
                             case 'translate':
-                                //TODO: how?
+                                validator.initTranslator(param);
+                                nextSequence();
                                 break;
                         }
                     }, next);

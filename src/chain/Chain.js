@@ -102,6 +102,11 @@ class SpecWrapper {
       spec.default(defaultValue);
       return this;
     }
+
+    this.translate = (translator) => {
+      spec.translate(translator);
+      return this;
+    }
   }
 }
 const ChainResponse = (done, context, startTime) => {
@@ -134,7 +139,6 @@ function invokeChain(done, name, next, action, spec, context, param, nxt, belt, 
       });
     } else {
       context.initSpecs(param, specError => {
-        console.log('initSpecs', specError);
         if ((param && param.$error) && !context.$error) {
           context.set('$error', param.$error());
         }

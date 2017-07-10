@@ -608,6 +608,28 @@ describe('Chain Unit', () => {
 
       done();
     });
+
+    it('should set spec translate', done => {
+      const SpecChainTest = new Chain('SpecChainTest5', (context, param, next) => {
+        context.set('name', param.name());
+        context.set('lastname', param.lastname());
+        next();
+      });
+      SpecChainTest.addSpec('fullname')
+        .translate((current, context) => {
+          const names = current.split(',');
+          context.set('lastname', names[0]);
+          context.set('name', names[1]);
+        });
+
+      ExecuteChain('SpecChainTest5', {
+        fullname: 'de Guzman,Jerico'
+      }, (result) => {
+        expect(result.name()).to.be.equal('Jerico');
+        expect(result.lastname()).to.be.equal('de Guzman');
+        done();
+      });
+    });
   });
   describe('Chain Middleware', () => {
     before(() => {

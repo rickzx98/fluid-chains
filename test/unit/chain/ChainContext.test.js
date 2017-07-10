@@ -172,5 +172,19 @@ describe('ChainContext Unit', () => {
             param.transform(context);
             expect(param.sampleField()).to.be.equal('hello');
         });
+
+        it('should translate field into new set of field', () => {
+            const spec = new ChainSpec('sampleField');
+            spec.translate((currentValue, context) => {
+                context.set('hello', currentValue);
+            });
+            const context = new ChainContext();
+            context.addValidator(spec);
+
+            const param = new ChainContext();
+            param.set('sampleField', 'hi');
+            context.initSpecs(param, () => { });
+            expect(param.hello()).to.be.equal('hi');
+        });
     });
 });

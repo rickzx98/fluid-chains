@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
+var _ChainContext = require('./ChainContext');
+
+var _ChainContext2 = _interopRequireDefault(_ChainContext);
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -69,7 +73,12 @@ var ChainSpec = function ChainSpec(field, required, customValidator) {
     };
 
     this.initTranslator = function (context) {
-        //TODO: How?
+        var currentValue = _lodash2.default.get(context, field);
+        if (currentValue) {
+            var newContext = new _ChainContext2.default();
+            _this.translator(currentValue(), newContext);
+            context.copy(newContext);
+        }
     };
 
     this.default = function (defaultValue) {
@@ -101,6 +110,14 @@ var ChainSpec = function ChainSpec(field, required, customValidator) {
 
         _this.transformer = transformer;
         specActions.push('transform');
+        return _this;
+    };
+
+    this.translate = function () {
+        var translator = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function (currentValue, context) {};
+
+        _this.translator = translator;
+        specActions.push('translate');
         return _this;
     };
 
