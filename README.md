@@ -486,12 +486,26 @@ Defines the input of the chain.
     param.email() // this is required for this email and validated before going here
    });
    
-   chainSample.addSpec('name',true);
+   chainSample.addSpec('name', true);
+   chainSample.addSpec('user')
+            .transform(function(currentValue, newForm){
+                if(currentValue){
+                    findUser(currentValue, function(userData) {
+                        newForm(userData);
+                    });
+                }
+            });
    chainSample.addSpec('email')
             .require()
             .validator(function(currentValue, valid) {
                 valid(currentValue.match(/email-regex/g));
             });
+   chainSample.addSpec('fullname')
+            .translate(function(currentValue, context) {
+                const names = currentValue.split(',');
+                context.set('lastname', names[0]);
+                context.set('firstname', names[1]);
+            });       
    
 ```
 
@@ -501,7 +515,7 @@ require()    | mark the field as a required input in chain | chain.addSpec(field
 default()    | defines the default value                   | chain.addSpec(field:String).default(value:String)
 validator()  | defines the validator                       | chain.addSpec(field:String).validator(validate:Function)
 transform()  | defines the transformer                     | chain.addSpec(field:String).transform(transformer:Function)
-
+translate()  | defines the translator                      | chain.addSpec(field:String).translate(translator:Function)
 #### ChainMiddleware
 
 constructor(target:String, action:Function(param:ChainContext, context:ChainContext, next:Function(err:Error)));
