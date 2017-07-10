@@ -16,7 +16,9 @@ describe('ChainContext Unit', () => {
             expect(() => {
                 const context = new ChainContext();
                 context.addValidator(spec);
-                context.validate(new ChainContext());
+                context.validate(new ChainContext(), (err) => {
+                    done();
+                });
             }).to.throw('Field sampleField is required.');
         });
         it('should throw error if custom validation field', () => {
@@ -57,22 +59,22 @@ describe('ChainContext Unit', () => {
                 });
             }).to.throw(Error);
         });
-       /* it('should throw an error when setting readonly field twice', () => {
-            const context = new ChainContext();
-            context.addValidator(new ChainSpec('name', true, undefined, true));
-            expect(() => {
-                context.set('name', 'hello');
-                context.set('name', 'hello again');
-            }).to.throw('Field name is already defined and can only be written once.');
-
-            context.addValidator(new ChainSpec('lastname').require().writeOnce());
-
-            expect(() => {
-                context.set('lastname', 'hello');
-                context.set('lastname', 'hello again');
-            }).to.throw('Field lastname is already defined and can only be written once.');
-
-        });*/
+        /* it('should throw an error when setting readonly field twice', () => {
+             const context = new ChainContext();
+             context.addValidator(new ChainSpec('name', true, undefined, true));
+             expect(() => {
+                 context.set('name', 'hello');
+                 context.set('name', 'hello again');
+             }).to.throw('Field name is already defined and can only be written once.');
+ 
+             context.addValidator(new ChainSpec('lastname').require().writeOnce());
+ 
+             expect(() => {
+                 context.set('lastname', 'hello');
+                 context.set('lastname', 'hello again');
+             }).to.throw('Field lastname is already defined and can only be written once.');
+ 
+         });*/
     });
 
     describe('copy', () => {
@@ -164,8 +166,8 @@ describe('ChainContext Unit', () => {
             });
             const context = new ChainContext();
             context.addValidator(spec);
-            
-            const param  = new ChainContext();
+
+            const param = new ChainContext();
             param.set('sampleField', 'hi');
             param.transform(context);
             expect(param.sampleField()).to.be.equal('hello');

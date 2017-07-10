@@ -7,6 +7,8 @@ exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _Util = require('./Util');
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -106,6 +108,8 @@ var ChainContext = function () {
             });
             return copy;
         }
+        //@deprecated
+
     }, {
         key: 'validate',
         value: function validate(param) {
@@ -113,6 +117,8 @@ var ChainContext = function () {
                 return validator.validate(param);
             });
         }
+        //@deprecated
+
     }, {
         key: 'transform',
         value: function transform(context) {
@@ -129,6 +135,8 @@ var ChainContext = function () {
                 }
             });
         }
+        //@deprecated
+
     }, {
         key: 'initDefaults',
         value: function initDefaults(context) {
@@ -139,6 +147,41 @@ var ChainContext = function () {
                     _this3.set(field, validator.defaultValue);
                 }
             });
+        }
+    }, {
+        key: 'initSpecs',
+        value: function initSpecs(param, done) {
+            (0, _Util.batchIn)(this.validators, function (validator, next) {
+                if (validator) {
+                    (0, _Util.batch)(validator.getSpecsSequence(), function (sequence, nextSequence) {
+                        switch (sequence) {
+                            case 'default':
+                                validator.initDefault(param);
+                                nextSequence();
+                                break;
+                            case 'require':
+                            case 'validator':
+                                validator.validate(param, function (err) {
+                                    console.log('validate', err);
+                                    if (err) {
+                                        done(err);
+                                    } else {
+                                        nextSequence();
+                                    }
+                                });
+                                break;
+                            case 'transform':
+                                validator.initTransformer(param, function () {
+                                    nextSequence();
+                                });
+                                break;
+                            case 'translate':
+                                //TODO: how?
+                                break;
+                        }
+                    }, next);
+                }
+            }, done);
         }
     }]);
 

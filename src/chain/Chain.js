@@ -133,39 +133,39 @@ function invokeChain(done, name, next, action, spec, context, param, nxt, belt, 
         $errorMessage: () => errMiddleware && errMiddleware.message
       });
     } else {
-
-      param.initDefaults(context);
-      param.transform(context);
-      context.validate(param);
-
-      if ((param && param.$error) && !context.$error) {
-        context.set('$error', param.$error());
-      }
-      if (context.$isTerminated && context.$isTerminated()) {
-        context.set('$$chain.status', STATUS_TERMINATED);
-        const clonedContext = context.clone();
-        done(clonedContext);
-      } else {
-        lodash.defer(() => {
-          const startTime = new Date().getTime();
-          try {
-            if (cacheEnabled && (param.$$chain && param.$$chain.id)) {
-              let key = param.$$chain.id;
-              if (getState(key, name, param)) {
-                let cachedContext = getState(key, name, param).clone();
-                concludeNextAction(cachedContext, param, belt, startTime, done);
+      context.initSpecs(param, specError => {
+        console.log('initSpecs', specError);
+        if ((param && param.$error) && !context.$error) {
+          context.set('$error', param.$error());
+        }
+        if (specError) {
+          throw specError;
+        } else if (context.$isTerminated && context.$isTerminated()) {
+          context.set('$$chain.status', STATUS_TERMINATED);
+          const clonedContext = context.clone();
+          done(clonedContext);
+        } else {
+          lodash.defer(() => {
+            const startTime = new Date().getTime();
+            try {
+              if (cacheEnabled && (param.$$chain && param.$$chain.id)) {
+                let key = param.$$chain.id;
+                if (getState(key, name, param)) {
+                  let cachedContext = getState(key, name, param).clone();
+                  concludeNextAction(cachedContext, param, belt, startTime, done);
+                } else {
+                  invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
+                }
               } else {
                 invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
               }
-            } else {
-              invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
+            } catch (err) {
+              context.set('$responseTime', new Date().getTime() - startTime);
+              failed(done, context, name, err);
             }
-          } catch (err) {
-            context.set('$responseTime', new Date().getTime() - startTime);
-            failed(done, context, name, err);
-          }
-        });
-      }
+          });
+        }
+      });
     }
   });
 }

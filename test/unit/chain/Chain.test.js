@@ -3,8 +3,8 @@ import 'babel-polyfill';
 import {
   Chain,
   ChainAction,
-  ExecuteChain,
-  ChainMiddleware
+  ChainMiddleware,
+  ExecuteChain
 } from '../../../src/';
 import {
   ChainStorage,
@@ -15,10 +15,11 @@ import {
   StrictModeEnabled
 } from '../../../src/chain/ChainSettings';
 import chai from 'chai';
-import sizeOf from 'object-sizeof';
 import {
   clearMiddleware
 } from '../../../src/middleware/MiddlewareStorage';
+import sizeOf from 'object-sizeof';
+
 const expect = chai.expect;
 
 describe('Chain Unit', () => {
@@ -150,8 +151,8 @@ describe('Chain Unit', () => {
       });
       expect(() => {
         ExecuteChain('hello3', {
-          hi: () => {}
-        }, (context) => {});
+          hi: () => { }
+        }, (context) => { });
       }).to.throw(Error);
 
     });
@@ -173,19 +174,19 @@ describe('Chain Unit', () => {
   })
   describe('constructor', () => {
     it('should compute its size', () => {
-      const chain = new Chain('sample0', () => {}, 'nextChain', 'errorHandler');
+      const chain = new Chain('sample0', () => { }, 'nextChain', 'errorHandler');
       console.log('chain', chain.size() + ' bytes');
     });
     it('should throw an error when Action is undefined', () => {
       expect(Chain).to.throw(Error);
     });
     it('should return UNTOUCHED as the initial status', () => {
-      const chain = new Chain('sample1', () => {});
+      const chain = new Chain('sample1', () => { });
       const info = chain.info();
       expect(info.status).to.be.equal('UNTOUCHED');
     });
     it('should able to return name, next chain, errorHandler and initial status with info()', () => {
-      const chain = new Chain('sample2', () => {}, 'nextChain', 'errorHandler');
+      const chain = new Chain('sample2', () => { }, 'nextChain', 'errorHandler');
       const info = chain.info();
       expect(info.name).to.be.equal('sample2');
       expect(info.status).to.be.equal('UNTOUCHED');
@@ -212,7 +213,7 @@ describe('Chain Unit', () => {
       });
     });
     it('should put in ChainStorage', () => {
-      const chain = new Chain('sample5', () => {});
+      const chain = new Chain('sample5', () => { });
       expect(ChainStorage.sample5).to.be.not.undefined;
     });
   });
@@ -330,8 +331,8 @@ describe('Chain Unit', () => {
 
       it('should trigger the errorHandler chain specified on the fourth argument of the constructor', (done) => {
         const start = new Chain('start_', (context, param, next) => {
-            throw new Error('sample error');
-          }, 'second3', 'errorHandler_start_')
+          throw new Error('sample error');
+        }, 'second3', 'errorHandler_start_')
           .execute((result) => {
             expect(result.errorWasTriggered).to.be.not.undefined;
             done();
@@ -348,10 +349,10 @@ describe('Chain Unit', () => {
 
       it('should trigger the errorHandler chain with next(Error) for asycnhronous callback', (done) => {
         const start = new Chain('start_0', (context, param, next) => {
-            setTimeout(() => {
-              next(new Error('sample error'));
-            });
-          }, 'second', 'errorHandler_start_0')
+          setTimeout(() => {
+            next(new Error('sample error'));
+          });
+        }, 'second', 'errorHandler_start_0')
           .execute((result) => {
             expect(result.errorWasTriggered).to.be.not.undefined;
             done();
@@ -370,8 +371,8 @@ describe('Chain Unit', () => {
 
       it('should trigger the nearest errorHandler of the chain hierarchy', (done) => {
         const start = new Chain('start_1', (context, param, next) => {
-            next();
-          }, 'second', 'errorHandler_start_1')
+          next();
+        }, 'second', 'errorHandler_start_1')
           .execute((result) => {
             expect(result.errorHandlerForStep2WasTriggered).to.be.not.undefined;
             expect(result.errorWasTriggered).to.be.undefined;
@@ -441,7 +442,7 @@ describe('Chain Unit', () => {
       strictChain.addSpec('surname', true)
 
       ExecuteChain('StrictModeChain01', {}, (result) => {
-        if (result.$err) {} else {
+        if (result.$err) { } else {
           expect(result.fullname).to.be.not.undefined;
           expect(result.fullname()).to.be.equal('John Wick');
           done();
@@ -467,7 +468,7 @@ describe('Chain Unit', () => {
       }, null, null);
 
       ExecuteChain('StrictModeChain01_1', {}, (result) => {
-        if (result.$err) {} else {
+        if (result.$err) { } else {
           done();
         }
       });
@@ -531,13 +532,13 @@ describe('Chain Unit', () => {
         .require();
 
       expect(() => {
-        ExecuteChain('SpecChainTest', {}, result => {});
+        ExecuteChain('SpecChainTest', {}, result => { });
       }).to.throw('Field sampleField is required.');
 
       done();
     });
 
-    it('should set spec required properties with customer message', (done) => {
+    it('should set spec required properties with custom message', (done) => {
       const SpecChainTest = new Chain('SpecChainTest2', (context, param, next) => {
         next();
       });
@@ -545,7 +546,7 @@ describe('Chain Unit', () => {
         .require('I am required.');
 
       expect(() => {
-        ExecuteChain('SpecChainTest2', {}, result => {});
+        ExecuteChain('SpecChainTest2', {}, result => { });
       }).to.throw('I am required.');
       done();
     });
@@ -557,12 +558,11 @@ describe('Chain Unit', () => {
       });
 
       SpecChainTest.addSpec('sampleField')
-        .transform((currentValue, newForm) => {
+        .default('hi').transform((currentValue, newForm) => {
           if (currentValue === 'hi') {
             newForm('hello');
           }
-        })
-        .default('hi');
+        });
 
       ExecuteChain('SpecChainTest3', {}, result => {
         expect(result.defaultValue).to.be.not.undefined;
@@ -596,14 +596,14 @@ describe('Chain Unit', () => {
       });
 
       SpecChainTest.addSpec('sampleField')
+        .default('hi')
         .validator((currentValue, valid) => {
           if (currentValue === 'hi') {
             valid(false, 'Do not say hi!');
           }
-        })
-        .default('hi');
+        });
       expect(() => {
-        ExecuteChain('SpecChainTest4', {}, result => {});
+        ExecuteChain('SpecChainTest4', {}, result => { });
       }).to.throw('Do not say hi!');
 
       done();
@@ -615,7 +615,7 @@ describe('Chain Unit', () => {
     });
     it('should go through the middleware with the exact chain name', done => {
       let index = 0;
-      new Chain('ChainMiddlewareSampleOne', (context, param) => {});
+      new Chain('ChainMiddlewareSampleOne', (context, param) => { });
       new ChainMiddleware('ChainMiddlewareSampleOne', (param, nextChain, next) => {
         index++;
         next();
@@ -629,9 +629,9 @@ describe('Chain Unit', () => {
     it('should go through the middleware of chain that matched regex definition of the middleware', done => {
       clearMiddleware();
       let index = 0;
-      new Chain('ChainMiddlewareSampleOne_regex', (context, param) => {});
-      new Chain('ChainMiddlewareSampleTwo_regex', (context, param) => {});
-      new Chain('ChainMiddlewareSampleThree_regex', (context, param) => {});
+      new Chain('ChainMiddlewareSampleOne_regex', (context, param) => { });
+      new Chain('ChainMiddlewareSampleTwo_regex', (context, param) => { });
+      new Chain('ChainMiddlewareSampleThree_regex', (context, param) => { });
 
       new ChainMiddleware(/^ChainMiddleware/g, (param, nextChain, next) => {
         index++;
@@ -665,8 +665,8 @@ describe('Chain Unit', () => {
         context.set('forThree', 'hi');
         next();
       });
-      new Chain('ExistingChainOne', (context, param) => {});
-      new Chain('ExistingChainTwo', (context, param) => {});
+      new Chain('ExistingChainOne', (context, param) => { });
+      new Chain('ExistingChainTwo', (context, param) => { });
       new Chain('ExistingChainThree', (context, param) => {
         context.set('fromNonExistingChain', param.forThree());
       });

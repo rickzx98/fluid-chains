@@ -32,7 +32,6 @@ var Middleware = exports.Middleware = function Middleware(name, callback) {
     try {
       action(param, context, done);
     } catch (err) {
-      console.log('err', err);
       done(err);
     }
   };

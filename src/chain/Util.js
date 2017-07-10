@@ -7,3 +7,28 @@ export const generateUUID = () => {
     });
     return uuid;
 };
+export const batchIn = (object, next, done) => {
+    const keys = Object.keys(object);
+    batchForObject(keys, object, next, done);
+}
+function batchForObject(keys, object, next, done, index = 0) {
+    if (index < keys.length) {
+        let value = object[keys[index]];
+        next(value, () => {
+            batchForObject(keys, object, next, done, ++index);
+        });
+    } else {
+        done();
+    }
+}
+export const batch = (array, next, done, index = 0) => {
+    if (index < array.length) {
+        let value = array[index];
+        next(value, () => {
+            batch(array, next, done, ++index);
+        });
+    } else {
+        done();
+    }
+
+}

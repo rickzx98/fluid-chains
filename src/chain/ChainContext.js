@@ -1,3 +1,5 @@
+import { batch, batchIn } from './Util';
+
 import lodash from 'lodash';
 
 export default class ChainContext {
@@ -88,11 +90,11 @@ export default class ChainContext {
         });
         return copy;
     }
-
+    //@deprecated
     validate(param) {
         lodash.forIn(this.validators, validator => validator.validate(param));
     }
-
+    //@deprecated
     transform(context) {
         lodash.forIn(context.validators, (validator, field) => {
             if (validator.transformer) {
@@ -105,12 +107,48 @@ export default class ChainContext {
             }
         });
     }
-
+    //@deprecated
     initDefaults(context) {
         lodash.forIn(context.validators, (validator, field) => {
             if (validator.defaultValue && !lodash.get(this, field)) {
                 this.set(field, validator.defaultValue);
             }
         });
+    }
+
+    initSpecs(param, done) {
+        batchIn(this.validators,
+            (validator, next) => {
+                if (validator) {
+                    batch(validator.getSpecsSequence(), (sequence, nextSequence) => {
+                        switch (sequence) {
+                            case 'default':
+                                validator.initDefault(param);
+                                nextSequence();
+                                break;
+                            case 'require':
+                            case 'validator':
+                                validator.validate(param, (err) => {
+                                    console.log('validate', err);
+                                    if (err) {
+                                        done(err);
+                                    } else {
+                                        nextSequence();
+                                    }
+                                });
+                                break;
+                            case 'transform':
+                                validator.initTransformer(param, () => {
+                                    nextSequence();
+                                });
+                                break;
+                            case 'translate':
+                                //TODO: how?
+                                break;
+                        }
+
+                    }, next);
+                }
+            }, done);
     }
 }

@@ -21,7 +21,6 @@ export class Middleware {
       try {
         action(param, context, done);
       } catch (err) {
-        console.log('err', err);
         done(err);
       }
     }

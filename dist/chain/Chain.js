@@ -157,39 +157,39 @@ function invokeChain(done, name, next, action, spec, context, param, nxt, belt, 
         }
       });
     } else {
-
-      param.initDefaults(context);
-      param.transform(context);
-      context.validate(param);
-
-      if (param && param.$error && !context.$error) {
-        context.set('$error', param.$error());
-      }
-      if (context.$isTerminated && context.$isTerminated()) {
-        context.set('$$chain.status', _ChainStatus.STATUS_TERMINATED);
-        var clonedContext = context.clone();
-        done(clonedContext);
-      } else {
-        _lodash2.default.defer(function () {
-          var startTime = new Date().getTime();
-          try {
-            if (cacheEnabled && param.$$chain && param.$$chain.id) {
-              var key = param.$$chain.id;
-              if ((0, _ChainStorage.getState)(key, name, param)) {
-                var cachedContext = (0, _ChainStorage.getState)(key, name, param).clone();
-                concludeNextAction(cachedContext, param, belt, startTime, done);
+      context.initSpecs(param, function (specError) {
+        console.log('initSpecs', specError);
+        if (param && param.$error && !context.$error) {
+          context.set('$error', param.$error());
+        }
+        if (specError) {
+          throw specError;
+        } else if (context.$isTerminated && context.$isTerminated()) {
+          context.set('$$chain.status', _ChainStatus.STATUS_TERMINATED);
+          var clonedContext = context.clone();
+          done(clonedContext);
+        } else {
+          _lodash2.default.defer(function () {
+            var startTime = new Date().getTime();
+            try {
+              if (cacheEnabled && param.$$chain && param.$$chain.id) {
+                var key = param.$$chain.id;
+                if ((0, _ChainStorage.getState)(key, name, param)) {
+                  var cachedContext = (0, _ChainStorage.getState)(key, name, param).clone();
+                  concludeNextAction(cachedContext, param, belt, startTime, done);
+                } else {
+                  invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
+                }
               } else {
                 invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
               }
-            } else {
-              invokeAction(action, name, spec, context, param, belt, cacheEnabled, startTime, done);
+            } catch (err) {
+              context.set('$responseTime', new Date().getTime() - startTime);
+              failed(done, context, name, err);
             }
-          } catch (err) {
-            context.set('$responseTime', new Date().getTime() - startTime);
-            failed(done, context, name, err);
-          }
-        });
-      }
+          });
+        }
+      });
     }
   });
 }
