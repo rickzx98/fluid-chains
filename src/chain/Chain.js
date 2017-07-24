@@ -214,9 +214,11 @@ function concludeNextAction(context, param, belt, startTime, done) {
     if (context.$isTerminated && context.$isTerminated()) {
       context.set('$$chain.status', STATUS_TERMINATED);
       ChainResponse(done, context, startTime);
-    } else {
+    } else if (context.$next) {
       context.set('$responseTime', new Date().getTime() - startTime);
       lodash.clone(ChainStorage[context.$next()]()).execute(done, context);
+    } else {
+      ChainResponse(done, context, startTime);
     }
   } else {
     ChainResponse(done, context, startTime);
