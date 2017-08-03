@@ -71,7 +71,8 @@ export class Chain {
       const spec = new ChainSpec(field, required, customValidator);
       this.spec.push(spec);
       context.addValidator(spec);
-      return new SpecWrapper(spec);
+      const wrapper = new SpecWrapper(spec);
+      return wrapper;
     };
     putChain(name, this);
   }
@@ -120,7 +121,7 @@ const ChainResponse = (done, context, startTime) => {
 const failed = (done, context, name, err) => {
   context.set('$$chain.status', STATUS_FAILED);
   if (context.$error) {
-    lodash.clone(ChainStorage[context.$error()]()).execute(done, CreateErrorContext(context.$error(), name, err, context.$next()));
+    lodash.clone(ChainStorage[context.$error()]()).execute(done, CreateErrorContext(context.$error(), name, err, context.$next ? context.$next() : undefined));
   } else {
     console.warn('UnhandledErrorCallback', err);
     done({

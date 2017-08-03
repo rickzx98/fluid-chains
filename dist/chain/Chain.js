@@ -79,7 +79,8 @@ var Chain = exports.Chain = function () {
       var spec = new _ChainSpec2.default(field, required, customValidator);
       _this.spec.push(spec);
       context.addValidator(spec);
-      return new SpecWrapper(spec);
+      var wrapper = new SpecWrapper(spec);
+      return wrapper;
     };
     (0, _ChainStorage.putChain)(name, this);
   }
@@ -136,7 +137,7 @@ var ChainResponse = function ChainResponse(done, context, startTime) {
 var failed = function failed(done, context, name, err) {
   context.set('$$chain.status', _ChainStatus.STATUS_FAILED);
   if (context.$error) {
-    _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, (0, _ContextFactory.CreateErrorContext)(context.$error(), name, err, context.$next()));
+    _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, (0, _ContextFactory.CreateErrorContext)(context.$error(), name, err, context.$next ? context.$next() : undefined));
   } else {
     console.warn('UnhandledErrorCallback', err);
     done({
