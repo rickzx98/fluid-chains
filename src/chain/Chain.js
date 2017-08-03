@@ -123,11 +123,7 @@ const failed = (done, context, name, err) => {
   if (context.$error) {
     lodash.clone(ChainStorage[context.$error()]()).execute(done, CreateErrorContext(context.$error(), name, err, context.$next ? context.$next() : undefined));
   } else {
-    console.warn('UnhandledErrorCallback', err);
-    done({
-      $err: () => err,
-      $errorMessage: () => err ? err.message : ''
-    });
+    done(CreateErrorContext('unhandled', name, err, context.$next ? context.$next() : undefined));
   }
 };
 

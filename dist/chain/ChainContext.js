@@ -178,7 +178,6 @@ var ChainContext = function () {
                             case 'require':
                             case 'validator':
                                 validator.validate(param, function (err) {
-                                    console.log('validate', err);
                                     if (err) {
                                         done(err);
                                     } else {

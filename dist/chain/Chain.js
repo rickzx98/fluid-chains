@@ -139,15 +139,7 @@ var failed = function failed(done, context, name, err) {
   if (context.$error) {
     _lodash2.default.clone(_ChainStorage.ChainStorage[context.$error()]()).execute(done, (0, _ContextFactory.CreateErrorContext)(context.$error(), name, err, context.$next ? context.$next() : undefined));
   } else {
-    console.warn('UnhandledErrorCallback', err);
-    done({
-      $err: function $err() {
-        return err;
-      },
-      $errorMessage: function $errorMessage() {
-        return err ? err.message : '';
-      }
-    });
+    done((0, _ContextFactory.CreateErrorContext)('unhandled', name, err, context.$next ? context.$next() : undefined));
   }
 };
 

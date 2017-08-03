@@ -143,7 +143,6 @@ export default class ChainContext {
                             case 'require':
                             case 'validator':
                                 validator.validate(param, (err) => {
-                                    console.log('validate', err);
                                     if (err) {
                                         done(err);
                                     } else {
