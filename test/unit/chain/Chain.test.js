@@ -537,6 +537,22 @@ describe('Chain Unit', () => {
 
       done();
     });
+    it.only('should get to the next chain when using chainSpecWrapper', (done) => {
+      const SpecChainTest = new Chain('SpecChainTest_wt', (context, param, next) => {
+        next();
+      });
+      SpecChainTest.addSpec('sampleField').require();
+      const SpecChainTest2 = new Chain('SpecChainTest_wt2', (context, param, next) => {
+        context.set('from', 'SpecChainTest_wt2');
+        next();
+      });
+
+      ExecuteChain(['SpecChainTest_wt', 'SpecChainTest_wt2'], { sampleField: 'value' }, result => {
+        expect(result.from).to.be.not.undefined;
+        expect(result.from()).to.be.equal('SpecChainTest_wt2');
+        done();
+      });
+    });
 
     it('should set spec required properties with custom message', (done) => {
       const SpecChainTest = new Chain('SpecChainTest2', (context, param, next) => {

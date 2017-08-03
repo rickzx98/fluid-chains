@@ -34,6 +34,7 @@ export default class ChainSpec {
                     }
                 });
             }
+            done();
         };
 
         this.initDefault = (context) => {

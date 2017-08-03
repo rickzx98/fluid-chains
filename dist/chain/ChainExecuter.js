@@ -7,11 +7,11 @@ exports.Execute = undefined;
 
 var _ChainStorage = require('./ChainStorage');
 
+var _ContextFactory = require('./ContextFactory');
+
 var _ChainContext = require('./ChainContext');
 
 var _ChainContext2 = _interopRequireDefault(_ChainContext);
-
-var _ContextFactory = require('./ContextFactory');
 
 var _middleware = require('../middleware/');
 

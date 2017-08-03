@@ -2,11 +2,12 @@ import {
   ChainStorage,
   exists
 } from './ChainStorage';
-import ChainContext from './ChainContext';
 import {
   ConvertToContext,
   CreateContext
 } from './ContextFactory';
+
+import ChainContext from './ChainContext';
 import {
   RunMiddleware,
 } from '../middleware/';

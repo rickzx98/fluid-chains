@@ -52,6 +52,7 @@ var ChainSpec = function ChainSpec(field, required, customValidator) {
                 }
             });
         }
+        done();
     };
 
     this.initDefault = function (context) {
