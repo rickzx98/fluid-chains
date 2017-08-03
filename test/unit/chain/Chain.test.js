@@ -537,7 +537,7 @@ describe('Chain Unit', () => {
 
       done();
     });
-    it.only('should get to the next chain when using chainSpecWrapper', (done) => {
+    it('should get to the next chain when using chainSpecWrapper', (done) => {
       const SpecChainTest = new Chain('SpecChainTest_wt', (context, param, next) => {
         next();
       });
