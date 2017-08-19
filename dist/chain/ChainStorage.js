@@ -17,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var ChainStorage = exports.ChainStorage = {};
 var putChain = exports.putChain = function putChain(name, chain) {
-    if (_lodash2.default.get(ChainStorage, name)) {
+    if (exists(name)) {
         throw Error('A chain with the same name as "' + name + '" has already been stored.');
     }
     _lodash2.default.set(ChainStorage, name, function () {

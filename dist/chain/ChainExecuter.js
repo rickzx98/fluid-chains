@@ -21,14 +21,16 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Execute = exports.Execute = function Execute(name, param, done) {
+var Execute = exports.Execute = function Execute(name, param) {
+  var done = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {};
+
   var context = (0, _ContextFactory.ConvertToContext)(param);
   context.set('$owner', 'starter');
   if (name instanceof Array) {
     ExecuteChains(name, done, 0, context);
-  } else if (_lodash2.default.get(_ChainStorage.ChainStorage, name)) {
+  } else if ((0, _ChainStorage.exists)(name)) {
     var chain = _lodash2.default.clone(_lodash2.default.get(_ChainStorage.ChainStorage, name)());
-    chain.execute(done, context, name);
+    chain.execute(done, context);
   } else {
     var cc = (0, _ContextFactory.CreateContext)(new _ChainContext2.default(), name);
     (0, _middleware.RunMiddleware)(name, param, cc, function (err) {

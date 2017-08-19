@@ -4,7 +4,7 @@ import lodash from 'lodash';
 
 export const ChainStorage = {};
 export const putChain = (name, chain) => {
-    if (lodash.get(ChainStorage, name)) {
+    if (exists(name)) {
         throw Error('A chain with the same name as "' + name + '" has already been stored.')
     }
     lodash.set(ChainStorage, name, () => chain);

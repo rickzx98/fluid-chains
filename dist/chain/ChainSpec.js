@@ -36,8 +36,7 @@ var ChainSpec = function ChainSpec(field, required, customValidator) {
             } else {
                 throw new Error(_this.requiredMessage || 'Field ' + field + ' is required.');
             }
-        }
-        if (customValidator && context[field]) {
+        } else if (customValidator && context[field]) {
             customValidator(context[field](), function (valid, message) {
                 if (!valid) {
                     if (done) {
@@ -51,8 +50,9 @@ var ChainSpec = function ChainSpec(field, required, customValidator) {
                     }
                 }
             });
+        } else {
+            done();
         }
-        done();
     };
 
     this.initDefault = function (context) {

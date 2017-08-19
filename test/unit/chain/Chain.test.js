@@ -530,12 +530,11 @@ describe('Chain Unit', () => {
       });
       SpecChainTest.addSpec('sampleField')
         .require();
-
-      expect(() => {
-        ExecuteChain('SpecChainTest', {}, result => { });
-      }).to.throw('Field sampleField is required.');
-
-      done();
+      ExecuteChain('SpecChainTest', {}, result => {
+        expect(result.$err).to.be.not.undefined;
+        expect(result.$errorMessage()).to.be.equal('Field sampleField is required.');
+        done();
+      });
     });
     it('should get to the next chain when using chainSpecWrapper', (done) => {
       const SpecChainTest = new Chain('SpecChainTest_wt', (context, param, next) => {
@@ -561,10 +560,11 @@ describe('Chain Unit', () => {
       SpecChainTest.addSpec('sampleField')
         .require('I am required.');
 
-      expect(() => {
-        ExecuteChain('SpecChainTest2', {}, result => { });
-      }).to.throw('I am required.');
-      done();
+      ExecuteChain('SpecChainTest2', {}, result => {
+        expect(result.$err).to.be.not.undefined;
+        expect(result.$errorMessage()).to.be.equal('I am required.');
+        done();
+      });
     });
 
     it('should set spec default & transform properties', (done) => {
@@ -618,11 +618,11 @@ describe('Chain Unit', () => {
             valid(false, 'Do not say hi!');
           }
         });
-      expect(() => {
-        ExecuteChain('SpecChainTest4', {}, result => { });
-      }).to.throw('Do not say hi!');
-
-      done();
+      ExecuteChain('SpecChainTest4', {}, result => {
+        expect(result.$err).to.be.not.undefined;
+        expect(result.$errorMessage()).to.be.equal('Do not say hi!');
+        done();
+      });
     });
 
     it('should set spec translate', done => {

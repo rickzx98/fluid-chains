@@ -71,8 +71,7 @@ export class Chain {
       const spec = new ChainSpec(field, required, customValidator);
       this.spec.push(spec);
       context.addValidator(spec);
-      const wrapper = new SpecWrapper(spec);
-      return wrapper;
+      return new SpecWrapper(spec);
     };
     putChain(name, this);
   }
@@ -126,27 +125,24 @@ const failed = (done, context, name, err) => {
     done(CreateErrorContext('unhandled', name, err, context.$next ? context.$next() : undefined));
   }
 };
-
+function errorResponse() { }
 function invokeChain(done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) {
   RunMiddleware(name, param.clone(), context, (errMiddleware) => {
     if (errMiddleware) {
-      done({
-        $err: () => errMiddleware,
-        $errorMessage: () => errMiddleware && errMiddleware.message
-      });
+      failed(done, context, name, errMiddleware);
     } else {
       context.initSpecs(param, specError => {
         if ((param && param.$error) && !context.$error) {
           context.set('$error', param.$error());
         }
         if (specError) {
-          throw specError;
+          failed(done, context, name, specError);
         } else if (context.$isTerminated && context.$isTerminated()) {
           context.set('$$chain.status', STATUS_TERMINATED);
           const clonedContext = context.clone();
           done(clonedContext);
         } else {
-          lodash.defer(() => {
+          setTimeout(() => {
             const startTime = new Date().getTime();
             try {
               if (cacheEnabled && (param.$$chain && param.$$chain.id)) {

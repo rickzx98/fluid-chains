@@ -13,14 +13,14 @@ import {
 } from '../middleware/';
 import lodash from 'lodash';
 
-export const Execute = (name, param, done) => {
+export const Execute = (name, param, done = () => { }) => {
   let context = ConvertToContext(param);
   context.set('$owner', 'starter');
   if (name instanceof Array) {
     ExecuteChains(name, done, 0, context);
-  } else if (lodash.get(ChainStorage, name)) {
+  } else if (exists(name)) {
     const chain = lodash.clone(lodash.get(ChainStorage, name)());
-    chain.execute(done, context, name);
+    chain.execute(done, context);
   } else {
     const cc = CreateContext(new ChainContext(), name);
     RunMiddleware(name, param, cc, err => {

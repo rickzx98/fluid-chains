@@ -4,11 +4,11 @@ import lodash from 'lodash';
 
 export const CreateErrorContext = (name, errorFrom, err, next) => {
   const context = new ChainContext();
-  context.addValidator(new ChainSpec('$err', true, undefined, true));
-  context.addValidator(new ChainSpec('$errorMessage', true, undefined, true));
-  context.addValidator(new ChainSpec('$errorFrom', true, undefined, true));
-  context.addValidator(new ChainSpec('$owner', true, undefined, true));
-  context.addValidator(new ChainSpec('$responseTime', false, undefined, true));
+  context.addValidator(new ChainSpec('$err', true));
+  context.addValidator(new ChainSpec('$errorMessage', true));
+  context.addValidator(new ChainSpec('$errorFrom', true));
+  context.addValidator(new ChainSpec('$owner', true));
+  context.addValidator(new ChainSpec('$responseTime', false));
   context.set('$owner', name);
   context.set('$err', err);
   context.set('$errorMessage', err.message);

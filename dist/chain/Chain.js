@@ -79,8 +79,7 @@ var Chain = exports.Chain = function () {
       var spec = new _ChainSpec2.default(field, required, customValidator);
       _this.spec.push(spec);
       context.addValidator(spec);
-      var wrapper = new SpecWrapper(spec);
-      return wrapper;
+      return new SpecWrapper(spec);
     };
     (0, _ChainStorage.putChain)(name, this);
   }
@@ -142,31 +141,24 @@ var failed = function failed(done, context, name, err) {
     done((0, _ContextFactory.CreateErrorContext)('unhandled', name, err, context.$next ? context.$next() : undefined));
   }
 };
-
+function errorResponse() {}
 function invokeChain(done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) {
   (0, _middleware.RunMiddleware)(name, param.clone(), context, function (errMiddleware) {
     if (errMiddleware) {
-      done({
-        $err: function $err() {
-          return errMiddleware;
-        },
-        $errorMessage: function $errorMessage() {
-          return errMiddleware && errMiddleware.message;
-        }
-      });
+      failed(done, context, name, errMiddleware);
     } else {
       context.initSpecs(param, function (specError) {
         if (param && param.$error && !context.$error) {
           context.set('$error', param.$error());
         }
         if (specError) {
-          throw specError;
+          failed(done, context, name, specError);
         } else if (context.$isTerminated && context.$isTerminated()) {
           context.set('$$chain.status', _ChainStatus.STATUS_TERMINATED);
           var clonedContext = context.clone();
           done(clonedContext);
         } else {
-          _lodash2.default.defer(function () {
+          setTimeout(function () {
             var startTime = new Date().getTime();
             try {
               if (cacheEnabled && param.$$chain && param.$$chain.id) {

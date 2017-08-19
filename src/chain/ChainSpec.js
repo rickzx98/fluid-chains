@@ -18,8 +18,7 @@ export default class ChainSpec {
                 else {
                     throw new Error(this.requiredMessage || `Field ${field} is required.`);
                 }
-            }
-            if (customValidator && context[field]) {
+            } else if (customValidator && context[field]) {
                 customValidator(context[field](), (valid, message) => {
                     if (!valid) {
                         if (done) {
@@ -33,8 +32,9 @@ export default class ChainSpec {
                         }
                     }
                 });
+            } else {
+                done();
             }
-            done();
         };
 
         this.initDefault = (context) => {

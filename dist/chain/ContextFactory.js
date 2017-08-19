@@ -21,11 +21,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var CreateErrorContext = exports.CreateErrorContext = function CreateErrorContext(name, errorFrom, err, next) {
   var context = new _ChainContext2.default();
-  context.addValidator(new _ChainSpec2.default('$err', true, undefined, true));
-  context.addValidator(new _ChainSpec2.default('$errorMessage', true, undefined, true));
-  context.addValidator(new _ChainSpec2.default('$errorFrom', true, undefined, true));
-  context.addValidator(new _ChainSpec2.default('$owner', true, undefined, true));
-  context.addValidator(new _ChainSpec2.default('$responseTime', false, undefined, true));
+  context.addValidator(new _ChainSpec2.default('$err', true));
+  context.addValidator(new _ChainSpec2.default('$errorMessage', true));
+  context.addValidator(new _ChainSpec2.default('$errorFrom', true));
+  context.addValidator(new _ChainSpec2.default('$owner', true));
+  context.addValidator(new _ChainSpec2.default('$responseTime', false));
   context.set('$owner', name);
   context.set('$err', err);
   context.set('$errorMessage', err.message);
