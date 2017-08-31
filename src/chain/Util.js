@@ -32,3 +32,12 @@ export const batch = (array, next, done, index = 0) => {
     }
 
 }
+
+export function isValidJson(json) {
+    try {
+        JSON.parse(json);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
