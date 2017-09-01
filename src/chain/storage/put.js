@@ -1,8 +1,9 @@
 /**
  * Put chain to the storage
- * @param {*} storage 
- * @param {*} name 
- * @param {*} chain 
+ * @param {*} storage
+ * @param {function} exists
+ * @param {*} name
+ * @param {*} chain
  */
 export const putChain = (storage, exists, name, chain) => {
     if (exists(name)) {
@@ -17,27 +18,27 @@ export const putChain = (storage, exists, name, chain) => {
 
 /**
  * Put chain context value to storage
- * @param {*} storage 
- * @param {*} chainId 
- * @param {*} context 
- * @param {*} field 
- * @param {*} value 
+ * @param {*} storage
+ * @param {*} chainId
+ * @param {*} context
+ * @param {*} field
+ * @param {*} value
  */
 export const putChainContext = (storage, chainId, field, value) => {
     if (storage[PUT_CHAIN_CONTEXT_METHOD]) {
-        storage[PUT_CHAIN_CONTEXT_METHOD](chainId, field, value);
+        storage[PUT_CHAIN_CONTEXT_METHOD](chainId, field, ()=> value);
     } else {
         if (!storage[chainId]) {
             storage[chainId] = {};
         }
-        storage[chainId][name] = () => Object.assign({}, vallue);
+        storage[chainId][field] = () => value;
     }
 };
 
 /**
  * Overrides the put chain function
- * @param {*} storage 
- * @param {*} plugin 
+ * @param {*} storage
+ * @param {*} plugin
  */
 export const setPutChainPlugin = (storage, plugin) => {
     if (!(plugin instanceof Function)) {
@@ -49,8 +50,8 @@ export const setPutChainPlugin = (storage, plugin) => {
 
 /**
  * Overrides the put chain context function
- * @param {*} storage 
- * @param {*} plugin 
+ * @param {*} storage
+ * @param {*} plugin
  */
 export const setPutChainContextPlugin = (storage, plugin) => {
     if (!(plugin instanceof Function)) {

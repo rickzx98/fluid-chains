@@ -1,22 +1,19 @@
-import { isValidJson } from '../Util';
-
 /**
  * Sets context value
- * @param {*} context 
- * @param {*} name 
- * @param {*} value 
+ * @param isValidJson
+ * @param setChainContext
+ * @param chainId
+ * @param name
+ * @param value
  */
-export function setContextValue(context, name, value) {
+export function setContextValue(isValidJson, setChainContext, chainId, name, value) {
     if (value instanceof Function) {
         throw new FunctionAsValueException();
     }
     else if (!isValidJson(value)) {
         throw new InvalidJSONValueException(value);
     }
-    const newValue = {};
-    newValue[name] = () => {
-
-    }
+    setChainContext(chainId, name, value);
 }
 
 class FunctionAsValueException extends Error {
