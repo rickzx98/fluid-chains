@@ -13,6 +13,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * Put chain to the storage
  * @param {*} storage
+ * @param {function} exists
  * @param {*} name
  * @param {*} chain
  */

@@ -9,7 +9,7 @@ import {putChain,
     setGetChainContextPlugin,
     setGetChainPlugin} from '../../../../src/chain/storage/';
 
-describe.only('storage.unit.test', ()=> {
+describe('storage.unit.test', ()=> {
     it('should put and get chain in storage', ()=> {
         putChain('storageTest.chain000', {
             execute: ()=> {

@@ -5,8 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.setContextValue = setContextValue;
 
-var _Util = require('../Util');
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -15,18 +13,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 /**
  * Sets context value
- * @param {*} context 
- * @param {*} name 
- * @param {*} value 
+ * @param isValidJson
+ * @param setChainContext
+ * @param getChainContext
+ * @param context
+ * @param chainId
+ * @param name
+ * @param value
  */
-function setContextValue(context, name, value) {
+function setContextValue(isValidJson, setChainContext, getChainContext, context, chainId, name, value) {
     if (value instanceof Function) {
         throw new FunctionAsValueException();
-    } else if (!(0, _Util.isValidJson)(value)) {
+    } else if (!isValidJson(value)) {
         throw new InvalidJSONValueException(value);
     }
-    var newValue = {};
-    newValue[name] = function () {};
+    setChainContext(chainId, name, value);
+    context[name] = function () {
+        return getChainContext(chainId, name);
+    };
 }
 
 var FunctionAsValueException = function (_Error) {

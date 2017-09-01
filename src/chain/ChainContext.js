@@ -11,10 +11,6 @@ export default class ChainContext {
     }
 
     set(name, value) {
-        const fieldSpec = this.validators[name];
-        /* if (fieldSpec && fieldSpec.once && lodash.get(this, name)) {
-             throw new Error('Field ' + name + ' is already defined and can only be written once.');
-         }*/
         if (value instanceof Function) {
             throw new Error('Function cannot be set as value');
         }
@@ -90,6 +86,7 @@ export default class ChainContext {
         });
         return copy;
     }
+
     copy(context) {
         lodash.forIn(context, (field, key) => {
             if (key !== 'addValidator' &&
@@ -104,10 +101,12 @@ export default class ChainContext {
             }
         });
     }
+
     //@deprecated
     validate(param) {
         lodash.forIn(this.validators, validator => validator.validate(param));
     }
+
     //@deprecated
     transform(context) {
         lodash.forIn(context.validators, (validator, field) => {
@@ -121,6 +120,7 @@ export default class ChainContext {
             }
         });
     }
+
     //@deprecated
     initDefaults(context) {
         lodash.forIn(context.validators, (validator, field) => {
