@@ -9,6 +9,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _defaults = require('./defaults');
+
+var _transformer = require('./transformer');
+
+var _translator = require('./translator');
+
 var _validators = require('./validators');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -69,6 +75,21 @@ var Spec = function () {
         key: 'runValidation',
         value: function runValidation(contextData) {
             new _validators.Validators(this.field, contextData, this.data);
+        }
+    }, {
+        key: 'runDefault',
+        value: function runDefault(context) {
+            new _defaults.Defaults(this.field, this.data, context).runDefault();
+        }
+    }, {
+        key: 'runTransform',
+        value: function runTransform(context) {
+            return new _transformer.Transformer(this.field, this.data, context).runTransform();
+        }
+    }, {
+        key: 'runTranslate',
+        value: function runTranslate(context) {
+            return new _translator.Translator(this.field, this.data, context).runTranslate();
         }
     }]);
 

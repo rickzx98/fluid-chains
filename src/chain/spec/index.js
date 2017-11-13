@@ -1,3 +1,6 @@
+import { Defaults } from './defaults'
+import { Transformer } from './transformer';
+import { Translator } from './translator';
 import { Validators } from './validators';
 
 export default class Spec {
@@ -30,6 +33,16 @@ export default class Spec {
     }
     runValidation(contextData) {
         new Validators(this.field, contextData, this.data);
+    }
+    runDefault(context) {
+        new Defaults(this.field, this.data, context).runDefault();
+    }
+
+    runTransform(context) {
+        return new Transformer(this.field, this.data, context).runTransform();
+    }
+    runTranslate(context) {
+        return new Translator(this.field, this.data, context).runTranslate();
     }
 }
 

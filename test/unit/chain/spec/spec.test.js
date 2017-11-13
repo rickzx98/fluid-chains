@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 
+import Context from '../../../../src/chain/context/';
 import Spec from '../../../../src/chain/spec/'
 import { expect } from 'chai';
 
@@ -32,4 +33,46 @@ describe.only('spec.unit.test', () => {
         expect(spec.actions[4]).to.be.equal('validate');
     });
 
+    it('should set context field default value', () => {
+        const context = new Context('_chained01');
+        const spec = new Spec('defaultField');
+        spec.default('defaultValue');
+        context.addValidator(spec);
+        spec.runDefault(context);
+        expect(context.getData()['defaultField']).to.be.not.undefined;
+        expect(context.getData()['defaultField']()).to.be.equal('defaultValue');
+    });
+
+    it('should asynchronously change the field value', done => {
+        const context = new Context('_chained02');
+        const spec = new Spec('transformThisField');
+        context.set('transformThisField', 'Hello world!');
+        spec.transform(currentValue => new Promise(resolve => {
+            resolve('hello');
+        }));
+        spec.runTransform(context)
+            .then(() => {
+                expect(context.getData()['transformThisField']()).to.be.equal('hello');
+                done();
+            });
+
+    });
+
+    it('should asynchronously translate the field value', done => {
+        const context = new Context('_chained02');
+        const spec = new Spec('transformThisField');
+        context.set('translateThisField', 'Hello world!');
+        spec.translate((currentValue, context) => new Promise(resolve => {
+            context.set('hello', 'hello');
+            context.set('world', 'world');
+            resolve();
+        }));
+        spec.runTranslate(context)
+            .then(() => {
+                expect(context.getData()['hello']()).to.be.equal('hello');
+                expect(context.getData()['world']()).to.be.equal('world');
+                done();
+            });
+
+    });
 });
