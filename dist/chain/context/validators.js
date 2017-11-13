@@ -13,16 +13,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var VALIDATORS = '$$$validators';
 
 var Validators = exports.Validators = function () {
-    function Validators(chainId, setChainContextValue, getChainContext) {
+    function Validators(chainId, getChainContext) {
         _classCallCheck(this, Validators);
 
-        var context = getChainContext(chainId);
-        this.fieldSpecs = context[VALIDATORS] ? context[VALIDATORS]() : [];
+        var validators = getChainContext(chainId, VALIDATORS);
+        this.fieldSpecs = validators ? validators() : [];
     }
 
     _createClass(Validators, [{
         key: 'addSpec',
-        value: function addSpec(fieldSpec) {
+        value: function addSpec(fieldSpec, setChainContextValue) {
             var validators = Object.assign([], [].concat(_toConsumableArray(this.fieldSpecs), [fieldSpec]));
             setChainContextValue(VALIDATORS, validators);
         }

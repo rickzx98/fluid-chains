@@ -1,11 +1,10 @@
 const VALIDATORS = '$$$validators';
 export class Validators {
-    constructor(chainId, setChainContextValue, getChainContext) {
-        const context = getChainContext(chainId);
-        this.fieldSpecs = context[VALIDATORS] ? context[VALIDATORS]() : [];
+    constructor(chainId, getChainContext) {
+        const validators = getChainContext(chainId, VALIDATORS);
+        this.fieldSpecs = validators ? validators() : [];
     }
-
-    addSpec(fieldSpec) {
+    addSpec(fieldSpec, setChainContextValue) {
         const validators = Object.assign([], [...this.fieldSpecs, fieldSpec]);
         setChainContextValue(VALIDATORS, validators);
     }

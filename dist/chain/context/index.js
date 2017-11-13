@@ -9,9 +9,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _storage = require('../storage/');
 
-var _validators = require('./validators');
+var _get = require('./get');
 
-var _clone = require('./clone');
+var _validators = require('./validators');
 
 var _Util = require('../Util');
 
@@ -34,7 +34,12 @@ var Context = function () {
     }, {
         key: 'addValidator',
         value: function addValidator(fieldSpec) {
-            new _validators.Validator(this.chainId, this.set, _storage.getChainContext).addSpec(fieldSpec);
+            new _validators.Validators(this.chainId, _storage.getChainContext).addSpec(fieldSpec, this.set.bind(this));
+        }
+    }, {
+        key: 'getData',
+        value: function getData() {
+            return new _get.GetContext(this.chainId, _storage.getChain).getContext();
         }
     }]);
 

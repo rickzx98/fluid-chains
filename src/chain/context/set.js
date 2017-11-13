@@ -12,11 +12,12 @@ export function setContextValue(isValidJson, setChainContext, getChainContext, c
     if (value instanceof Function) {
         throw new FunctionAsValueException();
     }
+    /* TODO: Why?? 
     else if (!isValidJson(value)) {
-        throw new InvalidJSONValueException(value);
-    }
+         throw new InvalidJSONValueException(value);
+     } */
     setChainContext(chainId, name, value);
-    context[name] = ()=> {
+    context[name] = () => {
         return getChainContext(chainId, name);
     }
 }
