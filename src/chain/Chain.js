@@ -125,7 +125,7 @@ const failed = (done, context, name, err) => {
     done(CreateErrorContext('unhandled', name, err, context.$next ? context.$next() : undefined));
   }
 };
-function errorResponse() { }
+
 function invokeChain(done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) {
   RunMiddleware(name, param.clone(), context, (errMiddleware) => {
     if (errMiddleware) {

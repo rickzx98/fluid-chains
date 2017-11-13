@@ -1,6 +1,10 @@
-import {isValidJson} from '../Util';
-import {putChainContext, getChainContext} from '../storage/';
-import {setContextValue} from './set';
+import { getChainContext, putChainContext } from '../storage/';
+
+import { Validator } from './validators';
+import { clone } from './clone';
+import { isValidJson } from '../Util';
+import { setContextValue } from './set';
+
 export default class Context {
     constructor(chainId) {
         this.chainId = chainId;
@@ -10,5 +14,8 @@ export default class Context {
         setContextValue(isValidJson, putChainContext, getChainContext, this, this.chainId, name, value);
     }
 
-
+    addValidator(fieldSpec) {
+        new Validator(this.chainId, this.set, getChainContext)
+            .addSpec(fieldSpec);
+    }
 }

@@ -141,7 +141,7 @@ var failed = function failed(done, context, name, err) {
     done((0, _ContextFactory.CreateErrorContext)('unhandled', name, err, context.$next ? context.$next() : undefined));
   }
 };
-function errorResponse() {}
+
 function invokeChain(done, name, next, action, spec, context, param, nxt, belt, cacheEnabled) {
   (0, _middleware.RunMiddleware)(name, param.clone(), context, function (errMiddleware) {
     if (errMiddleware) {
