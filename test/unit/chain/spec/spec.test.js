@@ -4,7 +4,7 @@ import Context from '../../../../src/chain/context/';
 import Spec from '../../../../src/chain/spec/'
 import { expect } from 'chai';
 
-describe.only('spec.unit.test', () => {
+describe('spec.unit.test', () => {
 
     it('should create spec with field name', () => {
         const spec = new Spec('fieldName');

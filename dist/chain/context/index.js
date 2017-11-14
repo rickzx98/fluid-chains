@@ -41,6 +41,11 @@ var Context = function () {
         value: function getData() {
             return new _get.GetContext(this.chainId, _storage.getChain).getContext();
         }
+    }, {
+        key: 'validate',
+        value: function validate() {
+            return new _validators.Validators(this.chainId, _storage.getChainContext).runValidations(this);
+        }
     }]);
 
     return Context;

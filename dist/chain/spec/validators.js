@@ -23,12 +23,12 @@ var Validators = exports.Validators = function () {
             var _this = this;
 
             var _specData = this.specData,
-                required = _specData.required,
+                require = _specData.require,
                 requireMessage = _specData.requireMessage,
                 validator = _specData.validator;
 
             return new Promise(function (resolve, reject) {
-                if (required && (!_this.contextData[_this.field] || _this.contextData[_this.field] === '')) {
+                if (require && (!_this.contextData[_this.field] || _this.contextData[_this.field]() === '')) {
                     reject(new Error(requireMessage || 'Field ' + _this.field + ' is required.'));
                 } else if (validator) {
                     validator(_this.contextData[_this.field] ? _this.contextData[_this.field]() : undefined).then(function () {

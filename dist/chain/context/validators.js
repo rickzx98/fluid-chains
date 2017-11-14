@@ -18,6 +18,8 @@ var Validators = exports.Validators = function () {
 
         var validators = getChainContext(chainId, VALIDATORS);
         this.fieldSpecs = validators ? validators() : [];
+        this.validators = validators;
+        this;
     }
 
     _createClass(Validators, [{
@@ -25,6 +27,14 @@ var Validators = exports.Validators = function () {
         value: function addSpec(fieldSpec, setChainContextValue) {
             var validators = Object.assign([], [].concat(_toConsumableArray(this.fieldSpecs), [fieldSpec]));
             setChainContextValue(VALIDATORS, validators);
+        }
+    }, {
+        key: 'runValidations',
+        value: function runValidations(context) {
+            var validators = this.validators().map(function (validator) {
+                return validator.runValidation(context);
+            });
+            return Promise.all(validators);
         }
     }]);
 

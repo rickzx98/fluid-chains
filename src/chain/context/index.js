@@ -22,4 +22,8 @@ export default class Context {
     getData() {
         return new GetContext(this.chainId, getChain).getContext();
     }
+
+    validate() {
+        return new Validators(this.chainId, getChainContext).runValidations(this);
+    }
 }
