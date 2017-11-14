@@ -13,27 +13,33 @@ export default class Spec {
 
     default(defaultValue) {
         addAction(this, 'default');
-        this.data = { ...this.data, defaultValue };
+        this.data = {...this.data, defaultValue};
     }
+
     require(requireMessage) {
         addAction(this, 'require');
-        this.data = { ...this.data, require: true, requireMessage };
+        this.data = {...this.data, require: true, requireMessage};
     }
+
     validate(validator = (currentValue) => new Promise()) {
         addAction(this, 'validate');
-        this.data = { ...this.data, validator };
+        this.data = {...this.data, validator};
     }
+
     transform(transformer = (currentValue) => new Promise()) {
         addAction(this, 'transform');
-        this.data = { ...this.data, transformer };
+        this.data = {...this.data, transformer};
     }
+
     translate(translator = (currentValue, context) => new Promise()) {
         addAction(this, 'translate');
-        this.data = { ...this.data, translator };
+        this.data = {...this.data, translator};
     }
-    runValidation(contextData) {
-        new Validators(this.field, contextData, this.data);
+
+    runValidation(context) {
+        return new Validators(this.field, context.getData(), this.data).runValidation();;
     }
+
     runDefault(context) {
         new Defaults(this.field, this.data, context).runDefault();
     }
@@ -41,6 +47,7 @@ export default class Spec {
     runTransform(context) {
         return new Transformer(this.field, this.data, context).runTransform();
     }
+
     runTranslate(context) {
         return new Translator(this.field, this.data, context).runTranslate();
     }

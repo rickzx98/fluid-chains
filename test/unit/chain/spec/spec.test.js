@@ -33,6 +33,24 @@ describe.only('spec.unit.test', () => {
         expect(spec.actions[4]).to.be.equal('validate');
     });
 
+    it('should set a custom validator', done => {
+        const context = new Context('_chained00');
+        const spec = new Spec('validationField');
+        spec.validate((currentValue) => new Promise((resolve, reject)=> {
+            if (currentValue > 0) {
+                resolve();
+            } else {
+                reject('Value must be greater than 0');
+            }
+        }));
+        context.set('validationField', 0);
+        spec.runValidation(context)
+            .catch(error => {
+                expect(error).to.be.equal('Value must be greater than 0');
+                done();
+            });
+    });
+
     it('should set context field default value', () => {
         const context = new Context('_chained01');
         const spec = new Spec('defaultField');

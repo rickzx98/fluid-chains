@@ -11,8 +11,8 @@ export class Validators {
             if (required && (!this.contextData[this.field] || this.contextData[this.field] === '')) {
                 reject(new Error(requireMessage || `Field ${this.field} is required.`));
             }
-            else if (validator && this.contextData[this.field]) {
-                validator.then(() => {
+            else if (validator) {
+                validator(this.contextData[this.field] ? this.contextData[this.field]() : undefined).then(() => {
                     resolve();
                 }).catch(error => {
                     reject(error);

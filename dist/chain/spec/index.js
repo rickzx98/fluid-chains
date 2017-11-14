@@ -73,8 +73,8 @@ var Spec = function () {
         }
     }, {
         key: 'runValidation',
-        value: function runValidation(contextData) {
-            new _validators.Validators(this.field, contextData, this.data);
+        value: function runValidation(context) {
+            return new _validators.Validators(this.field, context.getData(), this.data).runValidation();;
         }
     }, {
         key: 'runDefault',

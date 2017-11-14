@@ -30,8 +30,8 @@ var Validators = exports.Validators = function () {
             return new Promise(function (resolve, reject) {
                 if (required && (!_this.contextData[_this.field] || _this.contextData[_this.field] === '')) {
                     reject(new Error(requireMessage || 'Field ' + _this.field + ' is required.'));
-                } else if (validator && _this.contextData[_this.field]) {
-                    validator.then(function () {
+                } else if (validator) {
+                    validator(_this.contextData[_this.field] ? _this.contextData[_this.field]() : undefined).then(function () {
                         resolve();
                     }).catch(function (error) {
                         reject(error);
