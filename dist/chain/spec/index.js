@@ -79,7 +79,7 @@ var Spec = function () {
     }, {
         key: 'runDefault',
         value: function runDefault(context) {
-            new _defaults.Defaults(this.field, this.data, context).runDefault();
+            return new _defaults.Defaults(this.field, this.data, context).runDefault();
         }
     }, {
         key: 'runTransform',

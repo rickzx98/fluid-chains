@@ -46,4 +46,34 @@ describe.only('context.unit.test', () => {
             expect(error.message).to.be.equal('Field 2 is required'); done();
         });
     });
+
+    it.only('should run specs of all fields in context', done => {
+        const context = new Context('0005');
+        const spec = new Spec('field_1');
+        spec.default('hello');
+        spec.require('field 1 is required');
+        spec.transform((currentValue) => new Promise((resolve) => {
+            resolve('transformedValue');
+        }));
+        spec.translate((currentValue, context) => new Promise((resolve) => {
+            context.set('translatedField', currentValue);
+            resolve();
+        }));
+        spec.validate((currentValue) => new Promise((resolve, reject) => {
+            if (currentValue === 'transformedValue') {
+                resolve();
+            } else {
+                reject();
+            }
+        }));
+        context.addValidator(spec);
+        context.set('field_1', 'hello');
+        
+        context.runSpecs().then(() => {
+            console.log('context', context.getData());
+            done();
+        }).catch(error => {
+            console.log('error', error);
+        });;
+    });
 });

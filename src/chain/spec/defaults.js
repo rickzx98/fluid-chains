@@ -7,8 +7,13 @@ export class Defaults {
 
     runDefault() {
         const { defaultValue } = this.specData;
-        if (defaultValue) {
-            this.context.set(this.field, defaultValue);
-        }
+        return new Promise((resolve, reject) => {
+            try {
+                this.context.set(this.field, defaultValue);
+                resolve();
+            } catch (err) {
+                reject(err);
+            }
+        });
     }
 }

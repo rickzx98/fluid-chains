@@ -20,11 +20,18 @@ var Defaults = exports.Defaults = function () {
     _createClass(Defaults, [{
         key: "runDefault",
         value: function runDefault() {
+            var _this = this;
+
             var defaultValue = this.specData.defaultValue;
 
-            if (defaultValue) {
-                this.context.set(this.field, defaultValue);
-            }
+            return new Promise(function (resolve, reject) {
+                try {
+                    _this.context.set(_this.field, defaultValue);
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                }
+            });
         }
     }]);
 

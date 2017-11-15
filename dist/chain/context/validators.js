@@ -36,6 +36,28 @@ var Validators = exports.Validators = function () {
             });
             return Promise.all(validators);
         }
+    }, {
+        key: 'runSpecs',
+        value: function runSpecs(context) {
+            var validators = this.validators().map(function (validator) {
+                var promises = validator.actions.map(function (action) {
+                    switch (action) {
+                        case 'require':
+                        case 'validator':
+                            return validator.runValidation(context);
+                        case 'default':
+                            return validator.runDefault(context);
+                        case 'transform':
+                            return validator.runTransform(context);
+                        case 'translate':
+                            return validator.runTranslate(context);
+                    }
+                });
+                return Promise.all(promises);
+            });
+            console.log('validators', validators);
+            return Promise.all(validators);
+        }
     }]);
 
     return Validators;

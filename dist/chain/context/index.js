@@ -46,6 +46,11 @@ var Context = function () {
         value: function validate() {
             return new _validators.Validators(this.chainId, _storage.getChainContext).runValidations(this);
         }
+    }, {
+        key: 'runSpecs',
+        value: function runSpecs() {
+            return new _validators.Validators(this.chainId, _storage.getChainContext).runValidations(this);
+        }
     }]);
 
     return Context;
