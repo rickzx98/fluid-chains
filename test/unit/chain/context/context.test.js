@@ -4,7 +4,7 @@ import Context from '../../../../src/chain/context/';
 import Spec from '../../../../src/chain/spec/';
 import { expect } from 'chai';
 
-describe.only('context.unit.test', () => {
+describe('context.unit.test', () => {
 
     it('should create new context', () => {
         const context = new Context('0001');
@@ -42,12 +42,12 @@ describe.only('context.unit.test', () => {
         context.addValidator(spec);
         context.addValidator(spec2);
         context.set('field_1', 'value');
-        context.validate().catch(error => {
+        context.runSpecs().catch(error => {
             expect(error.message).to.be.equal('Field 2 is required'); done();
         });
     });
 
-    it.only('should run specs of all fields in context', done => {
+    it('should run specs of all fields in context', done => {
         const context = new Context('0005');
         const spec = new Spec('field_1');
         spec.default('hello');
@@ -60,17 +60,15 @@ describe.only('context.unit.test', () => {
             resolve();
         }));
         spec.validate((currentValue) => new Promise((resolve, reject) => {
-            if (currentValue === 'transformedValue') {
-                resolve();
-            } else {
-                reject();
-            }
+            resolve();
         }));
         context.addValidator(spec);
-        context.set('field_1', 'hello');
-        
+
         context.runSpecs().then(() => {
-            console.log('context', context.getData());
+            const { translatedField, field_1 } = context.getData();
+            expect(translatedField).to.not.be.undefined;
+            expect(translatedField()).to.be.equal('hello');
+            expect(field_1()).to.be.equal('transformedValue');
             done();
         }).catch(error => {
             console.log('error', error);

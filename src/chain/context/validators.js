@@ -23,7 +23,8 @@ export class Validators {
                     action => {
                         switch (action) {
                             case 'require':
-                            case 'validator':
+                                return validator.runRequireValidation(context);
+                            case 'validate':
                                 return validator.runValidation(context);
                             case 'default':
                                 return validator.runDefault(context);

@@ -49,7 +49,7 @@ var Context = function () {
     }, {
         key: 'runSpecs',
         value: function runSpecs() {
-            return new _validators.Validators(this.chainId, _storage.getChainContext).runValidations(this);
+            return new _validators.Validators(this.chainId, _storage.getChainContext).runSpecs(this);
         }
     }]);
 

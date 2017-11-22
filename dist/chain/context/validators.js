@@ -43,7 +43,8 @@ var Validators = exports.Validators = function () {
                 var promises = validator.actions.map(function (action) {
                     switch (action) {
                         case 'require':
-                        case 'validator':
+                            return validator.runRequireValidation(context);
+                        case 'validate':
                             return validator.runValidation(context);
                         case 'default':
                             return validator.runDefault(context);
@@ -55,7 +56,6 @@ var Validators = exports.Validators = function () {
                 });
                 return Promise.all(promises);
             });
-            console.log('validators', validators);
             return Promise.all(validators);
         }
     }]);

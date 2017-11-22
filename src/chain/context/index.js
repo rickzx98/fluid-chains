@@ -28,6 +28,6 @@ export default class Context {
     }
 
     runSpecs() {
-        return new Validators(this.chainId, getChainContext).runValidations(this);
+        return new Validators(this.chainId, getChainContext).runSpecs(this);
     }
 }

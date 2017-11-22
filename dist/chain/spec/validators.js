@@ -9,29 +9,43 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Validators = exports.Validators = function () {
-    function Validators(field, contextData, specData) {
+    function Validators(field, context, specData) {
         _classCallCheck(this, Validators);
 
         this.field = field;
-        this.contextData = contextData;
+        this.context = context;
         this.specData = specData;
     }
 
     _createClass(Validators, [{
-        key: 'runValidation',
-        value: function runValidation() {
+        key: 'runRequireValidation',
+        value: function runRequireValidation() {
             var _this = this;
 
             var _specData = this.specData,
                 require = _specData.require,
-                requireMessage = _specData.requireMessage,
-                validator = _specData.validator;
+                requireMessage = _specData.requireMessage;
 
             return new Promise(function (resolve, reject) {
-                if (require && (!_this.contextData[_this.field] || _this.contextData[_this.field]() === '')) {
+                var contextData = _this.context.getData();
+                if (require && (!contextData[_this.field] || contextData[_this.field]() === '')) {
                     reject(new Error(requireMessage || 'Field ' + _this.field + ' is required.'));
-                } else if (validator) {
-                    validator(_this.contextData[_this.field] ? _this.contextData[_this.field]() : undefined).then(function () {
+                } else {
+                    resolve();
+                }
+            });
+        }
+    }, {
+        key: 'runValidation',
+        value: function runValidation() {
+            var _this2 = this;
+
+            var validator = this.specData.validator;
+
+            return new Promise(function (resolve, reject) {
+                var contextData = _this2.context.getData();
+                if (validator) {
+                    validator(contextData[_this2.field] ? contextData[_this2.field]() : undefined).then(function () {
                         resolve();
                     }).catch(function (error) {
                         reject(error);

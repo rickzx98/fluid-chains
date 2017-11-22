@@ -1,18 +1,29 @@
 export class Validators {
-    constructor(field, contextData, specData) {
+    constructor(field, context, specData) {
         this.field = field;
-        this.contextData = contextData;
+        this.context = context;
         this.specData = specData;
+    }
+    
+    runRequireValidation() {
+        const { require, requireMessage } = this.specData;
+        return new Promise((resolve, reject) => {
+            const contextData = this.context.getData();
+            if (require && (!contextData[this.field] || contextData[this.field]() === '')) {
+                reject(new Error(requireMessage || `Field ${this.field} is required.`));
+            }
+            else {
+                resolve();
+            }
+        });
     }
 
     runValidation() {
-        const { require, requireMessage, validator } = this.specData;
+        const { validator } = this.specData;
         return new Promise((resolve, reject) => {
-            if (require && (!this.contextData[this.field] || this.contextData[this.field]() === '')) {
-                reject(new Error(requireMessage || `Field ${this.field} is required.`));
-            }
-            else if (validator) {
-                validator(this.contextData[this.field] ? this.contextData[this.field]() : undefined).then(() => {
+            const contextData = this.context.getData();
+            if (validator) {
+                validator(contextData[this.field] ? contextData[this.field]() : undefined).then(() => {
                     resolve();
                 }).catch(error => {
                     reject(error);

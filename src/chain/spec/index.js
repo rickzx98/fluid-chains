@@ -37,7 +37,11 @@ export default class Spec {
     }
 
     runValidation(context) {
-        return new Validators(this.field, context.getData(), this.data).runValidation();;
+        return new Validators(this.field, context, this.data).runValidation();
+    }
+
+    runRequireValidation(context) {
+        return new Validators(this.field, context, this.data).runRequireValidation();
     }
 
     runDefault(context) {
