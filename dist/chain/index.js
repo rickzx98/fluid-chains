@@ -31,7 +31,12 @@ var Chain = exports.Chain = function () {
         (0, _storage.putChain)(name, this);
     }
 
-    _createClass(Chain, null, [{
+    _createClass(Chain, [{
+        key: 'reduce',
+        value: function reduce(field) {
+            this.reducer = field;
+        }
+    }], [{
         key: 'start',
         value: function start(chains) {
             var param = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
