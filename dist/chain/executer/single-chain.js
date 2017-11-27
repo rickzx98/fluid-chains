@@ -43,7 +43,6 @@ var SingleChain = exports.SingleChain = function () {
                         }
                     }
                 } catch (err) {
-                    console.log(err);
                     reject(err);
                 }
             });

@@ -1,22 +1,18 @@
-import { ArrayChain } from './array-chain';
-import Context from "../context/index";
-import { SingleChain } from './single-chain';
-import { generateUUID } from "../Util";
-import { getChain } from "../storage/index";
-
 export class Runner {
-    constructor(getChain, generateUUID, Context) {
+    constructor(getChain, generateUUID, Context, SingleChain, ArrayChain) {
         this.getChain = getChain;
         this.generateUUID = generateUUID;
         this.Context = Context;
+        this.SingleChain = SingleChain;
+        this.ArrayChain = ArrayChain;
     }
     start(param, chains) {
         if (chains instanceof Array) {
-            return new ArrayChain(this.getChain, this.generateUUID, this.Context,
-                new SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext)
+            return new this.ArrayChain(this.getChain, this.generateUUID, this.Context,
+                new this.SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext)
             ).start(param, chains);
         } else {
-            return new SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext)
+            return new this.SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext)
                 .start(param, chains);
         }
     }
