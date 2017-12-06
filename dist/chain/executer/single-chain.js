@@ -9,13 +9,14 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SingleChain = exports.SingleChain = function () {
-    function SingleChain(getChain, generateUUID, Context, propertyToContext) {
+    function SingleChain(getChain, generateUUID, Context, propertyToContext, Reducer) {
         _classCallCheck(this, SingleChain);
 
         this.getChain = getChain;
         this.generateUUID = generateUUID;
         this.Context = Context;
         this.propertyToContext = propertyToContext;
+        this.Reducer = Reducer;
     }
 
     _createClass(SingleChain, [{
@@ -27,19 +28,32 @@ var SingleChain = exports.SingleChain = function () {
                 try {
                     var chain = _this.getChain(chains);
                     var chainId = _this.generateUUID();
-                    var action = chain.action(param);
-                    if (action) {
-                        var context = new _this.Context(chainId);
-                        if (action instanceof Promise) {
-                            action.then(function (props) {
-                                _this.propertyToContext(context, props);
+                    if (chain.reducer && param[chain.reducer]) {
+                        var array = param[chain.reducer]();
+                        new _this.Reducer(array, param, chains, _this.getChain, _this.generateUUID, _this.Context, _this.propertyToContext).reduce(function (err, result) {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(result);
+                            }
+                        });
+                    } else {
+                        var action = chain.action(param);
+                        if (action !== undefined) {
+                            var context = new _this.Context(chainId);
+                            if (action instanceof Promise) {
+                                action.then(function (props) {
+                                    _this.propertyToContext(context, props);
+                                    resolve(context.getData());
+                                }).catch(function (err) {
+                                    return reject;
+                                });
+                            } else {
+                                _this.propertyToContext(context, action);
                                 resolve(context.getData());
-                            }).catch(function (err) {
-                                return reject;
-                            });
+                            }
                         } else {
-                            _this.propertyToContext(context, action);
-                            resolve(context.getData());
+                            resolve({});
                         }
                     }
                 } catch (err) {

@@ -31,7 +31,7 @@ function setContextValue(isValidJson, setChainContext, getChainContext, context,
      } */
     setChainContext(chainId, name, value);
     context[name] = function () {
-        return getChainContext(chainId, name);
+        return Object.freeze(getChainContext(chainId, name));
     };
 }
 

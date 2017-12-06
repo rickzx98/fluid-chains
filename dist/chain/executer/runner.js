@@ -9,7 +9,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Runner = exports.Runner = function () {
-    function Runner(getChain, generateUUID, Context, SingleChain, ArrayChain) {
+    function Runner(getChain, generateUUID, Context, SingleChain, ArrayChain, Reducer, Util) {
         _classCallCheck(this, Runner);
 
         this.getChain = getChain;
@@ -17,15 +17,18 @@ var Runner = exports.Runner = function () {
         this.Context = Context;
         this.SingleChain = SingleChain;
         this.ArrayChain = ArrayChain;
+        this.Reducer = Reducer;
+        this.Util = Util;
     }
 
     _createClass(Runner, [{
         key: 'start',
         value: function start(param, chains) {
+            var newParam = this.Util.convertToContextStructure(param);
             if (chains instanceof Array) {
-                return new this.ArrayChain(this.getChain, this.generateUUID, this.Context, new this.SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext)).start(param, chains);
+                return new this.ArrayChain(this.getChain, this.generateUUID, this.Context, new this.SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext, this.Reducer)).start(newParam, chains);
             } else {
-                return new this.SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext).start(param, chains);
+                return new this.SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext, this.Reducer).start(newParam, chains);
             }
         }
     }]);
@@ -34,7 +37,7 @@ var Runner = exports.Runner = function () {
 }();
 
 var propertyToContext = function propertyToContext(context, chainReturn) {
-    if (chainReturn) {
+    if (chainReturn !== undefined) {
         if (chainReturn instanceof Object) {
             for (var name in chainReturn) {
                 if (chainReturn.hasOwnProperty(name)) {

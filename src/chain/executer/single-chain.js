@@ -6,16 +6,25 @@ export class SingleChain {
         this.propertyToContext = propertyToContext;
         this.Reducer = Reducer;
     }
+
     start(param, chains) {
         return new Promise((resolve, reject) => {
             try {
                 const chain = this.getChain(chains);
                 const chainId = this.generateUUID();
-                const action = chain.action(param);
                 if (chain.reducer && param[chain.reducer]) {
                     const array = param[chain.reducer]();
+                    new this.Reducer(array, param, chains, this.getChain, this.generateUUID, this.Context, this.propertyToContext)
+                        .reduce((err, result)=> {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(result);
+                            }
+                        });
                 } else {
-                    if (action) {
+                    const action = chain.action(param);
+                    if (action !== undefined) {
                         const context = new this.Context(chainId);
                         if (action instanceof Promise) {
                             action.then(props => {
@@ -26,6 +35,8 @@ export class SingleChain {
                             this.propertyToContext(context, action);
                             resolve(context.getData());
                         }
+                    } else {
+                        resolve({});
                     }
                 }
             } catch (err) {

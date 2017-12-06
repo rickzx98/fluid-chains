@@ -18,7 +18,7 @@ export function setContextValue(isValidJson, setChainContext, getChainContext, c
      } */
     setChainContext(chainId, name, value);
     context[name] = () => {
-        return getChainContext(chainId, name);
+        return Object.freeze(getChainContext(chainId, name));
     }
 }
 

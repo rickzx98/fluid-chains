@@ -10,11 +10,11 @@ describe.only('Chain unit test', () => {
         new Chain('SampleChain1', (parameter) => {
             let context = {};
             context.hello = 'world!';
-            context.fromParam = parameter.hi;
+            context.fromParam = parameter.hi();
             return context;
         });
 
-        Chain.start('SampleChain1', { hi: 'initParam' })
+        Chain.start('SampleChain1', {hi: 'initParam'})
             .then(result => {
                 expect(result.hello()).to.be.equal('world!');
                 expect(result.fromParam()).to.be.equal('initParam');
@@ -30,7 +30,7 @@ describe.only('Chain unit test', () => {
         new Chain('SampleChain2', (parameter) => {
             let context = {};
             context.hello = 'world!';
-            context.fromParam = parameter.hi;
+            context.fromParam = parameter.hi();
             return new Promise((resolve) => {
                 setTimeout(() => {
                     resolve(context);
@@ -38,7 +38,7 @@ describe.only('Chain unit test', () => {
             });
         });
 
-        Chain.start('SampleChain2', { hi: 'initParam' })
+        Chain.start('SampleChain2', {hi: 'initParam'})
             .then(result => {
                 expect(result.hello()).to.be.equal('world!');
                 expect(result.fromParam()).to.be.equal('initParam');
@@ -81,12 +81,36 @@ describe.only('Chain unit test', () => {
             .then(result => {
                 expect(result._3rd()).to.be.equal('1st - 2nd - 3rd');
                 done();
-            }).catch(err => {
-                done();
-            });
+            }).catch(() => {
+            done();
+        });
     });
 
     it('executes chain with reducer', done => {
-        done();
-    })
+        new Chain('SampleChainReducer', (parameter, current) => {
+            return current + (parameter.value ? parameter.value() : 0);
+        }).reduce('sampleArray');
+
+        Chain.start('SampleChainReducer', {sampleArray: [1, 2, 3, 4, 5]})
+            .then(result => {
+                expect(result.value()).to.be.equal(15);
+                done();
+            })
+            .catch(err=>console.log);
+    });
+
+    it('executes multiple chains with reducer', done => {
+        new Chain('SampleChainReducer1', (parameter, current) => {
+            return current + (parameter.value ? parameter.value() : 0);
+        }).reduce('sampleArray');
+        new Chain('SampleChain7', (parameter) => {
+            return {sum: 5 + parameter.value()};
+        });
+        Chain.start(['SampleChainReducer1', 'SampleChain7'], {sampleArray: [1, 2, 3, 4, 5]})
+            .then(result => {
+                expect(result.sum()).to.be.equal(20);
+                done();
+            })
+            .catch(err=>console.log);
+    });
 });

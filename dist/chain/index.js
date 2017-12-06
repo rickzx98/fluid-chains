@@ -35,6 +35,7 @@ var Chain = exports.Chain = function () {
         key: 'reduce',
         value: function reduce(field) {
             this.reducer = field;
+            return this;
         }
     }], [{
         key: 'start',

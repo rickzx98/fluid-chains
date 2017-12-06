@@ -13,6 +13,8 @@ var _context = require('../context/');
 
 var _context2 = _interopRequireDefault(_context);
 
+var _reducer = require('./reducer');
+
 var _runner = require('./runner');
 
 var _singleChain = require('./single-chain');
@@ -20,6 +22,8 @@ var _singleChain = require('./single-chain');
 var _Util = require('../Util');
 
 var _storage = require('../storage/');
+
+var _util = require('./util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -33,7 +37,7 @@ var Executer = exports.Executer = function () {
     _createClass(Executer, [{
         key: 'start',
         value: function start(param, chains) {
-            return new _runner.Runner(_storage.getChain, _Util.generateUUID, _context2.default, _singleChain.SingleChain, _arrayChain.ArrayChain).start(param, chains);
+            return new _runner.Runner(_storage.getChain, _Util.generateUUID, _context2.default, _singleChain.SingleChain, _arrayChain.ArrayChain, _reducer.Reducer, _util.Util).start(param, chains);
         }
     }]);
 

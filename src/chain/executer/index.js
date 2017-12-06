@@ -5,11 +5,11 @@ import { Runner } from './runner';
 import { SingleChain } from './single-chain';
 import { generateUUID } from '../Util';
 import { getChain } from '../storage/';
-
+import {Util} from './util';
 export class Executer {
     start(param, chains) {
         return new Runner(getChain, generateUUID, Context,
             SingleChain, ArrayChain,
-            Reducer).start(param, chains);
+            Reducer, Util).start(param, chains);
     }
 }

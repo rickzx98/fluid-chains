@@ -13,5 +13,6 @@ export class Chain {
     }
     reduce(field) {
         this.reducer = field;
+        return this;
     }
 }
