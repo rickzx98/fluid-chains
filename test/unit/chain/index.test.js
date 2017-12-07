@@ -6,7 +6,7 @@ import chai from 'chai';
 const expect = chai.expect;
 
 describe('Chain unit test', () => {
-    it('executes chain', done => {
+    it.only('executes chain', done => {
         new Chain('SampleChain1', (parameter) => {
             let context = {};
             context.hello = 'world!';

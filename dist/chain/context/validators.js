@@ -19,7 +19,6 @@ var Validators = exports.Validators = function () {
         var validators = getChainContext(chainId, VALIDATORS);
         this.fieldSpecs = validators ? validators() : [];
         this.validators = validators;
-        this;
     }
 
     _createClass(Validators, [{

@@ -4,7 +4,6 @@ export class Validators {
         const validators = getChainContext(chainId, VALIDATORS);
         this.fieldSpecs = validators ? validators() : [];
         this.validators = validators;
-        this
     }
     addSpec(fieldSpec, setChainContextValue) {
         const validators = Object.assign([], [...this.fieldSpecs, fieldSpec]);

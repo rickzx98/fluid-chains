@@ -1,5 +1,5 @@
 export class Util {
-   static convertToContextStructure(param) {
+   static convertToContextStructure(param, Context, gene) {
         const newParam = {};
         for (let name in param) {
             if (param.hasOwnProperty(name)) {

@@ -29,34 +29,39 @@ var SingleChain = exports.SingleChain = function () {
                     var chain = _this.getChain(chains);
                     var param = convertParamFromSpec(initialParam, chain);
                     var chainId = _this.generateUUID();
-                    if (chain.reducer && param[chain.reducer]) {
-                        var array = param[chain.reducer]();
-                        new _this.Reducer(array, param, chains, _this.getChain, _this.generateUUID, _this.Context, _this.propertyToContext).reduce(function (err, result) {
-                            if (err) {
-                                reject(err);
-                            } else {
-                                resolve(result);
-                            }
-                        });
-                    } else {
-                        var action = chain.action(param);
-                        if (action !== undefined) {
-                            var context = new _this.Context(chainId);
-                            if (action instanceof Promise) {
-                                action.then(function (props) {
-                                    _this.propertyToContext(context, props);
-                                    resolve(context.getData());
-                                }).catch(function (err) {
-                                    return reject;
-                                });
-                            } else {
-                                _this.propertyToContext(context, action);
-                                resolve(context.getData());
-                            }
+                    var context = new _this.Context(chainId);
+                    addSpecToContext(chain.specs, context);
+                    context.runSpecs(param).then(function () {
+                        if (chain.reducer && param[chain.reducer]) {
+                            var array = param[chain.reducer]();
+                            new _this.Reducer(array, param, chains, _this.getChain, _this.generateUUID, _this.Context, _this.propertyToContext).reduce(function (err, result) {
+                                if (err) {
+                                    reject(err);
+                                } else {
+                                    resolve(result);
+                                }
+                            });
                         } else {
-                            resolve({});
+                            var action = chain.action(param);
+                            if (action !== undefined) {
+                                if (action instanceof Promise) {
+                                    action.then(function (props) {
+                                        _this.propertyToContext(context, props);
+                                        resolve(context.getData());
+                                    }).catch(function (err) {
+                                        return reject;
+                                    });
+                                } else {
+                                    _this.propertyToContext(context, action);
+                                    resolve(context.getData());
+                                }
+                            } else {
+                                resolve({});
+                            }
                         }
-                    }
+                    }).catch(function (err) {
+                        return reject;
+                    });
                 } catch (err) {
                     reject(err);
                 }
@@ -78,4 +83,12 @@ var convertParamFromSpec = function convertParamFromSpec(param, chainInstance) {
         }
     }
     return newParam;
+};
+
+var addSpecToContext = function addSpecToContext(specs, context) {
+    if (specs) {
+        specs.forEach(function (spec) {
+            context.addValidator(spec);
+        });
+    }
 };

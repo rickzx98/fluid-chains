@@ -15,33 +15,35 @@ export class SingleChain {
                 const chainId = this.generateUUID();
                 const context = new this.Context(chainId);
                 addSpecToContext(chain.specs, context);
-                if (chain.reducer && param[chain.reducer]) {
-                    const array = param[chain.reducer]();
-                    new this.Reducer(array, param, chains, this.getChain,
-                        this.generateUUID, this.Context, this.propertyToContext)
-                        .reduce((err, result) => {
-                            if (err) {
-                                reject(err);
-                            } else {
-                                resolve(result);
-                            }
-                        });
-                } else {
-                    const action = chain.action(param);
-                    if (action !== undefined) {
-                        if (action instanceof Promise) {
-                            action.then(props => {
-                                this.propertyToContext(context, props);
-                                resolve(context.getData());
-                            }).catch(err => reject);
-                        } else {
-                            this.propertyToContext(context, action);
-                            resolve(context.getData());
-                        }
+                context.runSpecs(param).then(()=> {
+                    if (chain.reducer && param[chain.reducer]) {
+                        const array = param[chain.reducer]();
+                        new this.Reducer(array, param, chains, this.getChain,
+                            this.generateUUID, this.Context, this.propertyToContext)
+                            .reduce((err, result) => {
+                                if (err) {
+                                    reject(err);
+                                } else {
+                                    resolve(result);
+                                }
+                            });
                     } else {
-                        resolve({});
+                        const action = chain.action(param);
+                        if (action !== undefined) {
+                            if (action instanceof Promise) {
+                                action.then(props => {
+                                    this.propertyToContext(context, props);
+                                    resolve(context.getData());
+                                }).catch(err => reject);
+                            } else {
+                                this.propertyToContext(context, action);
+                                resolve(context.getData());
+                            }
+                        } else {
+                            resolve({});
+                        }
                     }
-                }
+                }).catch(err=>reject);
             } catch (err) {
                 reject(err);
             }
