@@ -5,7 +5,7 @@ import chai from 'chai';
 
 const expect = chai.expect;
 
-describe.only('Chain unit test', () => {
+describe('Chain unit test', () => {
     it('executes chain', done => {
         new Chain('SampleChain1', (parameter) => {
             let context = {};
@@ -114,7 +114,7 @@ describe.only('Chain unit test', () => {
             .catch(err => console.log);
     });
 
-    it.only('should executes chain with strict mode on', done => {
+    it('should executes chain with strict mode on', done => {
         new Chain('SampleChain8', (parameter) => {
             expect(parameter.sample).to.be.not.undefined;
             expect(parameter.hello).to.be.undefined;

@@ -48,8 +48,8 @@ var Context = function () {
         }
     }, {
         key: 'runSpecs',
-        value: function runSpecs() {
-            return new _validators.Validators(this.chainId, _storage.getChainContext).runSpecs(this);
+        value: function runSpecs(context) {
+            return new _validators.Validators(this.chainId, _storage.getChainContext).runSpecs(context || this);
         }
     }]);
 

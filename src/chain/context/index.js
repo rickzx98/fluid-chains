@@ -27,7 +27,7 @@ export default class Context {
         return new Validators(this.chainId, getChainContext).runValidations(this);
     }
 
-    runSpecs() {
-        return new Validators(this.chainId, getChainContext).runSpecs(this);
+    runSpecs(context) {
+        return new Validators(this.chainId, getChainContext).runSpecs(context || this);
     }
 }

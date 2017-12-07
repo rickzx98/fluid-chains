@@ -13,9 +13,12 @@ export class SingleChain {
                 const chain = this.getChain(chains);
                 const param = convertParamFromSpec(initialParam, chain);
                 const chainId = this.generateUUID();
+                const context = new this.Context(chainId);
+                addSpecToContext(chain.specs, context);
                 if (chain.reducer && param[chain.reducer]) {
                     const array = param[chain.reducer]();
-                    new this.Reducer(array, param, chains, this.getChain, this.generateUUID, this.Context, this.propertyToContext)
+                    new this.Reducer(array, param, chains, this.getChain,
+                        this.generateUUID, this.Context, this.propertyToContext)
                         .reduce((err, result) => {
                             if (err) {
                                 reject(err);
@@ -26,7 +29,6 @@ export class SingleChain {
                 } else {
                     const action = chain.action(param);
                     if (action !== undefined) {
-                        const context = new this.Context(chainId);
                         if (action instanceof Promise) {
                             action.then(props => {
                                 this.propertyToContext(context, props);
@@ -58,4 +60,12 @@ const convertParamFromSpec = (param, chainInstance) => {
         }
     }
     return newParam;
+};
+
+const addSpecToContext = (specs, context) => {
+    if (specs) {
+        specs.forEach(spec => {
+            context.addValidator(spec);
+        });
+    }
 };
