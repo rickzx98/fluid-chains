@@ -7,15 +7,16 @@ export class SingleChain {
         this.Reducer = Reducer;
     }
 
-    start(param, chains) {
+    start(initialParam, chains) {
         return new Promise((resolve, reject) => {
             try {
                 const chain = this.getChain(chains);
+                const param = convertParamFromSpec(initialParam, chain);
                 const chainId = this.generateUUID();
                 if (chain.reducer && param[chain.reducer]) {
                     const array = param[chain.reducer]();
                     new this.Reducer(array, param, chains, this.getChain, this.generateUUID, this.Context, this.propertyToContext)
-                        .reduce((err, result)=> {
+                        .reduce((err, result) => {
                             if (err) {
                                 reject(err);
                             } else {
@@ -45,3 +46,16 @@ export class SingleChain {
         });
     }
 }
+
+const convertParamFromSpec = (param, chainInstance) => {
+    let newParam = param;
+    if (chainInstance.isStrict) {
+        newParam = {};
+        if (chainInstance.specs) {
+            chainInstance.specs.forEach(spec => {
+                newParam[spec.field] = param[spec.field];
+            });
+        }
+    }
+    return newParam;
+};

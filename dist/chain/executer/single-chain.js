@@ -21,12 +21,13 @@ var SingleChain = exports.SingleChain = function () {
 
     _createClass(SingleChain, [{
         key: "start",
-        value: function start(param, chains) {
+        value: function start(initialParam, chains) {
             var _this = this;
 
             return new Promise(function (resolve, reject) {
                 try {
                     var chain = _this.getChain(chains);
+                    var param = convertParamFromSpec(initialParam, chain);
                     var chainId = _this.generateUUID();
                     if (chain.reducer && param[chain.reducer]) {
                         var array = param[chain.reducer]();
@@ -65,3 +66,16 @@ var SingleChain = exports.SingleChain = function () {
 
     return SingleChain;
 }();
+
+var convertParamFromSpec = function convertParamFromSpec(param, chainInstance) {
+    var newParam = param;
+    if (chainInstance.isStrict) {
+        newParam = {};
+        if (chainInstance.specs) {
+            chainInstance.specs.forEach(function (spec) {
+                newParam[spec.field] = param[spec.field];
+            });
+        }
+    }
+    return newParam;
+};
