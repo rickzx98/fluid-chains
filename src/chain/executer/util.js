@@ -1,12 +1,15 @@
+
 export class Util {
-   static convertToContextStructure(param, Context, gene) {
-        const newParam = {};
-        for (let name in param) {
-            if (param.hasOwnProperty(name)) {
-                newParam[name] = ()=>
-                    Object.freeze(param[name]);
+    static convertToContextStructure(param, Context, generateUUID) {
+        if (!(param instanceof Context)) {
+            const newParam = new Context(generateUUID());
+            for (let name in param) {
+                if (param.hasOwnProperty(name)) {
+                    newParam.set(name, param[name]);
+                }
             }
+            return newParam.getData();
         }
-        return newParam;
+        return param.getData();
     }
 }

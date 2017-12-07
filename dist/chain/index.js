@@ -47,7 +47,7 @@ var Chain = exports.Chain = function () {
         value: function spec(field, json) {
             var spec = new _spec2.default(field);
             if (json.require) {
-                spec.require(json.require);
+                spec.require(json.requireMessage);
             }
             if (json.default) {
                 spec.default(json.default);

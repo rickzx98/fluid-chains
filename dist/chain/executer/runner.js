@@ -24,11 +24,11 @@ var Runner = exports.Runner = function () {
     _createClass(Runner, [{
         key: 'start',
         value: function start(param, chains) {
-            var newParam = this.Util.convertToContextStructure(param);
+            var newParam = this.Util.convertToContextStructure(param, this.Context, this.generateUUID);
             if (chains instanceof Array) {
-                return new this.ArrayChain(this.getChain, this.generateUUID, this.Context, new this.SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext, this.Reducer)).start(newParam, chains);
+                return new this.ArrayChain(this.getChain, this.generateUUID, this.Context, new this.SingleChain(this.getChain, this.Context, propertyToContext, this.Reducer)).start(newParam, chains);
             } else {
-                return new this.SingleChain(this.getChain, this.generateUUID, this.Context, propertyToContext, this.Reducer).start(newParam, chains);
+                return new this.SingleChain(this.getChain, this.Context, propertyToContext, this.Reducer).start(newParam, chains);
             }
         }
     }]);

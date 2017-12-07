@@ -20,7 +20,7 @@ export class Chain {
     spec(field, json) {
         const spec = new Spec(field);
         if (json.require) {
-            spec.require(json.require);
+            spec.require(json.requireMessage);
         }
         if (json.default) {
             spec.default(json.default);

@@ -9,14 +9,14 @@ export class Runner {
         this.Util = Util;
     }
     start(param, chains) {
-        const newParam = this.Util.convertToContextStructure(param);
+        const newParam = this.Util.convertToContextStructure(param, this.Context, this.generateUUID);
         if (chains instanceof Array) {
             return new this.ArrayChain(this.getChain, this.generateUUID, this.Context,
-                new this.SingleChain(this.getChain, this.generateUUID,
+                new this.SingleChain(this.getChain,
                     this.Context, propertyToContext, this.Reducer)
             ).start(newParam, chains);
         } else {
-            return new this.SingleChain(this.getChain, this.generateUUID,
+            return new this.SingleChain(this.getChain,
                 this.Context, propertyToContext, this.Reducer)
                 .start(newParam, chains);
         }

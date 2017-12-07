@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.getChain = getChain;
+exports.getChainDataById = getChainDataById;
 exports.getChainContext = getChainContext;
 exports.setGetChainContextPlugin = setGetChainContextPlugin;
 exports.setGetChainPlugin = setGetChainPlugin;
@@ -32,6 +33,19 @@ function getChain(storage, name) {
     chain['$chainId'] = (0, _Util.generateUUID)();
     return Object.assign({}, chain);
 }
+
+/**
+ * Gets the chain data from storage by chain id
+ * @param storage
+ * @param name
+ */
+function getChainDataById(storage, chainId) {
+    if (storage[GET_CHAIN_METHOD]) {
+        return storage[GET_CHAIN_METHOD](chainId);
+    }
+    return storage[chainId];
+}
+
 /**
  *  Gets the chain context value from storage
  * @param storage

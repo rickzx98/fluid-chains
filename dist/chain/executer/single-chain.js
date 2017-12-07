@@ -9,11 +9,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SingleChain = exports.SingleChain = function () {
-    function SingleChain(getChain, generateUUID, Context, propertyToContext, Reducer) {
+    function SingleChain(getChain, Context, propertyToContext, Reducer) {
         _classCallCheck(this, SingleChain);
 
         this.getChain = getChain;
-        this.generateUUID = generateUUID;
         this.Context = Context;
         this.propertyToContext = propertyToContext;
         this.Reducer = Reducer;
@@ -28,13 +27,12 @@ var SingleChain = exports.SingleChain = function () {
                 try {
                     var chain = _this.getChain(chains);
                     var param = convertParamFromSpec(initialParam, chain);
-                    var chainId = _this.generateUUID();
-                    var context = new _this.Context(chainId);
-                    addSpecToContext(chain.specs, context);
-                    context.runSpecs(param).then(function () {
+                    var paramAsContext = new _this.Context(initialParam.$chainId);
+                    addSpecToContext(chain.specs, paramAsContext);
+                    paramAsContext.runSpecs().then(function () {
                         if (chain.reducer && param[chain.reducer]) {
                             var array = param[chain.reducer]();
-                            new _this.Reducer(array, param, chains, _this.getChain, _this.generateUUID, _this.Context, _this.propertyToContext).reduce(function (err, result) {
+                            new _this.Reducer(array, param, chains, _this.getChain, _this.Context, _this.propertyToContext).reduce(function (err, result) {
                                 if (err) {
                                     reject(err);
                                 } else {
@@ -43,13 +41,14 @@ var SingleChain = exports.SingleChain = function () {
                             });
                         } else {
                             var action = chain.action(param);
+                            var context = new _this.Context(chain.$chainId);
                             if (action !== undefined) {
                                 if (action instanceof Promise) {
                                     action.then(function (props) {
                                         _this.propertyToContext(context, props);
                                         resolve(context.getData());
                                     }).catch(function (err) {
-                                        return reject;
+                                        reject(err);
                                     });
                                 } else {
                                     _this.propertyToContext(context, action);
@@ -60,7 +59,7 @@ var SingleChain = exports.SingleChain = function () {
                             }
                         }
                     }).catch(function (err) {
-                        return reject;
+                        reject(err);
                     });
                 } catch (err) {
                     reject(err);
@@ -88,7 +87,7 @@ var convertParamFromSpec = function convertParamFromSpec(param, chainInstance) {
 var addSpecToContext = function addSpecToContext(specs, context) {
     if (specs) {
         specs.forEach(function (spec) {
-            context.addValidator(spec);
+            context.addSpec(spec);
         });
     }
 };

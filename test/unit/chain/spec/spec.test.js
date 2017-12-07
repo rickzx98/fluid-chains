@@ -55,7 +55,7 @@ describe('spec.unit.test', () => {
         const context = new Context('_chained01');
         const spec = new Spec('defaultField');
         spec.default('defaultValue');
-        context.addValidator(spec);
+        context.addSpec(spec);
         spec.runDefault(context);
         expect(context.getData()['defaultField']).to.be.not.undefined;
         expect(context.getData()['defaultField']()).to.be.equal('defaultValue');

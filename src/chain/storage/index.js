@@ -1,11 +1,17 @@
-import { putChain as pc,
-    putChainContext as pcc,
-    setPutChainContextPlugin as setPCC,
-    setPutChainPlugin as setPC } from './put';
-import {getChain as gc,
+import {
+    getChain as gc,
     getChainContext as gcc,
-    setGetChainContextPlugin as sgcc,
-    setGetChainPlugin as sgc} from './get';
+    getChainDataById as gcdbi,
+    setGetChainPlugin as sgc,
+    setGetChainContextPlugin as sgcc
+} from './get';
+import {
+    putChain as pc,
+    putChainContext as pcc,
+    setPutChainPlugin as setPC,
+    setPutChainContextPlugin as setPCC
+} from './put';
+
 import { exists } from './exists';
 
 if (global && !global.storage) {
@@ -39,4 +45,8 @@ export function setGetChainContextPlugin(plugin) {
 }
 export function setGetChainPlugin(plugin) {
     sgc(storage, plugin);
+}
+
+export function getChainDataById(chainId) {
+    return gcdbi(storage, chainId);
 }

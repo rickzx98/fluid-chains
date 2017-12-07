@@ -9,14 +9,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Reducer = exports.Reducer = function () {
-    function Reducer(array, param, chainName, getChain, generateUUID, Context, propertyToContext) {
+    function Reducer(array, param, chainName, getChain, Context, propertyToContext) {
         _classCallCheck(this, Reducer);
 
         this.array = array;
         this.param = param;
         this.chainName = chainName;
         this.getChain = getChain;
-        this.generateUUID = generateUUID;
         this.Context = Context;
         this.propertyToContext = propertyToContext;
     }
@@ -34,9 +33,8 @@ var Reducer = exports.Reducer = function () {
                 if (this.array && this.array.length > index) {
                     var currentValue = this.array[index];
                     var action = chain.action(Object.assign(this.param, accumulated), currentValue, index);
-                    var chainId = this.generateUUID();
                     if (action !== undefined) {
-                        var context = new this.Context(chainId);
+                        var context = new this.Context(chain.$chainId);
                         if (action instanceof Promise) {
                             action.then(function (props) {
                                 _this.propertyToContext(context, props);

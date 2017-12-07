@@ -1,4 +1,4 @@
-import { getChain, getChainContext, putChainContext } from '../storage/';
+import { getChainContext, getChainDataById, putChainContext } from '../storage/';
 
 import { GetContext } from './get';
 import { Validators } from './validators';
@@ -14,13 +14,13 @@ export default class Context {
         setContextValue(isValidJson, putChainContext, getChainContext, this, this.chainId, name, value);
     }
 
-    addValidator(fieldSpec) {
+    addSpec(fieldSpec) {
         new Validators(this.chainId, getChainContext)
             .addSpec(fieldSpec, this.set.bind(this));
     }
 
     getData() {
-        return new GetContext(this.chainId, getChain).getContext();
+        return new GetContext(this.chainId, getChainDataById).getContext();
     }
 
     validate() {

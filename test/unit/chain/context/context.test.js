@@ -24,7 +24,7 @@ describe('context.unit.test', () => {
         const context = new Context('0003');
         expect(context).to.be.not.undefined;
         context.set('sampleField', 'sampleValue');
-        context.addValidator({ name: 'spec' });
+        context.addSpec({ name: 'spec' });
         const contextData = context.getData();
         expect(contextData.sampleField).to.be.not.undefined;
         expect(contextData.sampleField()).to.be.equal('sampleValue');
@@ -39,8 +39,8 @@ describe('context.unit.test', () => {
         const spec2 = new Spec('field_2');
         spec2.require('Field 2 is required');
 
-        context.addValidator(spec);
-        context.addValidator(spec2);
+        context.addSpec(spec);
+        context.addSpec(spec2);
         context.set('field_1', 'value');
         context.runSpecs().catch(error => {
             expect(error.message).to.be.equal('Field 2 is required'); done();
@@ -62,7 +62,7 @@ describe('context.unit.test', () => {
         spec.validate((currentValue) => new Promise((resolve, reject) => {
             resolve();
         }));
-        context.addValidator(spec);
+        context.addSpec(spec);
 
         context.runSpecs().then(() => {
             const { translatedField, field_1 } = context.getData();

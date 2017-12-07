@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -11,15 +11,16 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var GetContext = exports.GetContext = function () {
-    function GetContext(chainId, getChain) {
+    function GetContext(chainId, getChainDataById) {
         _classCallCheck(this, GetContext);
 
-        var currentChain = getChain(chainId);
+        var currentChain = getChainDataById(chainId);
+        console.log('currentChain', currentChain);
         this.context = Object.assign({}, _extends({}, currentChain));
     }
 
     _createClass(GetContext, [{
-        key: "getContext",
+        key: 'getContext',
         value: function getContext() {
             return this.context;
         }

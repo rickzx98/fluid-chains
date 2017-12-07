@@ -32,14 +32,14 @@ var Context = function () {
             (0, _set.setContextValue)(_Util.isValidJson, _storage.putChainContext, _storage.getChainContext, this, this.chainId, name, value);
         }
     }, {
-        key: 'addValidator',
-        value: function addValidator(fieldSpec) {
+        key: 'addSpec',
+        value: function addSpec(fieldSpec) {
             new _validators.Validators(this.chainId, _storage.getChainContext).addSpec(fieldSpec, this.set.bind(this));
         }
     }, {
         key: 'getData',
         value: function getData() {
-            return new _get.GetContext(this.chainId, _storage.getChain).getContext();
+            return new _get.GetContext(this.chainId, _storage.getChainDataById).getContext();
         }
     }, {
         key: 'validate',

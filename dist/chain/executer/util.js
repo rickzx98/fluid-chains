@@ -15,21 +15,17 @@ var Util = exports.Util = function () {
 
     _createClass(Util, null, [{
         key: "convertToContextStructure",
-        value: function convertToContextStructure(param) {
-            var newParam = {};
-
-            var _loop = function _loop(name) {
-                if (param.hasOwnProperty(name)) {
-                    newParam[name] = function () {
-                        return Object.freeze(param[name]);
-                    };
+        value: function convertToContextStructure(param, Context, generateUUID) {
+            if (!(param instanceof Context)) {
+                var newParam = new Context(generateUUID());
+                for (var name in param) {
+                    if (param.hasOwnProperty(name)) {
+                        newParam.set(name, param[name]);
+                    }
                 }
-            };
-
-            for (var name in param) {
-                _loop(name);
+                return newParam.getData();
             }
-            return newParam;
+            return param.getData();
         }
     }]);
 

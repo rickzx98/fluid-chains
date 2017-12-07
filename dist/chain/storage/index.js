@@ -11,10 +11,11 @@ exports.setPutChainPlugin = setPutChainPlugin;
 exports.setPutChainContextPlugin = setPutChainContextPlugin;
 exports.setGetChainContextPlugin = setGetChainContextPlugin;
 exports.setGetChainPlugin = setGetChainPlugin;
-
-var _put = require('./put');
+exports.getChainDataById = getChainDataById;
 
 var _get = require('./get');
+
+var _put = require('./put');
 
 var _exists = require('./exists');
 
@@ -49,4 +50,8 @@ function setGetChainContextPlugin(plugin) {
 }
 function setGetChainPlugin(plugin) {
     (0, _get.setGetChainPlugin)(storage, plugin);
+}
+
+function getChainDataById(chainId) {
+    return (0, _get.getChainDataById)(storage, chainId);
 }

@@ -1,10 +1,9 @@
 export class Reducer {
-    constructor(array, param, chainName, getChain, generateUUID, Context, propertyToContext) {
+    constructor(array, param, chainName, getChain, Context, propertyToContext) {
         this.array = array;
         this.param = param;
         this.chainName = chainName;
         this.getChain = getChain;
-        this.generateUUID = generateUUID;
         this.Context = Context;
         this.propertyToContext = propertyToContext;
     }
@@ -15,9 +14,8 @@ export class Reducer {
             if (this.array && this.array.length > index) {
                 const currentValue = this.array[index];
                 const action = chain.action(Object.assign(this.param, accumulated), currentValue, index);
-                const chainId = this.generateUUID();
                 if (action !== undefined) {
-                    const context = new this.Context(chainId);
+                    const context = new this.Context(chain.$chainId);
                     if (action instanceof Promise) {
                         action.then(props => {
                             this.propertyToContext(context, props);

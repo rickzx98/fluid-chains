@@ -1,6 +1,8 @@
 const GET_CHAIN_METHOD = 'GET_CHAIN_PLUGIN';
 const GET_CHAIN_CONTEXT_METHOD = 'GET_CHAIN_CONTEXT_PLUGIN';
-import {generateUUID} from '../Util';
+
+import { generateUUID } from '../Util';
+
 /**
  * Gets the chain instance from storage
  * @param storage
@@ -14,6 +16,19 @@ export function getChain(storage, name) {
     chain['$chainId'] = generateUUID();
     return Object.assign({}, chain);
 }
+
+/**
+ * Gets the chain data from storage by chain id
+ * @param storage
+ * @param name
+ */
+export function getChainDataById(storage, chainId) {
+    if (storage[GET_CHAIN_METHOD]) {
+        return storage[GET_CHAIN_METHOD](chainId);
+    }
+    return storage[chainId];
+}
+
 /**
  *  Gets the chain context value from storage
  * @param storage

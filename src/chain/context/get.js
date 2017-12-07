@@ -1,6 +1,7 @@
 export class GetContext {
-    constructor(chainId, getChain) {
-        const currentChain = getChain(chainId);
+    constructor(chainId, getChainDataById) {
+        const currentChain = getChainDataById(chainId);
+        console.log('currentChain', currentChain);
         this.context = Object.assign({}, { ...currentChain });
     }
     getContext() {

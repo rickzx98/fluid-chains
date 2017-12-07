@@ -18,7 +18,6 @@ var Validators = exports.Validators = function () {
 
         var validators = getChainContext(chainId, VALIDATORS);
         this.fieldSpecs = validators ? validators() : [];
-        this.validators = validators;
     }
 
     _createClass(Validators, [{
@@ -30,7 +29,7 @@ var Validators = exports.Validators = function () {
     }, {
         key: 'runValidations',
         value: function runValidations(context) {
-            var validators = this.validators().map(function (validator) {
+            var validators = this.fieldSpecs.map(function (validator) {
                 return validator.runValidation(context);
             });
             return Promise.all(validators);
@@ -38,7 +37,7 @@ var Validators = exports.Validators = function () {
     }, {
         key: 'runSpecs',
         value: function runSpecs(context) {
-            var validators = this.validators().map(function (validator) {
+            var validators = this.fieldSpecs.map(function (validator) {
                 var promises = validator.actions.map(function (action) {
                     switch (action) {
                         case 'require':
@@ -55,7 +54,11 @@ var Validators = exports.Validators = function () {
                 });
                 return Promise.all(promises);
             });
-            return Promise.all(validators);
+            return Promise.all(validators).catch(function (err) {
+                return new Promise(function (resolve, reject) {
+                    reject(err);
+                });
+            });
         }
     }]);
 

@@ -1,7 +1,6 @@
 export class SingleChain {
-    constructor(getChain, generateUUID, Context, propertyToContext, Reducer) {
+    constructor(getChain, Context, propertyToContext, Reducer) {
         this.getChain = getChain;
-        this.generateUUID = generateUUID;
         this.Context = Context;
         this.propertyToContext = propertyToContext;
         this.Reducer = Reducer;
@@ -12,14 +11,13 @@ export class SingleChain {
             try {
                 const chain = this.getChain(chains);
                 const param = convertParamFromSpec(initialParam, chain);
-                const chainId = this.generateUUID();
-                const context = new this.Context(chainId);
-                addSpecToContext(chain.specs, context);
-                context.runSpecs(param).then(()=> {
+                const paramAsContext = new this.Context(initialParam.$chainId);
+                addSpecToContext(chain.specs, paramAsContext);
+                paramAsContext.runSpecs().then(() => {
                     if (chain.reducer && param[chain.reducer]) {
                         const array = param[chain.reducer]();
                         new this.Reducer(array, param, chains, this.getChain,
-                            this.generateUUID, this.Context, this.propertyToContext)
+                            this.Context, this.propertyToContext)
                             .reduce((err, result) => {
                                 if (err) {
                                     reject(err);
@@ -29,12 +27,13 @@ export class SingleChain {
                             });
                     } else {
                         const action = chain.action(param);
+                        const context = new this.Context(chain.$chainId);
                         if (action !== undefined) {
                             if (action instanceof Promise) {
                                 action.then(props => {
                                     this.propertyToContext(context, props);
                                     resolve(context.getData());
-                                }).catch(err => reject);
+                                }).catch(err => { reject(err); });
                             } else {
                                 this.propertyToContext(context, action);
                                 resolve(context.getData());
@@ -43,7 +42,7 @@ export class SingleChain {
                             resolve({});
                         }
                     }
-                }).catch(err=>reject);
+                }).catch(err => { reject(err); });
             } catch (err) {
                 reject(err);
             }
@@ -67,7 +66,8 @@ const convertParamFromSpec = (param, chainInstance) => {
 const addSpecToContext = (specs, context) => {
     if (specs) {
         specs.forEach(spec => {
-            context.addValidator(spec);
+            context.addSpec(spec);
         });
+
     }
 };
