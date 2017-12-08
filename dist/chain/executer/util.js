@@ -17,7 +17,7 @@ var Util = exports.Util = function () {
         key: "convertToContextStructure",
         value: function convertToContextStructure(param, Context, generateUUID) {
             if (!(param instanceof Context)) {
-                var newParam = new Context(generateUUID());
+                var newParam = Context.createContext(generateUUID());
                 for (var name in param) {
                     if (param.hasOwnProperty(name)) {
                         newParam.set(name, param[name]);

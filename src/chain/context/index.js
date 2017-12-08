@@ -1,8 +1,7 @@
 import { getChainContext, getChainDataById, putChainContext } from '../storage/';
 
 import { GetContext } from './get';
-import { Validators } from './validators';
-import { isValidJson } from '../Util';
+import { Validators } from './validators';;
 import { setContextValue } from './set';
 
 export default class Context {
@@ -11,7 +10,7 @@ export default class Context {
     }
 
     set(name, value) {
-        setContextValue(isValidJson, putChainContext, getChainContext, this, this.chainId, name, value);
+        setContextValue(putChainContext, getChainContext, this, this.chainId, name, value);
     }
 
     addSpec(fieldSpec) {
@@ -29,5 +28,11 @@ export default class Context {
 
     runSpecs(context) {
         return new Validators(this.chainId, getChainContext).runSpecs(context || this);
+    }
+
+    static createContext(chainId){
+        const context = new Context(chainId);
+        context.set('$chainId', chainId);
+        return context;
     }
 }

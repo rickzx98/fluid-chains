@@ -32,7 +32,7 @@ export class Validators {
                                 return validator.runTranslate(context);
                         }
                     }
-                )
+                );
                 return Promise.all(promises);
             });
         return Promise.all(validators)

@@ -13,11 +13,11 @@ var _get = require('./get');
 
 var _validators = require('./validators');
 
-var _Util = require('../Util');
-
 var _set = require('./set');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+;
 
 var Context = function () {
     function Context(chainId) {
@@ -29,7 +29,7 @@ var Context = function () {
     _createClass(Context, [{
         key: 'set',
         value: function set(name, value) {
-            (0, _set.setContextValue)(_Util.isValidJson, _storage.putChainContext, _storage.getChainContext, this, this.chainId, name, value);
+            (0, _set.setContextValue)(_storage.putChainContext, _storage.getChainContext, this, this.chainId, name, value);
         }
     }, {
         key: 'addSpec',
@@ -50,6 +50,13 @@ var Context = function () {
         key: 'runSpecs',
         value: function runSpecs(context) {
             return new _validators.Validators(this.chainId, _storage.getChainContext).runSpecs(context || this);
+        }
+    }], [{
+        key: 'createContext',
+        value: function createContext(chainId) {
+            var context = new Context(chainId);
+            context.set('$chainId', chainId);
+            return context;
         }
     }]);
 

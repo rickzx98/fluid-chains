@@ -21,7 +21,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * @param name
  * @param value
  */
-function setContextValue(isValidJson, setChainContext, getChainContext, context, chainId, name, value) {
+function setContextValue(setChainContext, getChainContext, context, chainId, name, value) {
     if (value instanceof Function) {
         throw new FunctionAsValueException();
     }

@@ -8,7 +8,7 @@
  * @param name
  * @param value
  */
-export function setContextValue(isValidJson, setChainContext, getChainContext, context, chainId, name, value) {
+export function setContextValue(setChainContext, getChainContext, context, chainId, name, value) {
     if (value instanceof Function) {
         throw new FunctionAsValueException();
     }

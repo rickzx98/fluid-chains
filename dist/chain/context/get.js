@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -15,12 +15,11 @@ var GetContext = exports.GetContext = function () {
         _classCallCheck(this, GetContext);
 
         var currentChain = getChainDataById(chainId);
-        console.log('currentChain', currentChain);
         this.context = Object.assign({}, _extends({}, currentChain));
     }
 
     _createClass(GetContext, [{
-        key: 'getContext',
+        key: "getContext",
         value: function getContext() {
             return this.context;
         }

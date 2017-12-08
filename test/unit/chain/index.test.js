@@ -14,7 +14,7 @@ describe('Chain unit test', () => {
             return context;
         });
 
-        Chain.start('SampleChain1', { hi: 'initParam' })
+        Chain.start('SampleChain1', {hi: 'initParam'})
             .then(result => {
                 expect(result.hello()).to.be.equal('world!');
                 expect(result.fromParam()).to.be.equal('initParam');
@@ -38,7 +38,7 @@ describe('Chain unit test', () => {
             });
         });
 
-        Chain.start('SampleChain2', { hi: 'initParam' })
+        Chain.start('SampleChain2', {hi: 'initParam'})
             .then(result => {
                 expect(result.hello()).to.be.equal('world!');
                 expect(result.fromParam()).to.be.equal('initParam');
@@ -82,8 +82,8 @@ describe('Chain unit test', () => {
                 expect(result._3rd()).to.be.equal('1st - 2nd - 3rd');
                 done();
             }).catch(() => {
-                done();
-            });
+            done();
+        });
     });
 
     it('executes chain with reducer', done => {
@@ -91,7 +91,7 @@ describe('Chain unit test', () => {
             return current + (parameter.value ? parameter.value() : 0);
         }).reduce('sampleArray');
 
-        Chain.start('SampleChainReducer', { sampleArray: [1, 2, 3, 4, 5] })
+        Chain.start('SampleChainReducer', {sampleArray: [1, 2, 3, 4, 5]})
             .then(result => {
                 expect(result.value()).to.be.equal(15);
                 done();
@@ -104,9 +104,9 @@ describe('Chain unit test', () => {
             return current + (parameter.value ? parameter.value() : 0);
         }).reduce('sampleArray');
         new Chain('SampleChain7', (parameter) => {
-            return { sum: 5 + parameter.value() };
+            return {sum: 5 + parameter.value()};
         });
-        Chain.start(['SampleChainReducer1', 'SampleChain7'], { sampleArray: [1, 2, 3, 4, 5] })
+        Chain.start(['SampleChainReducer1', 'SampleChain7'], {sampleArray: [1, 2, 3, 4, 5]})
             .then(result => {
                 expect(result.sum()).to.be.equal(20);
                 done();
@@ -114,7 +114,7 @@ describe('Chain unit test', () => {
             .catch(err => console.log);
     });
 
-    it.only('should executes chain with strict mode on', done => {
+    it('should executes chain with strict mode on', done => {
         new Chain('SampleChain8', (parameter) => {
             expect(parameter.sample).to.be.not.undefined;
             expect(parameter.hello).to.be.undefined;

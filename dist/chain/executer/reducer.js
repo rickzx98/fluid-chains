@@ -9,13 +9,12 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Reducer = exports.Reducer = function () {
-    function Reducer(array, param, chainName, getChain, Context, propertyToContext) {
+    function Reducer(array, param, chain, Context, propertyToContext) {
         _classCallCheck(this, Reducer);
 
         this.array = array;
         this.param = param;
-        this.chainName = chainName;
-        this.getChain = getChain;
+        this.chain = chain;
         this.Context = Context;
         this.propertyToContext = propertyToContext;
     }
@@ -29,25 +28,24 @@ var Reducer = exports.Reducer = function () {
             var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
             try {
-                var chain = this.getChain(this.chainName);
                 if (this.array && this.array.length > index) {
                     var currentValue = this.array[index];
-                    var action = chain.action(Object.assign(this.param, accumulated), currentValue, index);
+                    var action = this.chain.action(Object.assign(this.param, accumulated), currentValue, index);
                     if (action !== undefined) {
-                        var context = new this.Context(chain.$chainId);
+                        var context = new this.Context(this.chain.$chainId);
                         if (action instanceof Promise) {
                             action.then(function (props) {
                                 _this.propertyToContext(context, props);
-                                new Reducer(_this.array, _this.param, _this.chainName, _this.getChain, _this.generateUUID, _this.Context, _this.propertyToContext).reduce(done, context.getData(), ++index);
+                                new Reducer(_this.array, _this.param, _this.chain, _this.Context, _this.propertyToContext).reduce(done, context.getData(), ++index);
                             }).catch(function (err) {
-                                return reject;
+                                return done;
                             });
                         } else {
                             this.propertyToContext(context, action);
-                            new Reducer(this.array, this.param, this.chainName, this.getChain, this.generateUUID, this.Context, this.propertyToContext).reduce(done, context.getData(), ++index);
+                            new Reducer(this.array, this.param, this.chain, this.Context, this.propertyToContext).reduce(done, context.getData(), ++index);
                         }
                     } else {
-                        new Reducer(this.array, this.param, this.chainName, this.getChain, this.generateUUID, this.Context, this.propertyToContext).reduce(done, accumulated, ++index);
+                        new Reducer(this.array, this.param, this.chain, this.Context, this.propertyToContext).reduce(done, accumulated, ++index);
                     }
                 } else {
                     done(undefined, accumulated);

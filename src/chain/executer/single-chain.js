@@ -11,12 +11,12 @@ export class SingleChain {
             try {
                 const chain = this.getChain(chains);
                 const param = convertParamFromSpec(initialParam, chain);
-                const paramAsContext = new this.Context(initialParam.$chainId);
+                const paramAsContext = new this.Context(initialParam.$chainId());
                 addSpecToContext(chain.specs, paramAsContext);
                 paramAsContext.runSpecs().then(() => {
                     if (chain.reducer && param[chain.reducer]) {
                         const array = param[chain.reducer]();
-                        new this.Reducer(array, param, chains, this.getChain,
+                        new this.Reducer(array, param, chain,
                             this.Context, this.propertyToContext)
                             .reduce((err, result) => {
                                 if (err) {
@@ -27,13 +27,15 @@ export class SingleChain {
                             });
                     } else {
                         const action = chain.action(param);
-                        const context = new this.Context(chain.$chainId);
+                        const context = this.Context.createContext(chain.$chainId);
                         if (action !== undefined) {
                             if (action instanceof Promise) {
                                 action.then(props => {
                                     this.propertyToContext(context, props);
                                     resolve(context.getData());
-                                }).catch(err => { reject(err); });
+                                }).catch(err => {
+                                    reject(err);
+                                });
                             } else {
                                 this.propertyToContext(context, action);
                                 resolve(context.getData());
@@ -42,7 +44,9 @@ export class SingleChain {
                             resolve({});
                         }
                     }
-                }).catch(err => { reject(err); });
+                }).catch(err => {
+                    reject(err);
+                });
             } catch (err) {
                 reject(err);
             }

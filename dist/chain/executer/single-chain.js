@@ -27,12 +27,12 @@ var SingleChain = exports.SingleChain = function () {
                 try {
                     var chain = _this.getChain(chains);
                     var param = convertParamFromSpec(initialParam, chain);
-                    var paramAsContext = new _this.Context(initialParam.$chainId);
+                    var paramAsContext = new _this.Context(initialParam.$chainId());
                     addSpecToContext(chain.specs, paramAsContext);
                     paramAsContext.runSpecs().then(function () {
                         if (chain.reducer && param[chain.reducer]) {
                             var array = param[chain.reducer]();
-                            new _this.Reducer(array, param, chains, _this.getChain, _this.Context, _this.propertyToContext).reduce(function (err, result) {
+                            new _this.Reducer(array, param, chain, _this.Context, _this.propertyToContext).reduce(function (err, result) {
                                 if (err) {
                                     reject(err);
                                 } else {
@@ -41,7 +41,7 @@ var SingleChain = exports.SingleChain = function () {
                             });
                         } else {
                             var action = chain.action(param);
-                            var context = new _this.Context(chain.$chainId);
+                            var context = _this.Context.createContext(chain.$chainId);
                             if (action !== undefined) {
                                 if (action instanceof Promise) {
                                     action.then(function (props) {
