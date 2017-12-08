@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -21,7 +21,7 @@ var SingleChain = exports.SingleChain = function () {
     }
 
     _createClass(SingleChain, [{
-        key: "start",
+        key: 'start',
         value: function start(initialParam, chains) {
             var _this = this;
 
@@ -34,34 +34,36 @@ var SingleChain = exports.SingleChain = function () {
                         addSpecToContext(chain.specs, paramAsContext);
                         paramAsContext.runSpecs().then(function () {
                             var param = convertParamFromSpec(paramAsContext.getData(), chain);
-                            if (chain.reducer && param[chain.reducer]) {
-                                var array = param[chain.reducer]();
-                                new _this.Reducer(array, param, chain, _this.Context, _this.propertyToContext).reduce(function (err, result) {
-                                    if (err) {
-                                        reject(err);
-                                    } else {
-                                        resolve(result);
-                                    }
-                                });
-                            } else {
-                                var action = chain.action(param);
-                                var context = _this.Context.createContext(chain.$chainId);
-                                if (action !== undefined) {
-                                    if (action instanceof Promise) {
-                                        action.then(function (props) {
-                                            _this.propertyToContext(context, props);
-                                            resolve(context.getData());
-                                        }).catch(function (err) {
+                            onStartChain(chain, param, resolve, reject, _this.Context, function () {
+                                if (chain.reducer && param[chain.reducer]) {
+                                    var array = param[chain.reducer]();
+                                    new _this.Reducer(array, param, chain, _this.Context, _this.propertyToContext).reduce(function (err, result) {
+                                        if (err) {
                                             reject(err);
-                                        });
+                                        } else {
+                                            resolve(result);
+                                        }
+                                    });
+                                } else {
+                                    var action = chain.action(param);
+                                    var context = _this.Context.createContext(chain.$chainId);
+                                    if (action !== undefined) {
+                                        if (action instanceof Promise) {
+                                            action.then(function (props) {
+                                                _this.propertyToContext(context, props);
+                                                resolve(context.getData());
+                                            }).catch(function (err) {
+                                                reject(err);
+                                            });
+                                        } else {
+                                            _this.propertyToContext(context, action);
+                                            resolve(context.getData());
+                                        }
                                     } else {
-                                        _this.propertyToContext(context, action);
                                         resolve(context.getData());
                                     }
-                                } else {
-                                    resolve({});
                                 }
-                            }
+                            });
                         }).catch(function (err) {
                             reject(err);
                         });
@@ -76,6 +78,29 @@ var SingleChain = exports.SingleChain = function () {
     return SingleChain;
 }();
 
+var onStartChain = function onStartChain(chain, param, resolve, reject, Context, next) {
+    try {
+        var onStart = chain.onStart(param);
+        if (onStart instanceof Promise) {
+            onStart.then(function (con) {
+                if (con) {
+                    next();
+                } else {
+                    resolve(Context.createContext(chain.$chainId).getData());
+                }
+            }).catch(function (err) {
+                reject(err);
+            });
+        } else if (onStart) {
+            console.log('next');
+            next();
+        } else {
+            resolve(Context.createContext(chain.$chainId).getData());
+        }
+    } catch (err) {
+        reject(err);
+    }
+};
 var convertParamFromSpec = function convertParamFromSpec(param, chainInstance) {
     var newParam = param;
     if (chainInstance.isStrict) {

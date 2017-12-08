@@ -14,7 +14,7 @@ describe('Chain unit test', () => {
             return context;
         });
 
-        Chain.start('SampleChain1', {hi: 'initParam'})
+        Chain.start('SampleChain1', { hi: 'initParam' })
             .then(result => {
                 expect(result.hello()).to.be.equal('world!');
                 expect(result.fromParam()).to.be.equal('initParam');
@@ -38,7 +38,7 @@ describe('Chain unit test', () => {
             });
         });
 
-        Chain.start('SampleChain2', {hi: 'initParam'})
+        Chain.start('SampleChain2', { hi: 'initParam' })
             .then(result => {
                 expect(result.hello()).to.be.equal('world!');
                 expect(result.fromParam()).to.be.equal('initParam');
@@ -82,8 +82,8 @@ describe('Chain unit test', () => {
                 expect(result._3rd()).to.be.equal('1st - 2nd - 3rd');
                 done();
             }).catch(() => {
-            done();
-        });
+                done();
+            });
     });
 
     it('executes chain with reducer', done => {
@@ -91,7 +91,7 @@ describe('Chain unit test', () => {
             return current + (parameter.value ? parameter.value() : 0);
         }).reduce('sampleArray');
 
-        Chain.start('SampleChainReducer', {sampleArray: [1, 2, 3, 4, 5]})
+        Chain.start('SampleChainReducer', { sampleArray: [1, 2, 3, 4, 5] })
             .then(result => {
                 expect(result.value()).to.be.equal(15);
                 done();
@@ -104,9 +104,9 @@ describe('Chain unit test', () => {
             return current + (parameter.value ? parameter.value() : 0);
         }).reduce('sampleArray');
         new Chain('SampleChain7', (parameter) => {
-            return {sum: 5 + parameter.value()};
+            return { sum: 5 + parameter.value() };
         });
-        Chain.start(['SampleChainReducer1', 'SampleChain7'], {sampleArray: [1, 2, 3, 4, 5]})
+        Chain.start(['SampleChainReducer1', 'SampleChain7'], { sampleArray: [1, 2, 3, 4, 5] })
             .then(result => {
                 expect(result.sum()).to.be.equal(20);
                 done();
@@ -139,8 +139,8 @@ describe('Chain unit test', () => {
         new Chain('SampleChain9', (parameter) => {
             expect(parameter.sample()).to.be.equal('hello');
         }).spec('sample', {
-            transform: ()=> {
-                return new Promise((resolve)=> {
+            transform: () => {
+                return new Promise((resolve) => {
                     resolve('hello');
                 });
             }
@@ -159,8 +159,8 @@ describe('Chain unit test', () => {
         new Chain('SampleChain10', (parameter) => {
             expect(parameter.something()).to.be.equal('sweet');
         }).spec('sample', {
-            translate: (value, context)=> {
-                return new Promise((resolve)=> {
+            translate: (value, context) => {
+                return new Promise((resolve) => {
                     expect(value).to.be.equal('sample');
                     context.set('something', 'sweet');
                     resolve();
@@ -177,12 +177,12 @@ describe('Chain unit test', () => {
         });
     });
 
-    it('should executes chain with custom validator', done=> {
+    it('should executes chain with custom validator', done => {
         new Chain('SampleChain11', (parameter) => {
             expect(parameter.sample()).to.be.equal('sample');
         }).spec('sample', {
-            validate: (value)=> {
-                return new Promise((resolve)=> {
+            validate: (value) => {
+                return new Promise((resolve) => {
                     resolve(value === 'sample');
                 });
             }
@@ -194,17 +194,34 @@ describe('Chain unit test', () => {
         new Chain('SampleChain12', (parameter) => {
             expect(parameter.sample).to.be.undefined;
         }).spec('sample', {
-            validate: (value)=> {
-                return new Promise((resolve, reject)=> {
+            validate: (value) => {
+                return new Promise((resolve, reject) => {
                     if (value !== 'sample') {
                         reject('Value should be sample');
                     }
                 });
             }
         });
-        Chain.start('SampleChain12', {value: 'false'}).catch(err => {
+        Chain.start('SampleChain12', { value: 'false' }).catch(err => {
             expect(err.error).to.be.equal('Value should be sample');
             done();
         });
+    });
+
+    it.only('should run onStart function before starting a chain', done => {
+        let ifIStarted = false;
+        new Chain('SampleChain13', (param) => {
+
+        }).onStart((param) => {
+            console.log('onStartestt', param);
+            ifIStarted = true;
+            return true;
+        });
+
+        Chain.start('SampleChain13', {})
+            .then(() => {
+                expect(ifIStarted).to.be.true;
+                done();
+            });
     });
 });

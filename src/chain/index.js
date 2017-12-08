@@ -8,6 +8,9 @@ export class Chain {
     constructor(name, action = (parameter) => { }) {
         this.action = action;
         this.specs = [];
+        this.onStart = () => true;
+        this.onComplete = () => { };
+        this.onFail = () => { };
         putChain(name, this);
     }
     static start(chains, param = {}) {
@@ -41,8 +44,17 @@ export class Chain {
         this.isStrict = true;
         return this;
     }
-    cached(keyFields) {
-        this.isCached = true;
+    onStart(onStart) {
+        console.log('setOnstart', onStart);
+        this.onStart = onStart;
         return this;
     }
+    onComplete(onComplete) {
+        this.onComplete = onComplete;
+        return this;
+    }
+    onFail(onFail) {
+        this.onFail = onFail;
+        return this;
+    };
 }

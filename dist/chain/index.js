@@ -25,7 +25,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Chain = exports.Chain = function () {
+var Chain = function () {
     function Chain(name) {
         var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (parameter) {};
 
@@ -33,6 +33,11 @@ var Chain = exports.Chain = function () {
 
         this.action = action;
         this.specs = [];
+        this.onStart = function () {
+            return true;
+        };
+        this.onComplete = function () {};
+        this.onFail = function () {};
         (0, _storage.putChain)(name, this);
     }
 
@@ -71,9 +76,22 @@ var Chain = exports.Chain = function () {
             return this;
         }
     }, {
-        key: 'cached',
-        value: function cached(keyFields) {
-            this.isCached = true;
+        key: 'onStart',
+        value: function onStart(_onStart) {
+            console.log('setOnstart', _onStart);
+            this.onStart = _onStart;
+            return this;
+        }
+    }, {
+        key: 'onComplete',
+        value: function onComplete(_onComplete) {
+            this.onComplete = _onComplete;
+            return this;
+        }
+    }, {
+        key: 'onFail',
+        value: function onFail(_onFail) {
+            this.onFail = _onFail;
             return this;
         }
     }], [{
@@ -87,3 +105,5 @@ var Chain = exports.Chain = function () {
 
     return Chain;
 }();
+
+exports.Chain = Chain;
