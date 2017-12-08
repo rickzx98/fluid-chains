@@ -1,7 +1,7 @@
 import { getChainContext, getChainDataById, putChainContext } from '../storage/';
 
 import { GetContext } from './get';
-import { Validators } from './validators';;
+import { Validators } from './validators';
 import { setContextValue } from './set';
 
 export default class Context {
