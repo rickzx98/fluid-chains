@@ -1,15 +1,18 @@
 export class SingleChain {
-    constructor(getChain, Context, propertyToContext, Reducer) {
+    constructor(getChain, Context, propertyToContext, Reducer, addChainToStack, stackId) {
         this.getChain = getChain;
         this.Context = Context;
         this.propertyToContext = propertyToContext;
         this.Reducer = Reducer;
+        this.addChainToStack = addChainToStack;
+        this.stackId = stackId;
     }
 
     start(initialParam, chains) {
         return new Promise((resolve, reject) => {
             try {
                 const chain = this.getChain(chains);
+                this.addChainToStack(this.stackId, chain.$chainId);
                 const param = convertParamFromSpec(initialParam, chain);
                 const paramAsContext = new this.Context(initialParam.$chainId());
                 addSpecToContext(chain.specs, paramAsContext);

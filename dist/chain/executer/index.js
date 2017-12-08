@@ -37,7 +37,7 @@ var Executer = exports.Executer = function () {
     _createClass(Executer, [{
         key: 'start',
         value: function start(param, chains) {
-            return new _runner.Runner(_storage.getChain, _Util.generateUUID, _context2.default, _singleChain.SingleChain, _arrayChain.ArrayChain, _reducer.Reducer, _util.Util).start(param, chains);
+            return new _runner.Runner(_storage.getChain, _Util.generateUUID, _context2.default, _singleChain.SingleChain, _arrayChain.ArrayChain, _reducer.Reducer, _util.Util, _storage.createExecutionStack, _storage.addChainToStack, _storage.deleteStack).start(param, chains);
         }
     }]);
 

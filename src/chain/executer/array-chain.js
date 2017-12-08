@@ -5,6 +5,7 @@ export class ArrayChain {
         this.Context = Context;
         this.singleChain = singleChain;
     }
+
     start(param, chains) {
         return executeArrayChains(param, this.getChain, this.generateUUID, this.Context, chains, this.singleChain);
     }
@@ -21,7 +22,7 @@ const executeArrayChains = (param, getChain, generateUUID, Context, array, singl
             }
         }, param, singleChain);
     });
-}
+};
 
 const executeArrayChain = (param, getChain, generateUUID, Context, array = [], done, defaultParam, singleChain) => {
     const chain = array.shift();
@@ -41,4 +42,4 @@ const executeArrayChain = (param, getChain, generateUUID, Context, array = [], d
             }
         }).catch(err => done);
 
-}
+};

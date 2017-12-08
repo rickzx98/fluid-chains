@@ -9,13 +9,15 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SingleChain = exports.SingleChain = function () {
-    function SingleChain(getChain, Context, propertyToContext, Reducer) {
+    function SingleChain(getChain, Context, propertyToContext, Reducer, addChainToStack, stackId) {
         _classCallCheck(this, SingleChain);
 
         this.getChain = getChain;
         this.Context = Context;
         this.propertyToContext = propertyToContext;
         this.Reducer = Reducer;
+        this.addChainToStack = addChainToStack;
+        this.stackId = stackId;
     }
 
     _createClass(SingleChain, [{
@@ -26,6 +28,7 @@ var SingleChain = exports.SingleChain = function () {
             return new Promise(function (resolve, reject) {
                 try {
                     var chain = _this.getChain(chains);
+                    _this.addChainToStack(_this.stackId, chain.$chainId);
                     var param = convertParamFromSpec(initialParam, chain);
                     var paramAsContext = new _this.Context(initialParam.$chainId());
                     addSpecToContext(chain.specs, paramAsContext);
