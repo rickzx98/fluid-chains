@@ -99,7 +99,7 @@ describe('Chain unit test', () => {
             .catch(err => console.log);
     });
 
-    it('executes multiple chains with reducer', done => {
+    it.only('executes multiple chains with reducer', done => {
         new Chain('SampleChainReducer1', (parameter, current) => {
             return current + (parameter.value ? parameter.value() : 0);
         }).reduce('sampleArray');
@@ -111,7 +111,10 @@ describe('Chain unit test', () => {
                 expect(result.sum()).to.be.equal(20);
                 done();
             })
-            .catch(err => console.log);
+            .catch(err => {
+                console.log(err);
+                done();
+            });
     });
 
     it('should executes chain with strict mode on', done => {
@@ -125,6 +128,26 @@ describe('Chain unit test', () => {
             sample: 'sample',
             hello: 'hello'
         }).then(() => {
+            done();
+        }).catch(err => {
+            console.log(err);
+            done();
+        });
+    });
+
+    it('should executes chain with transform spec', done => {
+        new Chain('SampleChain9', (parameter) => {
+            console.log('parameter', parameter.sample);
+        }).spec('sample', {
+            transform: ()=> {
+                return new Promise((resolve)=> {
+                    resolve('hello');
+                });
+            }
+        });
+        Chain.start('SampleChain9', {
+            sample: 'sample'
+        }).then((res) => {
             done();
         }).catch(err => {
             console.log(err);

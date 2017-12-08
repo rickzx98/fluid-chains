@@ -13,26 +13,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 /**
  * Sets context value
- * @param isValidJson
  * @param setChainContext
- * @param getChainContext
- * @param context
  * @param chainId
  * @param name
  * @param value
  */
-function setContextValue(setChainContext, getChainContext, context, chainId, name, value) {
+function setContextValue(setChainContext, chainId, name, value) {
     if (value instanceof Function) {
         throw new FunctionAsValueException();
     }
-    /* TODO: Why?? 
-    else if (!isValidJson(value)) {
-         throw new InvalidJSONValueException(value);
-     } */
     setChainContext(chainId, name, value);
-    context[name] = function () {
-        return Object.freeze(getChainContext(chainId, name));
-    };
 }
 
 var FunctionAsValueException = function (_Error) {

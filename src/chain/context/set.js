@@ -1,25 +1,15 @@
 /**
  * Sets context value
- * @param isValidJson
  * @param setChainContext
- * @param getChainContext
- * @param context
  * @param chainId
  * @param name
  * @param value
  */
-export function setContextValue(setChainContext, getChainContext, context, chainId, name, value) {
+export function setContextValue(setChainContext, chainId, name, value) {
     if (value instanceof Function) {
         throw new FunctionAsValueException();
     }
-    /* TODO: Why?? 
-    else if (!isValidJson(value)) {
-         throw new InvalidJSONValueException(value);
-     } */
     setChainContext(chainId, name, value);
-    context[name] = () => {
-        return Object.freeze(getChainContext(chainId, name));
-    }
 }
 
 class FunctionAsValueException extends Error {

@@ -45,9 +45,10 @@ var putChainContext = exports.putChainContext = function putChainContext(storage
         if (!storage[chainId]) {
             storage[chainId] = {};
         }
-        storage[chainId][field] = function () {
-            return value;
+        var frozenValue = function frozenValue() {
+            return Object.freeze(value);
         };
+        storage[chainId][field] = frozenValue.bind(storage[chainId]);
     }
 };
 

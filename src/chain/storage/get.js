@@ -20,7 +20,7 @@ export function getChain(storage, name) {
 /**
  * Gets the chain data from storage by chain id
  * @param storage
- * @param name
+ * @param chainId
  */
 export function getChainDataById(storage, chainId) {
     if (storage[GET_CHAIN_METHOD]) {

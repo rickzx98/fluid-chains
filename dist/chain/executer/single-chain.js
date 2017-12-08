@@ -26,47 +26,49 @@ var SingleChain = exports.SingleChain = function () {
             var _this = this;
 
             return new Promise(function (resolve, reject) {
-                try {
-                    var chain = _this.getChain(chains);
-                    _this.addChainToStack(_this.stackId, chain.$chainId);
-                    var param = convertParamFromSpec(initialParam, chain);
-                    var paramAsContext = new _this.Context(initialParam.$chainId());
-                    addSpecToContext(chain.specs, paramAsContext);
-                    paramAsContext.runSpecs().then(function () {
-                        if (chain.reducer && param[chain.reducer]) {
-                            var array = param[chain.reducer]();
-                            new _this.Reducer(array, param, chain, _this.Context, _this.propertyToContext).reduce(function (err, result) {
-                                if (err) {
-                                    reject(err);
-                                } else {
-                                    resolve(result);
-                                }
-                            });
-                        } else {
-                            var action = chain.action(param);
-                            var context = _this.Context.createContext(chain.$chainId);
-                            if (action !== undefined) {
-                                if (action instanceof Promise) {
-                                    action.then(function (props) {
-                                        _this.propertyToContext(context, props);
-                                        resolve(context.getData());
-                                    }).catch(function (err) {
+                setTimeout(function () {
+                    try {
+                        var chain = _this.getChain(chains);
+                        _this.addChainToStack(_this.stackId, chain.$chainId);
+                        var paramAsContext = new _this.Context(initialParam.$chainId());
+                        addSpecToContext(chain.specs, paramAsContext);
+                        paramAsContext.runSpecs().then(function () {
+                            var param = convertParamFromSpec(paramAsContext.getData(), chain);
+                            if (chain.reducer && param[chain.reducer]) {
+                                var array = param[chain.reducer]();
+                                new _this.Reducer(array, param, chain, _this.Context, _this.propertyToContext).reduce(function (err, result) {
+                                    if (err) {
                                         reject(err);
-                                    });
-                                } else {
-                                    _this.propertyToContext(context, action);
-                                    resolve(context.getData());
-                                }
+                                    } else {
+                                        resolve(result);
+                                    }
+                                });
                             } else {
-                                resolve({});
+                                var action = chain.action(param);
+                                var context = _this.Context.createContext(chain.$chainId);
+                                if (action !== undefined) {
+                                    if (action instanceof Promise) {
+                                        action.then(function (props) {
+                                            _this.propertyToContext(context, props);
+                                            resolve(context.getData());
+                                        }).catch(function (err) {
+                                            reject(err);
+                                        });
+                                    } else {
+                                        _this.propertyToContext(context, action);
+                                        resolve(context.getData());
+                                    }
+                                } else {
+                                    resolve({});
+                                }
                             }
-                        }
-                    }).catch(function (err) {
+                        }).catch(function (err) {
+                            reject(err);
+                        });
+                    } catch (err) {
                         reject(err);
-                    });
-                } catch (err) {
-                    reject(err);
-                }
+                    }
+                });
             });
         }
     }]);
