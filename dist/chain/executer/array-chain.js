@@ -49,11 +49,12 @@ var executeArrayChain = function executeArrayChain(param, getChain, generateUUID
     var chain = array.shift();
     singleChain.start(param, chain).then(function (result) {
         if (array.length) {
-            executeArrayChain(Object.assign(defaultParam, result), getChain, generateUUID, Context, array, done, defaultParam, singleChain);
+            var newParam = Object.assign(defaultParam, result);
+            executeArrayChain(newParam, getChain, generateUUID, Context, array, done, defaultParam, singleChain);
         } else {
             done(undefined, result);
         }
     }).catch(function (err) {
-        return done;
+        done(err);
     });
 };

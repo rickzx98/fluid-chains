@@ -99,7 +99,7 @@ describe('Chain unit test', () => {
             .catch(err => console.log);
     });
 
-    it.only('executes multiple chains with reducer', done => {
+    it('executes multiple chains with reducer', done => {
         new Chain('SampleChainReducer1', (parameter, current) => {
             return current + (parameter.value ? parameter.value() : 0);
         }).reduce('sampleArray');
@@ -137,7 +137,7 @@ describe('Chain unit test', () => {
 
     it('should executes chain with transform spec', done => {
         new Chain('SampleChain9', (parameter) => {
-            console.log('parameter', parameter.sample);
+            expect(parameter.sample()).to.be.equal('hello');
         }).spec('sample', {
             transform: ()=> {
                 return new Promise((resolve)=> {
@@ -147,10 +147,63 @@ describe('Chain unit test', () => {
         });
         Chain.start('SampleChain9', {
             sample: 'sample'
-        }).then((res) => {
+        }).then(() => {
             done();
         }).catch(err => {
             console.log(err);
+            done();
+        });
+    });
+
+    it('should execute chain with translate spec', done => {
+        new Chain('SampleChain10', (parameter) => {
+            expect(parameter.something()).to.be.equal('sweet');
+        }).spec('sample', {
+            translate: (value, context)=> {
+                return new Promise((resolve)=> {
+                    expect(value).to.be.equal('sample');
+                    context.set('something', 'sweet');
+                    resolve();
+                });
+            }
+        });
+        Chain.start('SampleChain10', {
+            sample: 'sample'
+        }).then(() => {
+            done();
+        }).catch(err => {
+            console.log(err);
+            done();
+        });
+    });
+
+    it('should executes chain with custom validator', done=> {
+        new Chain('SampleChain11', (parameter) => {
+            expect(parameter.sample()).to.be.equal('sample');
+        }).spec('sample', {
+            validate: (value)=> {
+                return new Promise((resolve)=> {
+                    resolve(value === 'sample');
+                });
+            }
+        });
+        Chain.start('SampleChain11', {
+            sample: 'sample'
+        });
+
+        new Chain('SampleChain12', (parameter) => {
+            expect(parameter.sample).to.be.undefined;
+        }).spec('sample', {
+            validate: (value)=> {
+                return new Promise((resolve, reject)=> {
+                    if (value !== 'sample') {
+                        reject('Value should be sample');
+                    }
+                });
+            }
+        });
+        Chain.start('SampleChain12', {value: 'false'}).catch(err => {
+            expect(err.error).to.be.equal('Value should be sample');
             done();
         });
     });

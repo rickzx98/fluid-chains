@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -9,7 +9,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Reducer = exports.Reducer = function () {
-    function Reducer(array, param, chain, Context, propertyToContext) {
+    function Reducer(array, param, chain, Context, propertyToContext, contextInstance) {
         _classCallCheck(this, Reducer);
 
         this.array = array;
@@ -17,10 +17,11 @@ var Reducer = exports.Reducer = function () {
         this.chain = chain;
         this.Context = Context;
         this.propertyToContext = propertyToContext;
+        this.context = contextInstance || Context.createContext(chain.$chainId);
     }
 
     _createClass(Reducer, [{
-        key: 'reduce',
+        key: "reduce",
         value: function reduce(done) {
             var _this = this;
 
@@ -31,23 +32,21 @@ var Reducer = exports.Reducer = function () {
                 try {
                     if (_this.array && _this.array.length > index) {
                         var currentValue = _this.array[index];
-                        console.log('param', _this.param.sampleArray());
                         var action = _this.chain.action(Object.assign(_this.param, accumulated), currentValue, index);
                         if (action !== undefined) {
-                            var context = new _this.Context(_this.chain.$chainId);
                             if (action instanceof Promise) {
                                 action.then(function (props) {
-                                    _this.propertyToContext(context, props);
-                                    new Reducer(_this.array, _this.param, _this.chain, _this.Context, _this.propertyToContext).reduce(done, context.getData(), ++index);
+                                    _this.propertyToContext(_this.context, props);
+                                    new Reducer(_this.array, _this.param, _this.chain, _this.Context, _this.propertyToContext, _this.context).reduce(done, _this.context.getData(), ++index);
                                 }).catch(function (err) {
                                     return done;
                                 });
                             } else {
-                                _this.propertyToContext(context, action);
-                                new Reducer(_this.array, _this.param, _this.chain, _this.Context, _this.propertyToContext).reduce(done, context.getData(), ++index);
+                                _this.propertyToContext(_this.context, action);
+                                new Reducer(_this.array, _this.param, _this.chain, _this.Context, _this.propertyToContext, _this.context).reduce(done, _this.context.getData(), ++index);
                             }
                         } else {
-                            new Reducer(_this.array, _this.param, _this.chain, _this.Context, _this.propertyToContext).reduce(done, accumulated, ++index);
+                            new Reducer(_this.array, _this.param, _this.chain, _this.Context, _this.propertyToContext, _this.context).reduce(done, accumulated, ++index);
                         }
                     } else {
                         done(undefined, accumulated);

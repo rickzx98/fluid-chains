@@ -24,12 +24,14 @@ const executeArrayChains = (param, getChain, generateUUID, Context, array, singl
     });
 };
 
-const executeArrayChain = (param, getChain, generateUUID, Context, array = [], done, defaultParam, singleChain) => {
+const executeArrayChain = (param, getChain, generateUUID, Context, array = [], done,
+                           defaultParam, singleChain) => {
     const chain = array.shift();
     singleChain.start(param, chain)
         .then(result => {
             if (array.length) {
-                executeArrayChain(Object.assign(defaultParam, result),
+                const newParam = Object.assign(defaultParam, result);
+                executeArrayChain(newParam,
                     getChain,
                     generateUUID,
                     Context,
@@ -40,6 +42,8 @@ const executeArrayChain = (param, getChain, generateUUID, Context, array = [], d
             } else {
                 done(undefined, result);
             }
-        }).catch(err => done);
+        }).catch(err => {
+        done(err);
+    });
 
 };

@@ -18,36 +18,36 @@ var _set = require('./set');
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Context = function () {
-    function Context(chainId) {
+    function Context($chainId) {
         _classCallCheck(this, Context);
 
-        this.chainId = chainId;
+        this.$chainId = $chainId;
     }
 
     _createClass(Context, [{
         key: 'set',
         value: function set(name, value) {
-            (0, _set.setContextValue)(_storage.putChainContext, this.chainId, name, value);
+            (0, _set.setContextValue)(_storage.putChainContext, this.$chainId, name, value);
         }
     }, {
         key: 'addSpec',
         value: function addSpec(fieldSpec) {
-            new _validators.Validators(this.chainId, _storage.getChainContext.bind(this)).addSpec(fieldSpec, this.set.bind(this));
+            new _validators.Validators(this.$chainId, _storage.getChainContext.bind(this)).addSpec(fieldSpec, this.set.bind(this));
         }
     }, {
         key: 'getData',
         value: function getData() {
-            return new _get.GetContext(this.chainId, _storage.getChainDataById.bind(this)).getContext();
+            return new _get.GetContext(this.$chainId, _storage.getChainDataById.bind(this)).getContext();
         }
     }, {
         key: 'validate',
         value: function validate() {
-            return new _validators.Validators(this.chainId, _storage.getChainContext.bind(this)).runValidations(this);
+            return new _validators.Validators(this.$chainId, _storage.getChainContext.bind(this)).runValidations(this);
         }
     }, {
         key: 'runSpecs',
         value: function runSpecs() {
-            return new _validators.Validators(this.chainId, _storage.getChainContext.bind(this)).runSpecs(this);
+            return new _validators.Validators(this.$chainId, _storage.getChainContext.bind(this)).runSpecs(this);
         }
     }], [{
         key: 'createContext',
