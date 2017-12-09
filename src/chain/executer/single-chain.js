@@ -18,7 +18,7 @@ export class SingleChain {
                     addSpecToContext(chain.specs, paramAsContext);
                     paramAsContext.runSpecs().then(() => {
                         const param = convertParamFromSpec(paramAsContext.getData(), chain);
-                        onStartChain(chain, param, resolve, reject, this.Context, () => {
+                        onBeforeChain(chain, param, resolve, reject, this.Context, () => {
                             if (chain.reducer && param[chain.reducer]) {
                                 const array = param[chain.reducer]();
                                 new this.Reducer(array, param, chain,
@@ -61,11 +61,11 @@ export class SingleChain {
         });
     }
 }
-const onStartChain = (chain, param, resolve, reject, Context, next) => {
+const onBeforeChain = (chain, param, resolve, reject, Context, next) => {
     try {
-        const onStart = chain.onStart(param);
-        if (onStart instanceof Promise) {
-            onStart.then(con => {
+        const onbefore = chain.onbefore(param);
+        if (onbefore instanceof Promise) {
+            onbefore.then(con => {
                 if (con) {
                     next();
                 } else {
@@ -74,8 +74,7 @@ const onStartChain = (chain, param, resolve, reject, Context, next) => {
             }).catch(err => {
                 reject(err);
             })
-        } else if (onStart) {
-            console.log('next');
+        } else if (onbefore) {
             next();
         } else {
             resolve(Context.createContext(chain.$chainId).getData());

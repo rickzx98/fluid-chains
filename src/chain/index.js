@@ -5,16 +5,27 @@ import { generateUUID } from './Util';
 import { putChain } from './storage/';
 
 export class Chain {
-    constructor(name, action = (parameter) => { }) {
+    constructor(name, action = (parameter) => { }, sequence = []) {
         this.action = action;
         this.specs = [];
-        this.onStart = () => true;
-        this.onComplete = () => { };
-        this.onFail = () => { };
+        this.onbefore = () => true;
+        this.oncomplete = () => { };
+        this.onfail = () => { };
+        this.sequence = sequence || [];
+        if (!this.sequence.length) {
+            this.sequence.push(name);
+        }
         putChain(name, this);
     }
     static start(chains, param = {}) {
         return new Executer().start(param, chains);
+    }
+    static create(name) {
+        return new Chain(name);
+    }
+    connect(name) {
+        this.sequence.push(name);
+        return new Chain(name, () => { }, this.sequence);
     }
     reduce(field) {
         this.reducer = field;
@@ -44,17 +55,24 @@ export class Chain {
         this.isStrict = true;
         return this;
     }
-    onStart(onStart) {
-        console.log('setOnstart', onStart);
-        this.onStart = onStart;
+    onStart(action) {
+        this.action = action;
+        return this;
+    }
+    onBefore(onbefore) {
+        this.onbefore = onbefore;
         return this;
     }
     onComplete(onComplete) {
-        this.onComplete = onComplete;
+        this.oncomplete = onComplete;
         return this;
     }
     onFail(onFail) {
-        this.onFail = onFail;
+        this.onfail = onFail;
         return this;
     };
+
+    execute(param) {
+        return Chain.start(this.sequence || this.name, param);
+    }
 }

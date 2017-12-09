@@ -28,20 +28,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Chain = function () {
     function Chain(name) {
         var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (parameter) {};
+        var sequence = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
         _classCallCheck(this, Chain);
 
         this.action = action;
         this.specs = [];
-        this.onStart = function () {
+        this.onbefore = function () {
             return true;
         };
-        this.onComplete = function () {};
-        this.onFail = function () {};
+        this.oncomplete = function () {};
+        this.onfail = function () {};
+        this.sequence = sequence || [];
+        if (!this.sequence.length) {
+            this.sequence.push(name);
+        }
         (0, _storage.putChain)(name, this);
     }
 
     _createClass(Chain, [{
+        key: 'connect',
+        value: function connect(name) {
+            this.sequence.push(name);
+            return new Chain(name, function () {}, this.sequence);
+        }
+    }, {
         key: 'reduce',
         value: function reduce(field) {
             this.reducer = field;
@@ -77,22 +88,32 @@ var Chain = function () {
         }
     }, {
         key: 'onStart',
-        value: function onStart(_onStart) {
-            console.log('setOnstart', _onStart);
-            this.onStart = _onStart;
+        value: function onStart(action) {
+            this.action = action;
+            return this;
+        }
+    }, {
+        key: 'onBefore',
+        value: function onBefore(onbefore) {
+            this.onbefore = onbefore;
             return this;
         }
     }, {
         key: 'onComplete',
         value: function onComplete(_onComplete) {
-            this.onComplete = _onComplete;
+            this.oncomplete = _onComplete;
             return this;
         }
     }, {
         key: 'onFail',
         value: function onFail(_onFail) {
-            this.onFail = _onFail;
+            this.onfail = _onFail;
             return this;
+        }
+    }, {
+        key: 'execute',
+        value: function execute(param) {
+            return Chain.start(this.sequence || this.name, param);
         }
     }], [{
         key: 'start',
@@ -100,6 +121,11 @@ var Chain = function () {
             var param = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
             return new _executer.Executer().start(param, chains);
+        }
+    }, {
+        key: 'create',
+        value: function create(name) {
+            return new Chain(name);
         }
     }]);
 

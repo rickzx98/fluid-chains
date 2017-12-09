@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -21,7 +21,7 @@ var SingleChain = exports.SingleChain = function () {
     }
 
     _createClass(SingleChain, [{
-        key: 'start',
+        key: "start",
         value: function start(initialParam, chains) {
             var _this = this;
 
@@ -34,7 +34,7 @@ var SingleChain = exports.SingleChain = function () {
                         addSpecToContext(chain.specs, paramAsContext);
                         paramAsContext.runSpecs().then(function () {
                             var param = convertParamFromSpec(paramAsContext.getData(), chain);
-                            onStartChain(chain, param, resolve, reject, _this.Context, function () {
+                            onBeforeChain(chain, param, resolve, reject, _this.Context, function () {
                                 if (chain.reducer && param[chain.reducer]) {
                                     var array = param[chain.reducer]();
                                     new _this.Reducer(array, param, chain, _this.Context, _this.propertyToContext).reduce(function (err, result) {
@@ -78,11 +78,11 @@ var SingleChain = exports.SingleChain = function () {
     return SingleChain;
 }();
 
-var onStartChain = function onStartChain(chain, param, resolve, reject, Context, next) {
+var onBeforeChain = function onBeforeChain(chain, param, resolve, reject, Context, next) {
     try {
-        var onStart = chain.onStart(param);
-        if (onStart instanceof Promise) {
-            onStart.then(function (con) {
+        var onbefore = chain.onbefore(param);
+        if (onbefore instanceof Promise) {
+            onbefore.then(function (con) {
                 if (con) {
                     next();
                 } else {
@@ -91,8 +91,7 @@ var onStartChain = function onStartChain(chain, param, resolve, reject, Context,
             }).catch(function (err) {
                 reject(err);
             });
-        } else if (onStart) {
-            console.log('next');
+        } else if (onbefore) {
             next();
         } else {
             resolve(Context.createContext(chain.$chainId).getData());

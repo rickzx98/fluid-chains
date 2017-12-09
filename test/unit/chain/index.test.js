@@ -208,20 +208,30 @@ describe('Chain unit test', () => {
         });
     });
 
-    it.only('should run onStart function before starting a chain', done => {
+    it('should run onStart function before starting a chain', done => {
         let ifIStarted = false;
-        new Chain('SampleChain13', (param) => {
-
-        }).onStart((param) => {
-            console.log('onStartestt', param);
-            ifIStarted = true;
-            return true;
-        });
-
-        Chain.start('SampleChain13', {})
-            .then(() => {
-                expect(ifIStarted).to.be.true;
+        Chain
+            .create('SampleChain13')
+            .onStart((param) => {
+                return {
+                    status: 'I ran'
+                };
+            })
+            .onBefore((param) => {
+                ifIStarted = true;
+                return true;
+            })
+            .connect('SampleChain14')
+            .onStart(() => 'I ran 14')
+            .onBefore(() => { ifIStarted = false; return false; })
+            .execute()
+            .then((result) => {
+                expect(ifIStarted).to.be.false;
+                done();
+            }).catch(err => {
+                console.log(err);
                 done();
             });
     });
+
 });
