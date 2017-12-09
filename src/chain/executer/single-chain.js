@@ -11,21 +11,23 @@ export class SingleChain {
     start(initialParam, chains) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
+                const chain = this.getChain(chains);
                 try {
-                    const chain = this.getChain(chains);
                     this.addChainToStack(this.stackId, chain.$chainId);
                     const paramAsContext = new this.Context(initialParam.$chainId());
                     addSpecToContext(chain.specs, paramAsContext);
                     paramAsContext.runSpecs().then(() => {
                         const param = convertParamFromSpec(paramAsContext.getData(), chain);
-                        onBeforeChain(chain, param, resolve, reject, this.Context, () => {
+                        onBeforeChain(chain, param, resolve, (err) => {
+                            onFailChain(chain, err, resolve.bind(this), reject.bind(this), this, initialParam, chains);
+                        }, this.Context, () => {
                             if (chain.reducer && param[chain.reducer]) {
                                 const array = param[chain.reducer]();
                                 new this.Reducer(array, param, chain,
                                     this.Context, this.propertyToContext)
                                     .reduce((err, result) => {
                                         if (err) {
-                                            reject(err);
+                                            onFailChain(chain, err, resolve.bind(this), reject.bind(this), this, initialParam, chains);
                                         } else {
                                             resolve(result);
                                         }
@@ -39,7 +41,7 @@ export class SingleChain {
                                             this.propertyToContext(context, props);
                                             resolve(context.getData());
                                         }).catch(err => {
-                                            reject(err);
+                                            onFailChain(chain, err, resolve.bind(this), reject.bind(this), this, initialParam, chains);
                                         });
                                     } else {
                                         this.propertyToContext(context, action);
@@ -52,10 +54,10 @@ export class SingleChain {
                         });
 
                     }).catch(err => {
-                        reject(err);
+                        onFailChain(chain, err, resolve.bind(this), reject.bind(this), this, initialParam, chains);
                     });
                 } catch (err) {
-                    reject(err);
+                    onFailChain(chain, err, resolve.bind(this), reject.bind(this), this, initialParam, chains);
                 }
             });
         });
@@ -82,8 +84,21 @@ const onBeforeChain = (chain, param, resolve, reject, Context, next) => {
     } catch (err) {
         reject(err);
     }
+};
 
-}
+const onFailChain = (chain, error, resolve, reject, singleChain, initialParam, chains) => {
+    if (chain.onfail) {
+        chain.onfail(error, () => {
+            singleChain.start(initialParam, chains)
+                .then(result => { resolve(result); })
+                .catch(err => { reject(err); });
+        }, () => {
+            reject(error);
+        });
+    } else {
+        reject(error);
+    }
+};
 const convertParamFromSpec = (param, chainInstance) => {
     let newParam = param;
     if (chainInstance.isStrict) {

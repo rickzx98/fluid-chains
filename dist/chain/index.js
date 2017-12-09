@@ -37,8 +37,6 @@ var Chain = function () {
         this.onbefore = function () {
             return true;
         };
-        this.oncomplete = function () {};
-        this.onfail = function () {};
         this.sequence = sequence || [];
         if (!this.sequence.length) {
             this.sequence.push(name);
@@ -96,12 +94,6 @@ var Chain = function () {
         key: 'onBefore',
         value: function onBefore(onbefore) {
             this.onbefore = onbefore;
-            return this;
-        }
-    }, {
-        key: 'onComplete',
-        value: function onComplete(_onComplete) {
-            this.oncomplete = _onComplete;
             return this;
         }
     }, {

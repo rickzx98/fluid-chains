@@ -27,19 +27,21 @@ var SingleChain = exports.SingleChain = function () {
 
             return new Promise(function (resolve, reject) {
                 setTimeout(function () {
+                    var chain = _this.getChain(chains);
                     try {
-                        var chain = _this.getChain(chains);
                         _this.addChainToStack(_this.stackId, chain.$chainId);
                         var paramAsContext = new _this.Context(initialParam.$chainId());
                         addSpecToContext(chain.specs, paramAsContext);
                         paramAsContext.runSpecs().then(function () {
                             var param = convertParamFromSpec(paramAsContext.getData(), chain);
-                            onBeforeChain(chain, param, resolve, reject, _this.Context, function () {
+                            onBeforeChain(chain, param, resolve, function (err) {
+                                onFailChain(chain, err, resolve.bind(_this), reject.bind(_this), _this, initialParam, chains);
+                            }, _this.Context, function () {
                                 if (chain.reducer && param[chain.reducer]) {
                                     var array = param[chain.reducer]();
                                     new _this.Reducer(array, param, chain, _this.Context, _this.propertyToContext).reduce(function (err, result) {
                                         if (err) {
-                                            reject(err);
+                                            onFailChain(chain, err, resolve.bind(_this), reject.bind(_this), _this, initialParam, chains);
                                         } else {
                                             resolve(result);
                                         }
@@ -53,7 +55,7 @@ var SingleChain = exports.SingleChain = function () {
                                                 _this.propertyToContext(context, props);
                                                 resolve(context.getData());
                                             }).catch(function (err) {
-                                                reject(err);
+                                                onFailChain(chain, err, resolve.bind(_this), reject.bind(_this), _this, initialParam, chains);
                                             });
                                         } else {
                                             _this.propertyToContext(context, action);
@@ -65,10 +67,10 @@ var SingleChain = exports.SingleChain = function () {
                                 }
                             });
                         }).catch(function (err) {
-                            reject(err);
+                            onFailChain(chain, err, resolve.bind(_this), reject.bind(_this), _this, initialParam, chains);
                         });
                     } catch (err) {
-                        reject(err);
+                        onFailChain(chain, err, resolve.bind(_this), reject.bind(_this), _this, initialParam, chains);
                     }
                 });
             });
@@ -98,6 +100,22 @@ var onBeforeChain = function onBeforeChain(chain, param, resolve, reject, Contex
         }
     } catch (err) {
         reject(err);
+    }
+};
+
+var onFailChain = function onFailChain(chain, error, resolve, reject, singleChain, initialParam, chains) {
+    if (chain.onfail) {
+        chain.onfail(error, function () {
+            singleChain.start(initialParam, chains).then(function (result) {
+                resolve(result);
+            }).catch(function (err) {
+                reject(err);
+            });
+        }, function () {
+            reject(error);
+        });
+    } else {
+        reject(error);
     }
 };
 var convertParamFromSpec = function convertParamFromSpec(param, chainInstance) {

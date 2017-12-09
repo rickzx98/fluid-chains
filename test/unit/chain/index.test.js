@@ -234,4 +234,39 @@ describe('Chain unit test', () => {
             });
     });
 
+    it('should trigger onFail function is a chain has failed', done => {
+        Chain.create('SampleChain15')
+            .onStart(() => {
+                throw new Error('I failed');
+            })
+            .onFail((error, retry, reject) => {
+                expect(error.message).to.be.equal('I failed');
+                reject();
+            })
+            .execute()
+            .catch(err => {
+                done();
+            });
+    });
+    it('should retry when chain has failed', done => {
+        let retried = false;
+        Chain.create('SampleChain16')
+            .onStart(() => {
+                if (!retried) {
+                    throw new Error('I failed');
+                } else {
+                    return 'done';
+                }
+            })
+            .onFail((error, retry) => {
+                retried = true;
+                console.log('retried', retried);
+                retry();
+            })
+            .execute()
+            .then(result => {
+                expect(result.value()).to.be.equal('done');
+                done();
+            }).catch(err => console.log);
+    });
 });

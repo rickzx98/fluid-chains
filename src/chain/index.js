@@ -9,8 +9,6 @@ export class Chain {
         this.action = action;
         this.specs = [];
         this.onbefore = () => true;
-        this.oncomplete = () => { };
-        this.onfail = () => { };
         this.sequence = sequence || [];
         if (!this.sequence.length) {
             this.sequence.push(name);
@@ -61,10 +59,6 @@ export class Chain {
     }
     onBefore(onbefore) {
         this.onbefore = onbefore;
-        return this;
-    }
-    onComplete(onComplete) {
-        this.oncomplete = onComplete;
         return this;
     }
     onFail(onFail) {
