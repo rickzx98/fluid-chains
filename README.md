@@ -1,5 +1,5 @@
 # [Fluid-chains](https://rickzx98.github.io/fluid-chains/)
-
+### This project has been redesigned and moved to [fluid-func](https://github.com/rickzx98/fluid-func)
 [![NPM Download Stats](https://nodei.co/npm/fluid-chains.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/fluid-chains)
 
 A simple way to organize asynchronous Javascript functions that looks like this:
